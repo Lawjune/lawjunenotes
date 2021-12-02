@@ -6,9 +6,10 @@
 sudo apt install build-essential
 ```
 
-*Install vscode plugins:
-* C/C++ IntelliSense
-* Code Runner*
+\*Install vscode plugins:
+
+- C/C++ IntelliSense
+- Code Runner\*
 
 ```cpp
 #include <iostream>
@@ -22,7 +23,7 @@ int main() {
 
 https://www.onlinegdb.com/online_c++_compiler
 
-## Ep#2 - Main() Function and Hello World! 
+## Ep#2 - Main() Function and Hello World!
 
 ```cpp
 int main(int argc, char *argv[]) {
@@ -40,9 +41,9 @@ int main() {
 }
 ```
 
-## Ep#3 - Basic Data Types Explained 
+## Ep#3 - Basic Data Types Explained
 
-**int 
+**int
 integer 1,2,3... -1,-2,-3...
 4 bytes = 32 bits**
 
@@ -66,7 +67,6 @@ double floating point number
 valueless
 2/4/8 bytes depending on the platform**
 
-
 **string**
 
 ## Ep#4 - Declare and Assign Variables
@@ -76,7 +76,7 @@ valueless
 using namespace std;
 
 int main() {
-    
+
     // datatype variable_name;
     // datatype variable_name = iniital_value;
 
@@ -108,9 +108,10 @@ https://code.visualstudio.com/docs/cpp/config-linux
 cout << sizeof(char) << " bytes"<< endl;
 ```
 
-*1 byte = 8 bits -> 2^8 = 256
+\*1 byte = 8 bits -> 2^8 = 256
 256/2 = 128 -> 127 postive numbers we can fill
-*
+
+-
 
 https://www.asciitable.com/
 
@@ -173,7 +174,7 @@ int main()
 
 ## Ep#6 - iostream - cout, cin, cerr, clog basic input/output
 
-*cout -> character output*
+_cout -> character output_
 
 ```cpp
 #include <iostream>
@@ -205,7 +206,7 @@ g++ helloworld.cpp -o iostream
 
 ```sh
 ./iostream
-`=> 
+`=>
 JunLuo
 was here.
 3
@@ -230,7 +231,7 @@ Please supply two numbers:
 ```
 
 ```sh
-cat errorlog.txt 
+cat errorlog.txt
 `=>
 An error occured.
 A new log statement.
@@ -245,7 +246,7 @@ https://doc.bccnsoft.com/docs/cppreference_en/io_flags.html
 using namespace std;
 
 int main()
-{   
+{
     cout.flags( ios::hex | ios::showbase | ios::boolalpha );
 
     int value1, value2, value3;
@@ -270,7 +271,7 @@ int main()
 using namespace std;
 
 int main()
-{   
+{
     int x;
     cin >> x;
     if (x > 0)
@@ -284,14 +285,15 @@ int main()
 }
 ```
 
-## Ep#8 - Constants & Literals 
+## Ep#8 - Constants & Literals
 
 https://www.cplusplus.com/doc/tutorial/constants/
 
 **#define identifier replacement**
 
-*After this directive, any occurrence of identifier in the code is interpreted as replacement, where replacement is any sequence of characters (until the end of the line). This replacement is performed by the preprocessor, and happens before the program is compiled, thus causing a sort of blind replacement: the validity of the types or syntax involved is not checked in any way.
-*
+\*After this directive, any occurrence of identifier in the code is interpreted as replacement, where replacement is any sequence of characters (until the end of the line). This replacement is performed by the preprocessor, and happens before the program is compiled, thus causing a sort of blind replacement: the validity of the types or syntax involved is not checked in any way.
+
+-
 
 ```cpp
 #include <iostream>
@@ -317,17 +319,17 @@ int main ()
 **SWITCH
 switch (expression)
 {
-  case constant1:
-     group-of-statements-1;
-     break;
-  case constant2:
-     group-of-statements-2;
-     break;
-  .
-  .
-  .
-  default:
-     default-group-of-statements
+case constant1:
+group-of-statements-1;
+break;
+case constant2:
+group-of-statements-2;
+break;
+.
+.
+.
+default:
+default-group-of-statements
 }
 **
 
@@ -336,7 +338,7 @@ switch (expression)
 using namespace std;
 
 int main()
-{   
+{
     int x;
     cin >> x;
     switch (x) {
@@ -367,7 +369,7 @@ using namespace std;
 #define DEBUG
 
 int main()
-{   
+{
     #ifdef DEBUG
     cout << "Please supply a diameter " << NEWLINE;
     #endif
@@ -396,7 +398,7 @@ using namespace std;
 #define HEX(h) (6*h)
 
 int main()
-{   
+{
     cout << "Finding the Perimeter of a Shape.." << endl;
 
     cout << "1 - Square" << endl;
@@ -454,14 +456,14 @@ int main()
 #include <iostream>
 using namespace std;
 
-int main() {   
+int main() {
     int num;
     cout << "Please enter in a number." << endl;
-    cin >> num; 
+    cin >> num;
     for (int i=0; i < num; i++) {
         cout << i << endl;
     }
-    
+
     return 0;
 }
 ```
@@ -472,7 +474,7 @@ int main() {
 #include <iostream>
 using namespace std;
 
-int main() {   
+int main() {
 
     bool exit = false;
     // while(exit == false) {
@@ -494,7 +496,7 @@ int main() {
 #include <iostream>
 using namespace std;
 
-int main() {   
+int main() {
 
     while (false)
     {
@@ -505,7 +507,7 @@ int main() {
         cout << "Do While - Do loop executed" << endl;
     }
     while (false);
-    
+
 }
 
 // Do While - Do loop executed
@@ -515,15 +517,15 @@ int main() {
 
 ## Ep#14 - Variable Scope
 
-## Ep#15 - Break, Continue, and Goto 
+## Ep#15 - Break, Continue, and Goto
 
-**Definitions
-* break: that ends or "breaks" out of a loop
-* continue: that skips or "continues" on to the next iteration
-**
+\*\*Definitions
 
-***Never use `goto`***
+- break: that ends or "breaks" out of a loop
+- continue: that skips or "continues" on to the next iteration
+  \*\*
 
+**_Never use `goto`_**
 
 ## Highlight - Limits for Basic Data Types (numeric_limits)
 
@@ -533,7 +535,7 @@ int main() {
 
 using namespace std;
 
-int main() {   
+int main() {
 
     cout << sizeof(char) << " byte" << endl;
     cout << sizeof(int) << " byte" << endl;
@@ -551,11 +553,12 @@ int main() {
     cout << "char max Value: " << int(numeric_limits<char>::max()) << endl;
     cout << "unsigned char min Value: " << int(numeric_limits<unsigned char>::min()) << endl;
     cout << "unsigned char max Value: " << int(numeric_limits<unsigned char>::max()) << endl;
-    
+
     return 0;
 }
 
 ```
+
 ```output
 1 byte
 4 byte
@@ -591,7 +594,7 @@ int array[4]
 
 using namespace std;
 
-int main() {   
+int main() {
 
     int array[4] = {10, 11, 12, 13};
 
@@ -601,6 +604,7 @@ int main() {
     return 0;
 }
 ```
+
 ```output
 10
 11
@@ -608,18 +612,17 @@ int main() {
 13
 ```
 
-array   0,   1,   2,   3,   ...n
+array 0, 1, 2, 3, ...n
 memory [int, int, int, int, ...n]
-memory [10,  11,  12,  14,  ...n]
+memory [10, 11, 12, 14, ...n]
 addr+0, addr+4byte, addr+8byte, addr+12byte, ...n
-
 
 ## Ep#17 - Functions with Parameters and Examples
 
 <return type> <function name>(<Parameters>) {
-    ...statements or blocks of code
-    return <result>; //only if there is a return type
-} 
+...statements or blocks of code
+return <result>; //only if there is a return type
+}
 
 ```cpp
 #include <iostream>
@@ -642,12 +645,13 @@ float sum(float a, float b) {
 }
 
 int main() {
-    func1();   
+    func1();
     cout << func2() << endl;
     cout << sum(3.5, 4.6) << endl;
     return 0;
 }
 ```
+
 ```output
 Hello World!
 func2
@@ -667,7 +671,7 @@ int func2();
 float sum(float, float);
 
 int main() {
-    func1();   
+    func1();
     cout << func2() << endl;
     cout << sum(3.5, 4.6) << endl;
     return 0;
@@ -735,6 +739,7 @@ char func(int n1, int n2, float n3) {
     return n1 + n2 + n3;
 }
 ```
+
 ```output
 0
 -1
@@ -745,7 +750,7 @@ S
 ## Ep#20 - References and Passing by Reference
 
 <datatype>& ref = <somevar>;
-*Allow you to modify the <somevar> outside its declaration function scope.*
+_Allow you to modify the <somevar> outside its declaration function scope._
 
 ```cpp
 #include <iostream>
@@ -760,6 +765,7 @@ int main() {
     return 0;
 }
 ```
+
 ```output
 ref: 1
 &ref: 0x7fffec7d7e0c
@@ -794,6 +800,7 @@ int main() {
     return 0;
 }
 ```
+
 ```output
 reference: 3
 notreference: 3
@@ -817,6 +824,7 @@ int main() {
     return 0;
 }
 ```
+
 ```output
 We're having fun!
 We're having fun!
@@ -841,7 +849,7 @@ Segmentation fault (core dumped)
 ...
 -func()
 -func()
--func() -> recrusively expect to remove the func() since here 
+-func() -> recrusively expect to remove the func() since here
 -main()
 ```
 
@@ -863,6 +871,7 @@ int main() {
     return 0;
 }
 ```
+
 ```output
 We're having fun with 5!
 We're having fun with 4!
@@ -895,6 +904,7 @@ int main() {
     return 0;
 }
 ```
+
 ```output
 15
 ```
@@ -902,11 +912,11 @@ int main() {
 ## Ep#22 - Enums / Enumerations with Examples
 
 enum <name> {
-    ConstantName_1,
-    ConstantName_2,
-    ConstantName_3,
-    ...
-    ConstantName_n,
+ConstantName_1,
+ConstantName_2,
+ConstantName_3,
+...
+ConstantName_n,
 }
 
 ```cpp
@@ -937,10 +947,11 @@ int main() {
     {
         cout << "January was chosen." << endl;
     }
-    
+
     return 0;
 }
 ```
+
 ```output
 January was chosen.
 ```
@@ -976,7 +987,7 @@ struct location {
         cout << country << " ";
         cout << zipcode << " ";
         cout << latitude << " ";
-        cout << longitude << endl; 
+        cout << longitude << endl;
     }
 
 } loc[10];
@@ -1002,6 +1013,7 @@ int main() {
     return 0;
 }
 ```
+
 ```output
 New York New York n/a USA 5555 0 1
 New York New York n/a USA 5555 1 2
@@ -1056,7 +1068,6 @@ int main() {
 }
 ```
 
-
 # C Programming in Linux Tutorial
 
 ## #001 - Hello World
@@ -1064,7 +1075,7 @@ int main() {
 ```c
 #include <stdio.h>
 
-int main(int argc, char *argv[]) 
+int main(int argc, char *argv[])
 {
     printf("Hello World\n");
 
@@ -1077,8 +1088,8 @@ int main(int argc, char *argv[])
 ```c
 #include <stdio.h>
 
-int main(int argc, char *argv[]) 
-{   
+int main(int argc, char *argv[])
+{
 
     int k;
     int zznum;
@@ -1105,6 +1116,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 ```
+
 ```output
 Hello World
 Value of k = 24
@@ -1120,8 +1132,8 @@ mychar ASCII code is 99
 ```c
 #include <stdio.h>
 
-int main(int argc, char *argv[]) 
-{   
+int main(int argc, char *argv[])
+{
 
     int my_int;
     char my_char;
@@ -1165,6 +1177,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 ```
+
 ```output
 24.3 - my_num = 24.299999
 24.4 - my_num = 24.400000
@@ -1188,8 +1201,8 @@ Value of my_sum_db = 26.400000
 ```c
 #include <stdio.h>
 
-int main(int argc, char *argv[]) 
-{   
+int main(int argc, char *argv[])
+{
 
     char message[13] = "Hello World!";
 
@@ -1200,7 +1213,154 @@ int main(int argc, char *argv[])
     return 0;
 }
 ```
+
 ```output
 Message is Hello World!
 Array 2 is message e
+```
+
+## #005 - Data Types: pointer
+
+```c
+#include <stdio.h>
+
+int main(int argc, char *argv[])
+{
+    int n;
+    int *k;
+
+    n = 25;
+    k = &n;
+
+    printf("n = %d\n", n);
+    printf("k = %x\n", k);
+    printf("*k = %d\n", *k);
+
+    *k = 10;
+    printf("k = %x\n", k);
+    printf("*k = %d\n", *k);
+
+    return 0;
+}
+```
+
+```output
+n = 25
+k = 254b274c
+*k = 25
+k = 254b274c
+*k = 10
+```
+
+## #006 - Data Types: Array
+
+```c
+#include <stdio.h>
+
+int main(int argc, char *argv[])
+{
+    int a[4];
+
+    a[0]  = 3;
+    a[1] = 2;
+    a[2] = 7;
+    a[3] = 10;
+
+    int length;
+    length = sizeof(a) / sizeof(int);
+
+
+    for(int i=0; i<length; i++) {
+        printf("a[%d] = %d\n", i, a[i]);
+    }
+
+    return 0;
+}
+```
+
+```output
+a[0] = 3
+a[1] = 2
+a[2] = 7
+a[3] = 10
+```
+
+## #007 - If-Then-Else Statement
+
+## #008 - For Loop Statement
+
+## #009 - "while" Loop
+
+## #010 - "struct" Statement
+
+```c
+#include <stdio.h>
+
+int main(int argc, char *argv[])
+{
+
+    struct
+    {
+        int a;
+        float b;
+        int c;
+    } myst;
+
+    myst.a = 4;
+    myst.b = 3.37;
+    myst.c = 1;
+
+    printf("a = %d, b = %f, c = %d/n", myst.a, myst.b, myst.c);
+
+    return 0;
+}
+```
+
+```output
+a = 4, b = 3.370000, c = 1/n
+```
+
+## #011 - typedef Statement
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+typedef struct Books {
+   char title[50];
+   char author[50];
+   char subject[100];
+   int book_id;
+} Book;
+
+int main( ) {
+
+   Book book;
+
+   strcpy( book.title, "C Programming");
+   strcpy( book.author, "Nuha Ali");
+   strcpy( book.subject, "C Programming Tutorial");
+   book.book_id = 6495407;
+
+   printf( "Book title : %s\n", book.title);
+   printf( "Book author : %s\n", book.author);
+   printf( "Book subject : %s\n", book.subject);
+   printf( "Book book_id : %d\n", book.book_id);
+
+   return 0;
+}
+```
+
+```c
+#include <stdio.h>
+
+#define TRUE  1
+#define FALSE 0
+
+int main( ) {
+   printf( "Value of TRUE : %d\n", TRUE);
+   printf( "Value of FALSE : %d\n", FALSE);
+
+   return 0;
+}
 ```
