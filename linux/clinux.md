@@ -379,3 +379,135 @@ argv[0] = ./helloworld
 argv[1] = one
 argv[2] = anyinput
 ```
+
+## #016 - Multiple Source Files
+
+*addnums.c*
+```c
+#include<stdio.h>
+
+int addnumbers(int a, int b)
+{
+    int sum;
+    sum = a + b;
+    return sum;
+}
+```
+
+*helloworld.c*
+```c
+#include <stdio.h>
+
+int main(int argc, char *argv[]) 
+{   
+    int total;
+    total = addnumbers(2, 4);
+    printf("total = %d\n", total);     
+    return 0;
+}
+```
+
+```sh
+gcc -c helloworld.c
+gcc -c addnum.c
+ls
+`=>
+addnum.c  addnum.o  helloworld  helloworld.c  helloworld.o
+```
+```sh
+gcc -o helloworld helloworld.o addnum.o
+./helloworld
+`=> 
+total = 6
+```
+
+```c
+#include <stdio.h>
+
+int addnumbers(int a, int b);
+
+int main(int argc, char *argv[]) 
+{   
+    int total;
+    total = addnumbers(2, 4);
+    printf("total = %d\n", total);     
+    return 0;
+}
+```
+
+```sh
+gcc -o helloworld helloworld.c addnum.c
+```
+
+*addnums.h*
+```c
+int addnumbers(int a, int b);
+```
+
+*addnums.c*
+```c
+#include <stdio.h>
+#include "addnum.h"
+
+int addnumbers(int a, int b)
+{
+    int sum;
+    sum = a + b;
+    return sum;
+}
+```
+
+```c
+#include <stdio.h>
+#include "addnum.h"
+
+int addnumbers(int a, int b);
+
+int main(int argc, char *argv[]) 
+{   
+    int total;
+    total = addnumbers(2, 4);
+    printf("total = %d\n", total);     
+    return 0;
+}
+```
+
+```sh
+gcc -o helloworld helloworld.c addnum.c
+```
+
+## #017 - String Functions and Operations
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char *argv[]) 
+{   
+    char str[24];
+    char str2[24];
+    int i;
+    int n;
+
+    sprintf(str, "Hello World!");
+    printf("%s\n", str);
+
+    i = 4;
+    sprintf(str, "Value of i = %d", i);
+    printf("%s\n", str);
+
+    n = strlen(str);
+    printf("Length of str is %d\n", n);
+
+    strcpy(str2, str);
+    printf("str2 is %s\n", str2);
+
+    memset(str, 0, 24);
+    printf("New str is %s\n", str);
+
+    memset(str, 'a', 10);
+    printf("New str is %s\n", str);
+
+    return 0;
+}
+```
