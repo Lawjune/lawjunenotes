@@ -511,3 +511,424 @@ int main(int argc, char *argv[])
     return 0;
 }
 ```
+
+## #018 - Char Pointer vs Array Char
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char *argv[]) 
+{   
+    char str[24] = "First string";
+    char *ptr = "Second string";
+
+    printf("str = %s\n", str);
+    printf("ptr = %s\n", ptr);
+
+    ptr = ptr + 1; 
+    printf("ptr = %s\n", ptr);
+
+    // We can't do that
+    // str = str + 1;
+    // printf("str = %s\n", str);
+
+    return 0;
+}
+```
+```output
+str = First string
+ptr = Second string
+ptr = econd string
+```
+*The 'S' missing will becomde the garbage!!!*
+
+str -> 0x08ffff -> 'F'
+    -> 0x090000 -> 'i'
+    ......
+    -> 0x09000B -> 'g'
+    -> 0x09000C -> unkonwn char
+
+ptr -> 0x0cffef -> 0x0d0001
+    
+    -> 0x0d0001 -> 'S'
+    -> 0x0d0002 -> 'e'
+    ......
+    -> 0x0d000E -> 'g'
+
+
+## #019 - Preprocessor
+
+```sh
+gcc -E -c helloworld.c
+`=>
+# 1 "helloworld.c"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 31 "<command-line>"
+# 1 "/usr/include/stdc-predef.h" 1 3 4
+# 32 "<command-line>" 2
+# 1 "helloworld.c"
+# 1 "/usr/include/stdio.h" 1 3 4
+# 27 "/usr/include/stdio.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 1 3 4
+# 33 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 3 4
+# 1 "/usr/include/features.h" 1 3 4
+# 461 "/usr/include/features.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 1 3 4
+# 449 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/wordsize.h" 1 3 4
+# 450 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/long-double.h" 1 3 4
+# 451 "/usr/include/x86_64-linux-gnu/sys/cdefs.h" 2 3 4
+# 462 "/usr/include/features.h" 2 3 4
+# 485 "/usr/include/features.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/gnu/stubs.h" 1 3 4
+# 10 "/usr/include/x86_64-linux-gnu/gnu/stubs.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/gnu/stubs-64.h" 1 3 4
+# 11 "/usr/include/x86_64-linux-gnu/gnu/stubs.h" 2 3 4
+# 486 "/usr/include/features.h" 2 3 4
+# 34 "/usr/include/x86_64-linux-gnu/bits/libc-header-start.h" 2 3 4
+# 28 "/usr/include/stdio.h" 2 3 4
+
+
+
+
+
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h" 1 3 4
+# 209 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h" 3 4
+
+# 209 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h" 3 4
+typedef long unsigned int size_t;
+# 34 "/usr/include/stdio.h" 2 3 4
+
+
+# 1 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stdarg.h" 1 3 4
+# 40 "/usr/lib/gcc/x86_64-linux-gnu/9/include/stdarg.h" 3 4
+typedef __builtin_va_list __gnuc_va_list;
+# 37 "/usr/include/stdio.h" 2 3 4
+
+# 1 "/usr/include/x86_64-linux-gnu/bits/types.h" 1 3 4
+# 27 "/usr/include/x86_64-linux-gnu/bits/types.h" 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/wordsize.h" 1 3 4
+# 28 "/usr/include/x86_64-linux-gnu/bits/types.h" 2 3 4
+# 1 "/usr/include/x86_64-linux-gnu/bits/timesize.h" 1 3 4
+# 29 "/usr/include/x86_64-linux-gnu/bits/types.h" 2 3 4
+
+
+typedef unsigned char __u_char;
+typedef unsigned short int __u_short;
+typedef unsigned int __u_int;
+typedef unsigned long int __u_long;
+
+
+typedef signed char __int8_t;
+typedef unsigned char __uint8_t;
+typedef signed short int __int16_t;
+typedef unsigned short int __uint16_t;
+typedef signed int __int32_t;
+typedef unsigned int __uint32_t;
+
+typedef signed long int __int64_t;
+typedef unsigned long int __uint64_t;
+```
+
+```c
+#include <stdio.h>
+
+#define NUM1 5
+#define NUM2 8
+
+#define SUM(x, y) x+y
+
+int main(int argc, char *argv[]) 
+{   
+
+    int i;
+    int k;
+    int sum;
+
+    i = NUM1;
+    k = NUM2;
+
+    sum = SUM(i, k);
+
+    /* This is my comment */
+
+    return 0;
+}
+```
+```sh
+gcc -E -c helloworld.c
+......
+# 8 "helloworld.c"
+int main(int argc, char *argv[])
+{
+
+    int i;
+    int k;
+    int sum;
+
+    i = 5;
+    k = 8;
+
+    sum = i+k;
+
+
+
+    return 0;
+}
+````
+
+```c
+#include <stdio.h>
+
+#define NUM1 5
+#define NUM2 8
+
+#define SUM(x, y) x+y
+#define ADD
+
+int main(int argc, char *argv[]) 
+{   
+
+    int i;
+    int k;
+    int sum;
+
+    i = NUM1;
+    k = NUM2;
+
+    sum = SUM(i, k);
+
+    /* This is my comment */
+
+#ifdef ADD
+    sum = i + k;
+#else
+    sum = SUM(i, k);
+#endif
+
+    return 0;
+}
+```
+```sh
+gcc -E -c helloworld.c
+......
+# 9 "helloworld.c"
+int main(int argc, char *argv[])
+{
+
+    int i;
+    int k;
+    int sum;
+
+    i = 5;
+    k = 8;
+
+    sum = i+k;
+
+
+
+
+    sum = i + k;
+
+
+
+
+    return 0;
+}
+````
+
+## #020 - Unary and Binary Operations
+
+```c
+#include <stdio.h>
+
+
+int main(int argc, char *argv[]) 
+{  
+    int a, b, sum;
+    
+    a = 4;
+    a++; 
+    printf("a = %d\n", a);
+
+    a = 2;
+    a += 4;
+    printf("a = %d\n", a);
+
+    a = 7;
+    a--;
+    printf("a = %d\n", a);
+
+    a = 7;
+    a -= 3;
+    printf("a = %d\n", a);
+
+    a = 7;
+    a *= 3;
+    printf("a = %d\n", a);
+
+    a = 7;
+    a /= 3;
+    printf("a = %d\n", a);
+
+    a = 7;
+    printf("a = %d\n", a--);
+    a = 7;
+    printf("a = %d\n", --a);
+
+    return 0;
+}
+```
+```output
+a = 5
+a = 6
+a = 6
+a = 4
+a = 21
+a = 2
+a = 7
+a = 6
+```
+
+## #021 - Type Casting
+
+```c
+#include <stdio.h>
+
+
+int main(int argc, char *argv[]) 
+{  
+    int i;
+    char c;
+
+    char *ptr;
+    char s;
+
+    c = 'w';
+    i = (int) c;
+    printf("i = %d, %c\n", i, i);
+
+    s = 'x';
+    ptr = &s;
+    i = (int) ptr;
+    printf("i = %x\n", i);
+    
+    i = 3000;
+    c = (char) i;
+    printf("c = %d\n", c);
+
+    return 0;
+}
+```
+
+## #022 - malloc() free()
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main(int argc, char *argv[]) 
+{  
+
+    char *ptr;
+    ptr = (char *) malloc(24);
+
+    if(ptr == NULL)
+    {
+        printf("Failed to get or allocate memory!\n");
+        exit(1);
+    }
+
+    strcpy(ptr, "Hello there!");
+    printf("ptr: %s\n", ptr);
+
+    free(ptr);
+
+    return 0;
+}
+```
+
+## #023 - Creating Header File
+
+*addnum.h*
+```c
+#ifndef _ADDNUM__H__
+#define _ADDNUM__H__
+
+#define addnum(x, y) x+y
+int addnumbers(int a, int b);
+
+#endif
+```
+
+```c
+#include <stdio.h>
+#include "addnum.h"
+
+int main(int argc, char *argv[]) 
+{  
+    printf("sum = %d\n", addnum(7, 6));
+    printf("sum = %d\n", addnumbers(7, 6));
+    return 0;
+}
+```
+```output
+sum = 13
+sum = 13
+```
+
+## #024 - open() read() write() Functions
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{  
+
+    int fd;
+    char buf[16];
+
+    /* write */
+    fd = open("myfile.txt", O_CREAT | O_WRONLY, 0600);
+
+    if(fd == -1) 
+    {
+        printf("Failed to create and open the file.\n");
+        exit(1);
+    }
+
+    write(fd, "Hello World!\n", 13);
+
+    close(fd);
+
+    /* read */
+    fd = open("myfile.txt", O_RDONLY);
+
+    if(fd == -1) 
+    {
+        printf("Failed to open and read the file.\n");
+        exit(1);
+    }
+
+    read(fd, buf, 13);
+    buf[13] = '\0';
+
+    close(fd);
+
+    printf("buf: %s\n", buf);
+
+    return 0;
+}
+```
+
+
+
