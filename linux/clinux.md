@@ -930,5 +930,170 @@ int main(int argc, char *argv[])
 }
 ```
 
+## #025 - readdir() opendir() Functions
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <dirent.h>
+
+int main(int argc, char *argv[]) 
+{  
+    DIR *dir;
+    struct dirent *sd;
+
+    dir = opendir(".");
+
+    if(dir == NULL)
+    {
+        printf("Error! Unable to open directory.\n");
+        exit(1);
+    }
+
+    while ( (sd=readdir(dir)) != NULL)
+    {
+        printf(">> %s\n", sd->d_name);
+    }
+    
+
+    closedir(dir);
+
+    return 0;
+}
+```
+```output
+>> addnum.c
+>> addnum.h
+>> myfile.txt
+>> ..
+>> .
+>> .vscode
+>> helloworld.c
+>> helloworld
+```
+
+## #026 - fork() Function
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{   
+    int childpid;
+    int count1 = 0, count2 = 0;
+
+    printf("Before it forks!\n");
+
+    childpid = fork();
+
+    if (childpid == 0)
+    {
+        printf("This is a child process\n");
+        while (count1 < 10)
+        {
+            printf("Child process: %d\n", count1);
+            sleep(1);
+            count1++;
+        }
+        
+    } else {
+        printf("This is the parent process\n");
+        while (count2 < 20)
+        {
+            printf("Parent process: %d\n", count2);
+            sleep(1);
+            count2++;
+        }
+    }
+
+    return 0;
+}
+```
+```output
+Before it forks!
+This is the parent process
+Parent process: 0
+This is a child process
+Child process: 0
+Parent process: 1
+Child process: 1
+Parent process: 2
+Child process: 2
+Parent process: 3
+Child process: 3
+Parent process: 4
+Child process: 4
+Child process: 5
+Parent process: 5
+Parent process: 6
+Child process: 6
+Child process: 7
+Parent process: 7
+Child process: 8
+Parent process: 8
+Child process: 9
+Parent process: 9
+Parent process: 10
+Parent process: 11
+Parent process: 12
+Parent process: 13
+Parent process: 14
+Parent process: 15
+Parent process: 16
+Parent process: 17
+Parent process: 18
+Parent process: 19
+```
+
+```sh
+ps -aux | grep helloworld
+```
+
+## #027 - Bubble Sort
+```c
+#include <stdio.h>
+
+int main(int argc, char *argv[]) 
+{  
+
+    int a[10] = {8, 20, 5, 11, 21, 45, 7, 2, 22, 17};
+    int temp;
+
+    int count, current;
+
+    for ( count=9; count > 0; count--)
+    {
+        for(current=0; current<count; current++)
+        {
+            if(a[current] > a[current+1])
+            {
+                temp = a[current];
+                a[current] = a[current+1];
+                a[current+1] = temp;
+            }
+        }
+    }
+
+    for (count=0; count<10; count++)
+        printf("a[%d] = %d\n", count, a[count]);
+
+    return 0;
+}
+```
+```output
+a[0] = 2
+a[1] = 5
+a[2] = 7
+a[3] = 8
+a[4] = 11
+a[5] = 17
+a[6] = 20
+a[7] = 21
+a[8] = 22
+a[9] = 45
+```
+
 
 
