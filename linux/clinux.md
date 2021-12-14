@@ -1095,5 +1095,142 @@ a[8] = 22
 a[9] = 45
 ```
 
+## #028 - Recursion
+
+```c
+#include <stdio.h>
+
+int accumlate(int a)
+{
+    int ret;
+    a = a*2 + 2;
+    printf("a = %d\n", a);
+    if (a < 100)
+        ret = accumlate(a);
+    else
+        ret = a ;
+    printf("ret = %d\n", ret);
+    return ret;
+}
+
+int main(int argc, char *argv[]) 
+{  
+    int ret;
+    ret = accumlate(1);
+    printf("main: ret = %d\n", ret);
+
+    return 0;
+}
+```
+```output
+a = 4
+a = 10
+a = 22
+a = 46
+a = 94
+a = 190
+ret = 190
+ret = 190
+ret = 190
+ret = 190
+ret = 190
+ret = 190
+main: ret = 190
+```
+
+## #029 - pthreads
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <unistd.h>
+
+void *myfunc (void *myvar);
+
+int main(int argc, char *argv[]) 
+{   
+    pthread_t thread1, thread2;
+    char *msg1 = "First thread";
+    char *msg2 = "Second thread";
+    int ret1, ret2;
+
+    ret1 = pthread_create(&thread1, NULL, myfunc, (void *) msg1);
+    ret2 = pthread_create(&thread2, NULL, myfunc, (void *) msg2);
+
+    printf("Main function after pthread_create\n");
+
+    pthread_join(thread1, NULL);
+    pthread_join(thread2, NULL);
+    printf("First thread ret1 = %d\n", ret1);
+    printf("First thread ret2 = %d\n", ret2);
+
+    return 0;
+}
+
+void *myfunc (void *myvar)
+{
+    char *msg;
+    msg = (char *) myvar;
+
+    int i;
+    for (i=0; i<10; i++)
+    {
+        printf("%s %d\n", msg, i);
+        sleep(1);
+    }
+
+    return NULL;
+}
+```
+```sh
+gcc -pthread -o helloworld helloworld.c
+```
+```output
+Main function after pthread_create
+Second thread 0
+First thread 0
+First thread 1
+Second thread 1
+First thread 2
+Second thread 2
+First thread 3
+Second thread 3
+First thread 4
+Second thread 4
+First thread 5
+Second thread 5
+Second thread 6
+First thread 6
+First thread 7
+Second thread 7
+First thread 8
+Second thread 8
+First thread 9
+Second thread 9
+First thread ret1 = 0
+First thread ret2 = 0
+```
+
+## #030 - scanf() Function
+
+```c
+#include <stdio.h>
+
+int main(int argc, char *argv[]) 
+{   
+    int input;
+    scanf("%d", &input);
+    printf("input = %d\n", input);
+
+    char name[10];
+    scanf("%s", name);
+    printf("name = %s\n", name);
+
+    return 0;
+}
+```
+***Recommend to use command line instead of scanf!***
+
 
 
