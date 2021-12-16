@@ -1233,4 +1233,84 @@ int main(int argc, char *argv[])
 ***Recommend to use command line instead of scanf!***
 
 
+## #031 - Switch-Case
 
+## #032 - qsort
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int comparefunc(const void *a, const void *b)
+{
+    return ( *(int*)a - *(int*)b );
+}
+
+int main(int argc, char *argv[]) 
+{
+    int numbers[] = {5, 2, 23, 14, 7, 8, 42, 1, 33 ,10};
+
+    printf("Before sorted:\n");
+    for (int i=0; i<10; i++)
+        printf("%d ", numbers[i]);
+    printf("\n\n");
+
+    qsort(numbers, 10, sizeof(int), comparefunc);
+
+    printf("After sorted:\n");
+    for (int i=0; i<10; i++)
+        printf("%d ", numbers[i]);
+    printf("\n\n");
+    
+    return 0;
+}
+```
+```output
+Before sorted:
+5 2 23 14 7 8 42 1 33 10 
+
+After sorted:
+1 2 5 7 8 10 14 23 33 42 
+```
+
+```c
+void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*))
+```
+
+* base − This is the pointer to the first element of the array to be sorted.
+
+* nitems − This is the number of elements in the array pointed by base.
+
+* size − This is the size in bytes of each element in the array.
+
+* compar − This is the function that compares two elements.
+
+
+## #033 - read() write() Functions
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{
+    char buf[10];
+    int ret;
+
+    while (1)
+    {
+        ret = read(0, buf, 10);
+
+        if(ret < 10)
+        {
+            buf[ret] = '\0';
+            printf("%s\n", buf);
+            break;
+        } else
+            printf("%s\n", buf);
+    }
+    
+    
+    return 0;
+}
+```
