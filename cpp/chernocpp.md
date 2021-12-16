@@ -206,11 +206,211 @@ int main(int argc, const char * argv[]) {
 }
 ```
 
+## Static in C++
+
+### Static for Classes and Structs in C++
+
+```cpp
+#include <iostream>
+
+struct Entity {
+    static int x, y;
+    int a, b;
+    void print() {
+        std::cout << x << ", " << y << std::endl;
+    }
+    
+    static void Print() {
+        // The static method can not access to the instance variables such a, b
+        // std::cout << a << ", " << b << std::endl;
+        std::cout << x << ", " << y << std::endl;
+    }
+};
+
+int Entity::x;
+int Entity::y;
+
+int main(int argc, const char * argv[]) {
+    
+    Entity e;
+    e.x = 6;
+    e.y = 7;
+    
+    Entity e1;
+    e1.x = 16;
+    e1.y = 17;
+    
+    e.print();
+    
+    Entity::x = 26;
+    Entity::y = 27;
+    e.print();
+    e.Print();
+    
+    return 0;
+}
+```
+```output
+16, 17
+26, 27
+26, 27
+```
+
+### Local Static in C++
+
+```cpp
+#include <iostream>
+
+void func() {
+    static int i = 0;
+    i++;
+    std::cout << i << std::endl;
+}
+
+int main(int argc, const char * argv[]) {
+    
+    func();
+    func();
+    func();
+    func();
+    func();
+    func();
+    
+    return 0;
+}
+```
+```output
+1
+2
+3
+4
+5
+6
+```
+
+```cpp
+#include <iostream>
+
+class Singleton {
+private:
+    static Singleton* s_instance;
+public:
+    static Singleton& get() { return *s_instance; }
+    void say_hello() { printf("Hello!\n"); }
+};
+
+Singleton* Singleton::s_instance = nullptr;
+
+int main(int argc, const char * argv[]) {
+    
+    Singleton::get().say_hello();
+    
+    return 0;
+}
+```
+==(**Equals**)
+```cpp
+#include <iostream>
+
+class Singleton {
+public:
+    static Singleton& get() {
+        static Singleton instance;
+        return instance;
+    }
+    void say_hello() { printf("Hello!\n"); }
+};
+
+int main(int argc, const char * argv[]) {
+    
+    Singleton::get().say_hello();
+    
+    return 0;
+}
+```
+
+## ENUMS in C++
+
+```cpp
+#include <iostream>
+
+enum enum_example {
+    A, B, C
+};
+
+enum enum_char : unsigned char {
+    D, E, F
+};
+
+int main(int argc, const char * argv[]) {
+    
+    enum_example enum_value = B;
+    std::cout << "enum_value = " << enum_value << std::endl;
+    
+    enum_char enum_char_value = E;
+    std::cout << "enum_char_value = " << enum_char_value << std::endl;
+    
+    return 0;
+}
+```
+```output
+enum_value = 1
+enum_char_value =
+```
+
+```cpp
+#include <iostream>
+
+class Log {
+public:
+//    const int log_level_error = 0;
+//    const int log_level_warning = 1;
+//    const int log_level_info = 2;
+    enum level_enum {
+        log_level_error = 0, log_level_warning, log_level_info
+    };
+    
+private:
+    level_enum m_log_level = log_level_info; // m means member
+    
+public:
+    void set_level(level_enum level) {
+        m_log_level = level;
+    }
+    
+    void error(const char* message) {
+        if (m_log_level < log_level_warning)
+        std::cout << "[Error]: " << message << std::endl;
+    }
+    
+    void warn(const char* message) {
+        if (m_log_level >= log_level_warning)
+        std::cout << "[Warning]: " << message << std::endl;
+    }
+    
+    void info(const char* message) {
+        std::cout << "[Info]: " << message << std::endl;
+    }
+};
 
 
+int main(int argc, const char * argv[]) {
+    
 
-
-
+    
+    Log log;
+    log.set_level(log.log_level_warning);
+    log.error("Error!");
+    log.warn("Warning!");
+    log.info("Info!");
+    
+    return 0;
+}
+```
+```output
+[Warning]: Warning!
+[Info]: Info!
+```
 
 
 
