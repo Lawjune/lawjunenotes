@@ -1,5 +1,5 @@
-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
+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
 
-git push https://Lawjune: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@github.com/Lawjune/lawjunenotes.git
+git push https://Lawjune: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@github.com/Lawjune/lawjunenotes.git
 
-git push https://Lawjune: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@github.com/Lawjune/web-3D-car.git
+git push https://Lawjune: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@github.com/Lawjune/web-3D-car.git

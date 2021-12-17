@@ -316,7 +316,7 @@ int main(int argc, char *argv[])
 
 ## #015 - argc argv
 
-**gcc -o helloc helloc.c
+**gcc -o helloc helloc.c**
 
 ```c
 #include <stdio.h>
@@ -1313,4 +1313,147 @@ int main(int argc, char *argv[])
     
     return 0;
 }
+```
+
+## #034 - Socket Programming
+
+```c
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{
+    
+    /* Variables */
+    int sock;
+    struct sockaddr_in server;
+    int mysock;
+    char buf[1024];
+    int rval;
+
+    /* Create socket */   
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0) 
+    {
+        perror("Failed to create socket.");
+        close(sock);
+        exit(1);
+    }
+
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = INADDR_ANY;
+    server.sin_port = htons(5000);
+
+    /* Call bind */  
+    if(bind(sock, (struct sockaddr *) &server, sizeof(server))) 
+    {
+        perror("Bind failed.");
+        close(sock);
+        exit(1);
+    }
+
+    /* Listen */ 
+    listen(sock, 5);
+
+    /* Accpet */   
+    do {
+        mysock = accept(sock, (struct sockaddr *) 0, 0);
+        if(mysock == -1)
+        {
+            close(sock);
+            perror("Accept failed.");
+        } else
+        {
+            memset(buf, 0, sizeof(buf));
+            if((rval = recv(mysock, buf, sizeof(buf), 0)) < 0 )
+                perror("Reading stream message error");
+            else if (rval == 0)
+                printf("Ending connection.\n");
+            else
+                printf("MSG: %s\n", buf);
+            printf("Got the message: (rval = %d)\n", rval);
+            close(mysock);
+        }
+    } while(1);
+    
+    return 0;
+}
+```
+```c
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <netdb.h>
+
+#define DATA "Hello World of socket"
+
+int main(int argc, char *argv[]) 
+{
+    
+    /* Variables */
+    int sock;
+    struct sockaddr_in server;
+    struct hostent *hp;
+    char buf[1024];
+
+    /* Create socket */   
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0) 
+    {
+        perror("Failed to create socket.");
+        exit(1);
+    }
+
+    server.sin_family = AF_INET;
+    // server.sin_addr.s_addr = INADDR_ANY;
+    // server.sin_port = 5000;
+    hp = gethostbyname(argv[1]);
+    if(hp == 0)
+    {
+        perror("Get host via gethostbyname failed.");
+        close(sock);
+        exit(1);
+    }
+
+    memcpy(&server.sin_addr, hp->h_addr, hp->h_length);
+    server.sin_port = htons(5000);
+
+    if (connect(sock, (struct sockaddr *) &server, sizeof(server)))
+    {
+        perror("Connect server failed.");
+        close(sock);
+        exit(1);
+    } 
+
+    if (send(sock, DATA, sizeof(DATA), 0) < 0)
+    {
+        perror("Send data failed.");
+        close(sock);
+        exit(1);
+    }
+    printf("Sent %s\n", DATA);
+    close(sock);
+    
+    return 0;
+}
+```
+```sh
+./server
+MSG: Hello World of socket
+`=>
+Got the message: (rval = 22)
+```
+```sh
+./client localhost
+`=>
+Sent Hello World of socket
 ```
