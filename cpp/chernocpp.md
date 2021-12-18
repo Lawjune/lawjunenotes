@@ -329,7 +329,7 @@ int main(int argc, const char * argv[]) {
 }
 ```
 
-## ENUMS in C++
+### ENUMS in C++
 
 ```cpp
 #include <iostream>
@@ -411,6 +411,147 @@ int main(int argc, const char * argv[]) {
 [Warning]: Warning!
 [Info]: Info!
 ```
+
+### Constructors in C++
+
+```cpp
+#include <iostream>
+
+class Entity {
+public:
+    float x, y;
+    
+    Entity() {
+        x = 0.0f;
+        y = 0.0f;
+    }
+    
+    Entity(float a, float b) {
+        x = a;
+        y = b;
+    }
+    
+    void print() {
+        std::cout << x << std::endl;
+    }
+};
+
+int main(int argc, const char * argv[]) {
+
+    Entity e;
+    e.print();
+    
+    Entity e1(10.0f, 5.0f);
+    e1.print();
+    return 0;
+}
+```
+```output
+0
+10
+```
+
+### Destructors in C++
+
+```cpp
+#include <iostream>
+
+class Entity {
+public:
+    float x, y;
+    
+    Entity() {
+        x = 0.0f;
+        y = 0.0f;
+    }
+    
+    Entity(float a, float b) {
+        x = a;
+        y = b;
+    }
+    
+    ~Entity() {
+        std::cout << "Destroyed Entity with sum: " << (x + y) << std::endl;
+    }
+    
+    void print() {
+        std::cout << (x + y) << std::endl;
+    }
+};
+
+void func() {
+    Entity e(6.0f, 7.0f);
+    e.print();
+}
+
+int main(int argc, const char * argv[]) {
+
+    Entity e;
+    e.print();
+    
+    func();
+    
+    Entity e1(10.0f, 5.0f);
+    e1.print();
+    
+    return 0;
+}
+
+```
+```output
+0
+13
+Destroyed Entity with sum: 13
+15
+Destroyed Entity with sum: 15
+Destroyed Entity with sum: 0
+```
+
+### Inheritance in C++
+
+```cpp
+#include <iostream>
+
+class Entity {
+public:
+    float x, y;
+    
+    Entity() {
+        x = 0.0f;
+        y = 0.0f;
+    }
+    
+    void move(float xa, float ya) {
+        x += xa;
+        y += ya;
+        std::cout << "Now moved to { " << x << " , " << y << " }." << std::endl;
+    }
+};
+
+class Player : public Entity {
+public:
+    const char* name;
+};
+
+int main(int argc, const char * argv[]) {
+    
+    std::cout << sizeof(Entity) << std::endl;
+    std::cout << sizeof(Player) << std::endl;
+    
+    Player player;
+    player.move(6, 7);
+    return 0;
+}
+```
+```output
+8
+16
+Now moved to { 6 , 7 }.
+```
+
+
+
+
 
 
 
