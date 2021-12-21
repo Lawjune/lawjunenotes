@@ -549,9 +549,154 @@ int main(int argc, const char * argv[]) {
 Now moved to { 6 , 7 }.
 ```
 
+## Virtual Functions 
 
+### Virtual Functions in C++
 
+https://pabloariasal.github.io/2017/06/10/understanding-virtual-tables/
 
+```cpp
+#include <iostream>
+#include <string>
+
+class Entity {
+public:
+    virtual std::string get_name() { return "Entity"; }
+};
+
+class Player : public Entity {
+private:
+    std::string m_name;
+public:
+    Player(const std::string& name) : m_name(name) {}
+    std::string get_name() override { return m_name; }
+};
+
+int main(int argc, const char * argv[]) {
+    
+    Entity* e = new Entity();
+    std::cout << e->get_name() << std::endl;
+    
+    Player* p = new Player("Lawjune");
+    std::cout << p->get_name() << std::endl;
+    
+    Entity* entity = p;
+    std::cout << entity->get_name() << std::endl;
+    
+    return 0;
+}
+```
+```output
+Entity
+Lawjune
+Lawjune
+```
+
+### Interfaces in C++ (Pure Virtual Functions)
+
+```cpp
+#include <iostream>
+#include <string>
+
+class Printable {
+public:
+    virtual std::string get_class_name() = 0;
+};
+
+class Entity : public Printable {
+public:
+    virtual std::string get_name() { return "Entity"; }
+    std::string get_class_name() override { return "Entity"; }
+};
+
+class Player : public Entity {
+private:
+    std::string m_name;
+public:
+    Player(const std::string& name) : m_name(name) {}
+    std::string get_name() override { return m_name; }
+    std::string get_class_name() override { return m_name; }
+};
+
+void print(Printable* obj) {
+    std::cout << obj->get_class_name() << std::endl;
+}
+
+int main(int argc, const char * argv[]) {
+    
+    Entity* e = new Entity();
+    std::cout << e->get_name() << std::endl;
+    
+    Player* p = new Player("Lawjune");
+    std::cout << p->get_name() << std::endl;
+    
+    Entity* entity = p;
+    std::cout << entity->get_name() << std::endl;
+    
+    print(p);
+    print(e);
+    
+    return 0;
+}
+```
+```output
+Entity
+Lawjune
+Lawjune
+Lawjune
+Entity
+```
+
+## Visibility in C++
+
+## Arrays in C++
+
+```cpp
+#include <iostream>
+
+int main(int argc, const char * argv[]) {
+        
+    int example[5];
+    int* ptr = example;
+    for (int i=0; i<5; i++)
+        example[i] =6;
+    
+    example[2] = 7;
+    *(int*)((char*)ptr + 8) = 6;
+    
+    return 0;
+}
+```
+
+```cpp
+#include <iostream>
+
+class Entity {
+public:
+    static const int exampleSize = 5;
+    int example[exampleSize];
+    Entity() {
+        for (int i=0; i < exampleSize; i++)
+            example[i] = 6;
+    }
+};
+
+int main(int argc, const char * argv[]) {
+        
+
+    Entity e;
+    for (int i=0; i<5; i++) {
+        std::cout << e.example[i] << " " << std::endl;
+    }
+    
+    int* another = new int[5];
+    for (int i=0; i < 5; i++)
+        another[i] = 7;
+    delete[] another;
+    
+    return 0;
+}
+```
 
 
 
