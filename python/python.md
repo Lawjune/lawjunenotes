@@ -1,5 +1,5 @@
 ## Data Structures
-### 1 - Lists
+### Data Structures 1 - Lists
 ```python
 letters = ["a", "b", "c"]
 print(letters)
@@ -28,7 +28,7 @@ print(chars)
 ['H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd']
 ```
 
-### 2 - Accessing Items
+### Data Structures 2 - Accessing Items
 ```python
 letters = ["a", "b", "c", "d"]
 print(f"letters[1] = {letters[1]}")
@@ -56,7 +56,7 @@ numbers[::3] = [0, 3, 6, 9]
 numbers[::-1] = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
 ```
 
-### 3 - List Unpacking
+### Data Structures 3 - List Unpacking
 
 ```python
 numbers = list(range(10))
@@ -86,7 +86,7 @@ print_list(1, 2, 3, 4, 5)
 5
 ````
 
-### 4 - Looping over Lists
+### Data Structures 4 - Looping over Lists
 
 ```python
 letters = ["a", "b", "c"]
@@ -106,7 +106,7 @@ for index, value in enumerate(letters):
 2 c
 ```
 
-### 5 - Adding or Removing Items
+### Data Structures 5 - Adding or Removing Items
 
 ```python
 letters = ["a", "b", "c"]
@@ -139,7 +139,7 @@ print(numbers)
 []
 ```
 
-### 6 - Finding Items
+### Data Structures 6 - Finding Items
 
 ```python
 letters = ["a", "b", "c"]
@@ -155,7 +155,7 @@ print(letters.count("d"))
 0
 ```
 
-### 7 - Sorting Lists
+### Data Structures 7 - Sorting Lists
 
 ```python
 numbers = [3, 51, 2, 8, 6]
@@ -191,7 +191,7 @@ print(items) # Nothing happen
 [('product2', 9), ('product1', 10), ('product3', 12)]
 ```
 
-### 8 - Lambda Functions
+### Data Structures 8 - Lambda Functions
 
 ```python
 items = [
@@ -204,7 +204,7 @@ items.sort(key=lambda item:item[1])
 print(items)
 ```
 
-### 9 - Map Function
+### Data Structures 9 - Map Function
 
 ```python
 items = [
@@ -220,17 +220,165 @@ print(prices)
 [10, 9, 12]
 ```
 
+### Data Structures 10 - Filter Function
+
+```python
+items = [
+    ("product1", 10),
+    ("product2", 9),
+    ("product3", 12),
+]
+
+x = list(filter(lambda item: item[1] >= 10, items))
+print(x)
+```
+
+### Data Structures 11 - List Comprehensions
+
+```python
+items = [
+    ("product1", 10),
+    ("product2", 9),
+    ("product3", 12),
+]
+prices_a = list(map(lambda item: item[1], items))
+prices_b = [item[1] for item in items] # Recommended
+
+print(prices_a)
+print(prices_b)
+
+filtered_a = list(filter(lambda item: item[1] >= 10, items))
+filtered_b = [item for item in items if item[1] >= 10] # Recommended
+
+print(filtered_a)
+print(filtered_b)
+```
+```output
+[10, 9, 12]
+[10, 9, 12]
+[('product1', 10), ('product3', 12)]
+[('product1', 10), ('product3', 12)]
+```
+
+### Data Structures 12 - Zip Function
+
+```python
+list1 = [1, 2, 3]
+list2 = [10, 20, 30]
+
+print(list(zip("abc", list1, list2)))
+```
+```output
+[('a', 1, 10), ('b', 2, 20), ('c', 3, 30)]
+```
+
+### Data Structures 13 - Stacks
+
+```python
+browsing_session = []
+browsing_session.append(1)
+browsing_session.append(2)
+browsing_session.append(3)
+print(browsing_session)
+print(browsing_session.pop())
+print(browsing_session[-1])
+print(browsing_session.pop())
+if not browsing_session:
+    print(browsing_session[-1])
+
+```
+```output
+[1, 2, 3]
+3
+2
+2
+```
+
+### Data Structures 14 - Queues
+
+```python
+from collections import deque
+
+queue = deque([])
+queue.append(1)
+queue.append(2)
+queue.append(3)
+print(queue.popleft())
+print(queue)
+if not queue:
+    print("Empty")
+```
+1
+deque([2, 3])
+```
 
 
+### Data Structures 15 - Tuples
 
+```python
+point = 1, 2
+print(type(point))
+```
+```python
+<class 'tuple'>
+<class 'tuple'>
+(6, 7, 6, 7, 6, 7)
+('H', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', '!')
+```
 
+### Data Structures 16 - Swapping Variables
 
+```python
+x = 6
+y = 7
 
+x, y = y, x
+print("x", x)
+print("y", y)
+```
 
+### Data Structures 17 - Arrays
 
+***Don't solve a problem doesn't exist!***
 
+```python
+from array import array
 
+numbers = array("i", [1, 2, 3])
+numbers.append(4)
+print(numbers)
+numbers.insert(2, 2)
+print(numbers)
+# numbers.remove(0)
+```
+```output
+array('i', [1, 2, 3, 4])
+array('i', [1, 2, 2, 3, 4])
+```
 
+### Data Structures 18 - Sets
+
+```python
+numbers = [1, 1, 2, 3, 3, 4]
+first =set(numbers)
+second = {1, 3}
+second.add(5)
+
+print(first | second)
+print(first & second)
+print(first - second)
+print(first ^ second)
+
+if 1 in first:
+    print("Yes")
+```
+```output
+{1, 2, 3, 4, 5}
+{1, 3}
+{2, 4}
+{2, 4, 5}
+Yes
+```
 
 
 
