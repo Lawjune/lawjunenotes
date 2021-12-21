@@ -1545,3 +1545,238 @@ Firstname: Andy
 Lasttname: Mars
 Age: 22
 ```
+
+## #036 - Shared Memory
+
+*server.c*
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+
+#define SHSIZE 100
+
+int main(int argc, char *argv[]) 
+{
+    int shmid;
+    key_t key;
+    char *shm;
+    char *s;
+
+    key = 9876;
+
+    shmid = shmget(key, SHSIZE, IPC_CREAT | 0666);
+    if(shmid < 0)
+    {
+        perror("shmget");
+        exit(1);
+    }
+
+    shm = shmat(shmid, NULL, 0);
+
+    if(shm == (char *) -1)
+    {
+        perror("shmat");
+        exit(1);
+    }
+
+    memcpy(shm, "Hello World", 11);
+
+    s = shm;
+    s += 11;
+
+    *s = 0;
+
+    while (*shm != '*')
+        sleep(1);
+
+    return 0;
+}
+```
+
+*client.c*
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+
+#define SHSIZE 100
+
+int main(int argc, char *argv[]) 
+{
+    int shmid;
+    key_t key;
+    char *shm;
+    char *s;
+
+    key = 9876;
+
+    shmid = shmget(key, SHSIZE, 0666);
+    if(shmid < 0)
+    {
+        perror("shmget");
+        exit(1);
+    }
+
+    shm = shmat(shmid, NULL, 0);
+
+    if(shm == (char *) -1)
+    {
+        perror("shmat");
+        exit(1);
+    }
+
+    for (s = shm; *s != 0; s++)
+        printf("%c", *s);
+
+    printf("\n");
+
+    *shm = '*';
+
+    return 0;
+}
+```
+```output
+Hello World
+```
+
+```sh
+ipcs -m
+`=>
+------ Shared Memory Segments --------
+key        shmid      owner      perms      bytes      nattch     status      
+0x00000000 9          lawjune    600        524288     2          dest         
+0x00000000 10         lawjune    600        630000     2          dest         
+0x00000000 13         lawjune    600        524288     2          dest         
+0x00000000 14         lawjune    600        524288     2          dest         
+0x00000000 17         lawjune    600        524288     2          dest         
+0x00000000 24         lawjune    600        524288     2          dest         
+0x00000000 29         lawjune    600        524288     2          dest         
+0x00000000 35         lawjune    600        33554432   2          dest         
+0x00002694 46         lawjune    666        100        0  
+```
+
+```sh
+ipcrm -M 9876
+ipcs -m
+`=>
+------ Shared Memory Segments --------
+key        shmid      owner      perms      bytes      nattch     status      
+0x00000000 9          lawjune    600        524288     2          dest         
+0x00000000 10         lawjune    600        630000     2          dest         
+0x00000000 13         lawjune    600        524288     2          dest         
+0x00000000 14         lawjune    600        524288     2          dest         
+0x00000000 17         lawjune    600        524288     2          dest         
+0x00000000 24         lawjune    600        524288     2          dest         
+0x00000000 29         lawjune    600        524288     2          dest         
+0x00000000 35         lawjune    600        33554432   2          dest   
+```
+
+## #037 - pipe() Function
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{
+    pid_t pid;
+    int mypipefd[2];
+    int ret;
+    char buf[20];
+
+    ret = pipe(mypipefd);
+
+    if(ret == -1)
+    {
+        perror("pipe");
+        exit(1);
+    }
+
+    pid = fork();
+    
+    if(pid == 0)
+    {
+        /* Child process */
+        // mypipefd[0] - reading
+        // mypipefd[1] - writing
+        printf("Child process\n");
+        close(mypipefd[0]);
+        write(mypipefd[1], "Hello there!", 12);
+
+    } else {
+        /* Parent process */
+        printf("Parent process\n");
+        close(mypipefd[1]);
+        read(mypipefd[0], buf, 15);
+        printf("buf: %s\n", buf);
+    }
+
+    return 0;
+}
+```
+```output
+Parent process
+Child process
+buf: Hello there!�U
+```
+***Try to figure out how to avoid printing unexpected buf!***
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{
+    pid_t pid;
+    int mypipefd[2];
+    int ret;
+    char* buf;
+    buf = (char *) malloc(20);
+
+    ret = pipe(mypipefd);
+
+    if(ret == -1)
+    {
+        free(buf);
+        perror("pipe");
+        exit(1);
+    }
+
+    pid = fork();
+    
+    if(pid == 0)
+    {
+        /* Child process */
+        // mypipefd[0] - reading
+        // mypipefd[1] - writing
+        printf("Child process\n");
+        close(mypipefd[0]);
+        write(mypipefd[1], "Hello there!", 12);
+
+    } else {
+        /* Parent process */
+        printf("Parent process\n");
+        close(mypipefd[1]);
+        read(mypipefd[0], buf, 15);
+        printf("buf: %s\n", buf);
+    }
+
+    free(buf);
+
+    return 0;
+}
+```
+```output
+Parent process
+Child process
+buf: Hello there!
+```
