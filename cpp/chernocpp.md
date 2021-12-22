@@ -698,7 +698,165 @@ int main(int argc, const char * argv[]) {
 }
 ```
 
+## Strings in C++
 
+### How Strings Work in C++ (and how to use them)
+
+```cpp
+#include <iostream>
+
+int main(int argc, const char * argv[]) {
+    
+    const char* name = "Lawjune";
+    std::cout << "name: " << name << std::endl;
+    char name1[8] = {'L', 'a', 'w', 'j', 'u', 'n', 'e', 0};
+    std::cout << "name1: " << name1 << std::endl;
+    return 0;
+}
+```
+```output
+name: Lawjune
+name1: Lawjune
+```
+
+```cpp
+#include <iostream>
+#include <string>
+
+void print_string(const std::string& string) {
+    std::cout << string << std::endl;
+}
+
+int main(int argc, const char * argv[]) {
+    
+    std::string name = "Lawjune";
+    std::cout << "name: " << name << std::endl;
+    std::cout << "name.size(): " << name.size() << std::endl;
+    std::cout << "name.find(aw): " << name.find("aw") << std::endl;
+    name += " hello!";
+    std::cout << "name: " << name << std::endl;
+    print_string(name);
+
+    return 0;
+}
+```
+```output
+name: Lawjune
+name.size(): 7
+name.find(aw): 1
+name: Lawjune hello!
+Lawjune hello!
+```
+
+### String Literals in C++
+
+```cpp
+#include <iostream>
+#include <string>
+#include <stdlib.h>
+
+int main(int argc, const char * argv[]) {
+    
+    char name[10] = "Law\0june";
+    std::cout << name << std::endl;
+    std::cout << strlen(name) << std::endl;
+    name[3] = 'j';
+    std::cout << name << std::endl;
+    std::cout << strlen(name) << std::endl;
+
+    return 0;
+}
+```
+```output
+Law
+3
+Lawjjune
+8
+```
+
+```cpp
+#include <iostream>
+#include <string>
+#include <stdlib.h>
+
+int main(int argc, const char * argv[]) {
+    
+    char* name = "Lawjune";
+    std::cout << name << std::endl;
+    std::cout << strlen(name) << std::endl;
+
+    return 0;
+}
+```
+```sh
+➜  welcomecpp g++ main.cpp -o main
+main.cpp:7:18: warning: conversion from string literal to 'char *' is deprecated [-Wc++11-compat-deprecated-writable-strings]
+    char* name = "Lawjune";
+                 ^
+1 warning generated.
+➜  welcomecpp ./main
+Lawjune
+7
+```
+
+```cpp
+#include <iostream>
+#include <string>
+#include <stdlib.h>
+
+int main(int argc, const char * argv[]) {
+    
+    const char* name = "Lawjune";
+    std::cout << name << std::endl;
+    std::cout << strlen(name) << std::endl;
+    
+    const wchar_t* name1 = L"Lawjune";
+    std::cout << name1 << std::endl;
+
+    const char16_t* name2 = u"Lawjune";
+    std::cout << name2 << std::endl;
+
+    const char32_t* name3 = U"Lawjune";
+    std::cout << name3 << std::endl;
+
+    return 0;
+}
+```
+```sh
+g++ main.cpp -o main --std=c++11
+```
+```output
+Lawjune
+7
+0x10bdeaf28
+0x10bdeaf48
+0x10bdeaf28
+```
+
+*clang does not support.*
+```cpp
+#include <iostream>
+#include <string>
+#include <stdlib.h>
+
+int main(int argc, const char * argv[]) {
+    using  namespace std::string_literals;
+    
+    std::u32string name = U"Lawjune"s + U" hello!";
+//    std::cout << name << std::endl;
+    
+    const char* example = R"(line1
+line2
+line3
+line3)";
+    
+    std::cout << example << std::endl;
+    
+    return 0;
+}
+```
+
+## CONST in C++
 
 
 
