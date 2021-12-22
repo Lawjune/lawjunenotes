@@ -1780,3 +1780,120 @@ Parent process
 Child process
 buf: Hello there!
 ```
+
+## #038 - fopen() fread() fwrite() Functions
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+int main(int argc, char *argv[]) 
+{
+    FILE *fs;
+    char buf[10];
+    size_t sz;
+
+    fs = fopen("mytext.txt", "r");
+
+    if(fs == NULL)
+    {
+        perror("fopen");
+        exit(1);
+    }
+
+    while (!feof(fs))
+    {
+        memset(buf, 0, strlen(buf));
+        sz = fread((void *) buf, 9, 1, fs);
+        // buf[9] = '\0';
+        
+        printf("%s", buf);
+    }
+    
+    printf("\n");
+
+    fclose(fs);
+
+    return 0;
+}
+```
+```output
+I love t program in C.
+```
+
+## #039 - mutex pthread
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <string.h>
+
+void *myfunc1(void *ptr);
+void *myfunc2(void *ptr);
+
+pthread_mutex_t lock;
+int a[100];
+
+int main(int argc, char *argv[]) 
+{
+
+    pthread_t thrd1, thrd2;
+    int thret1, thret2;
+    char *msg1 = "First thread";
+    char *msg2 = "Second thread";
+
+    memset(a, 0, sizeof(a));
+    
+    thret1 = pthread_create(&thrd1, NULL, myfunc1, (void *)msg1);
+    thret2 = pthread_create(&thrd2, NULL, myfunc2, (void *)msg2);
+
+    pthread_join(thrd1, NULL);
+    pthread_join(thrd2, NULL);
+
+    printf("thret1 = %d\n", thret1);
+    printf("thret2 = %d\n", thret2);
+
+    return 0;
+}
+
+void *myfunc1(void *ptr)
+{   
+    int i;
+    char *msg = (char *) ptr;
+    printf("msg: %s\n", msg);
+
+    pthread_mutex_lock(&lock);
+    for (i=0; i<100; i++)
+    {
+        printf("X");
+        a[i] = i;
+    }
+    pthread_mutex_unlock(&lock);
+}
+
+void *myfunc2(void *ptr)
+{   
+    int i;
+    char *msg = (char *) ptr;
+    printf("msg: %s\n", msg);
+
+    pthread_mutex_lock(&lock);
+    for (i=0; i<100; i++)
+    {
+        printf("%d, ", a[i]);
+    }
+    pthread_mutex_unlock(&lock);
+}
+```
+```sh
+gcc -pthread -o main main.c
+```
+```output
+msg: First thread
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXmsg: Second thread
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, thret1 = 0
+thret2 = 0
+```
