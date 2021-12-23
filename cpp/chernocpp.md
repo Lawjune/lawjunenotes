@@ -858,6 +858,290 @@ line3)";
 
 ## CONST in C++
 
+```cpp
+#include <iostream>
+#include <string>
+
+int main(int argc, const char * argv[]) {
+    
+    const int MAX_AGE = 100;
+    int* a = new int;
+    const int* b = new int;
+    // int const* == const int*
+    
+    *a = 2;
+    a = (int*)&MAX_AGE;
+    std::cout << *a << std::endl;
+    
+    // *b = 2 // It doesn't work!
+    b = (int*)&MAX_AGE;
+    std::cout << *b << std::endl;
+    b = nullptr;
+    std::cout << b << std::endl;
+    
+//    delete a;
+    delete b;
+    
+    return 0;
+}
+```
+```output
+100
+100
+0x0
+```
+
+```cpp
+#include <iostream>
+#include <string>
+
+class Entity {
+private:
+    int m_x, m_y;
+    mutable int var;
+public:
+    int get_x() const {
+        
+        // Can't modify the members
+        // m_x = 1 -> it doesn't work!
+        // Only allow to modify "mutable" variables
+        var = 1;
+        return m_x;
+    }
+    
+    void set_x(int x) {
+        m_x = x;
+    }
+};
+
+void print_entity(const Entity& e) {
+    std::cout << e.get_x() << std::endl;
+}
+
+int main(int argc, const char * argv[]) {
+    
+    Entity e;
+    print_entity(e);
+    
+    return 0;
+}
+```
+
+## The Mutable Keyword in C++
+
+
+```cpp
+#include <iostream>
+#include <string>
+
+class Entity {
+private:
+    std::string m_name;
+    mutable int m_debug_count = 0;
+public:
+    const std::string& get_name() const {
+        m_debug_count++;
+        return m_name;
+    }
+};
+
+
+int main(int argc, const char * argv[]) {
+    
+    Entity e;
+    e.get_name();
+    
+    return 0;
+}
+```
+
+## Member Initializer Lists in C++ (Constructor Initializer List)
+
+```cpp
+#include <iostream>
+#include <string>
+
+class Example {
+public:
+    Example()
+    {
+        std::cout << "Created Entity!" << std::endl;
+    }
+    
+    Example(int x)
+    {
+        std::cout << "Created Entity with " << x << "!" << std::endl;
+    }
+};
+
+class Entity
+{
+private:
+    std::string m_name;
+    int x, y, z;
+    Example m_example;
+public:
+    Entity() : m_name("Unknown"), x(0), y(0), z(0)
+    {
+        m_example = Example(7);
+    }
+    
+    Entity(const std::string& name) : m_name(name), m_example(6)
+    {}
+    
+    const std::string& get_name() const
+    {
+        return m_name;
+    }
+};
+
+
+int main(int argc, const char * argv[])
+{
+    
+    Entity e;
+    std::cout << e.get_name() << std::endl;
+
+    Entity e1("Lawjune");
+    std::cout << e1.get_name() << std::endl;
+    
+    return 0;
+}
+```
+```output
+Created Entity!
+Created Entity with 7!
+Unknown
+Created Entity with 6!
+Lawjune
+```
+
+## Ternary Operators in C++ (Conditional Assignment)
+
+```cpp
+#include <iostream>
+#include <string>
+
+static int s_level = 1;
+static int s_speed = 2;
+
+int main(int argc, const char * argv[])
+{
+    s_speed = s_level > 5 ? 10 : 5;
+    std::cout << s_speed << std::endl;
+    
+    std::string rank = s_level > 10 ? "Master" : "Beginner";
+    std::cout << rank << std::endl;
+    
+    return 0;
+}
+```
+```output
+5
+Beginner
+``` 
+
+## How to CREATE/INSTANTIATE OBJECTS in C++
+
+```cpp
+#include <iostream>
+#include <string>
+
+class Entity
+{
+private:
+    std::string m_name;
+public:
+    Entity() : m_name("Unknown") {}
+    
+    Entity(const std::string& name) : m_name(name) {}
+    
+    const std::string& get_name() const
+    {
+        return m_name;
+    }
+};
+
+
+int main(int argc, const char * argv[])
+{
+    Entity* entity;
+    {
+        Entity e;
+
+        std::cout << e.get_name() << std::endl;
+   
+//        Entity e1("Lawjune");
+//        entity = &e; // Not working!
+        Entity e1 = Entity("Lawjune");
+        std::cout << e1.get_name() << std::endl;
+      
+        // Not recommemd to use new here!!!
+        Entity* e2 = new Entity("Lawjune-2");
+        entity = (Entity*) &e2;
+        std::cout << entity->get_name() << std::endl;
+        delete e2;
+    }
+    
+    return 0;
+}
+```
+```output
+Unknown
+Lawjune
+@Ѐ�LawjuneLawjune
+```
+
+## The NEW Keyword in C++
+
+```cpp
+#include <iostream>
+#include <string>
+
+class Entity
+{
+private:
+    std::string m_name;
+public:
+    Entity() : m_name("Unknown") {}
+    
+    Entity(const std::string& name) : m_name(name) {}
+    
+    const std::string& get_name() const
+    {
+        return m_name;
+    }
+};
+
+
+int main(int argc, const char * argv[])
+{
+    int a = 2;
+    int* b = new int[50]; // 4 * 50 = 200 bytes
+    
+    // Created a real object!
+    Entity* e = new Entity[50];
+    
+    // Only allocate the memory without constructing an object
+    Entity* e1 = (Entity*)malloc(sizeof(Entity));
+    
+    std::cout << e->get_name() << std::endl;
+    std::cout << e1->get_name() << std::endl;
+    
+    delete[] e;
+//    delete[] e1;
+    delete[] b;
+    
+    return 0;
+}
+```
+```output
+Unknown
+
+```
+
+
+
 
 
 
