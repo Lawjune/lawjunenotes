@@ -2043,3 +2043,160 @@ nm main
 0000000000001060 T _start
 0000000000004010 D __TMC_END__
 ```
+
+## #042 - Static Variables
+
+*main.c*
+```c
+#include <stdio.h>
+
+int num;
+int myfunc();
+
+int main(int argc, char *argv[]) 
+{   
+    num = 6;
+    myfunc();
+    return 0;
+}
+```
+
+*static_var.c*
+```c
+#include <stdio.h>
+
+extern int num;
+
+int myfunc() 
+{
+    printf("extern num = %d\n", num);
+    return 0;
+}
+```
+
+```sh
+gcc -o main main.c static_var.c
+```
+```output
+extern num = 6
+```
+
+```c
+static int num
+```
+*=> will make the varibale num as private of the source file of main.c.*
+
+```c
+#include <stdio.h>
+
+int myfunc()
+{
+    int i = 0;
+    i += 2;
+    printf("i = %d\n", i);
+    i += 2;
+    printf("i = %d\n", i);
+    return 0;
+}
+
+int main(int argc, char *argv[]) 
+{   
+    myfunc();
+    myfunc();
+    return 0;
+}
+```
+```output
+i = 2
+i = 4
+i = 2
+i = 4
+```
+
+```c
+#include <stdio.h>
+
+int myfunc()
+{
+    static int i = 0;
+    i += 2;
+    printf("i = %d\n", i);
+    i += 2;
+    printf("i = %d\n", i);
+    return 0;
+}
+
+int main(int argc, char *argv[]) 
+{   
+    myfunc();
+    myfunc();
+    return 0;
+}
+```
+```output
+i = 2
+i = 4
+i = 6
+i = 8
+```
+
+## #043 - String to Integer Conversion
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) 
+{   
+    char *strint = "5782";
+    char *strdbl = "5927.4578";
+
+    int a;
+    double b;
+
+    a = atoi(strint);
+    b = atof(strdbl);
+
+    printf("a = %d\n", a);
+    printf("b = %f\n", b);
+
+    return 0;
+}
+```
+```output
+a = 5782
+b = 5927.457800
+```
+
+## #044 - Time Functions
+
+```c
+#include <stdio.h>
+#include <time.h>
+
+int main(int argc, char *argv[]) 
+{   
+
+    time_t mytime;
+    struct tm *mytm;
+    mytime = time(NULL);
+
+    printf("%s\n", ctime(&mytime));
+
+    mytm = localtime(&mytime);
+    printf("Year: %d\n", 1900 + mytm->tm_year);
+    printf("Month: %d\n", 1 + mytm->tm_mon);
+    printf("Day of Month: %d\n", mytm->tm_mday);
+    printf("DST: %d\n", mytm->tm_isdst);
+
+    return 0;
+}
+```
+```output
+Fri Dec 24 07:46:05 2021
+
+Year: 2021
+Month: 12
+Day of Month: 24
+DST: 0
+```
