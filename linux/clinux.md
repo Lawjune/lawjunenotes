@@ -1897,3 +1897,149 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXmsg: Second thr
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, thret1 = 0
 thret2 = 0
 ```
+
+## #040 - Dynamic Shared Libraries
+
+*add.c*
+```c
+#include <stdio.h>
+
+int addnumbers(int a, int b)
+{
+    int sum;
+    sum = a + b;
+    return sum;
+}
+```
+```sh
+gcc -shared -o libadd.so add.c
+file libadd.so
+`=>
+libadd.so: ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked, BuildID[sha1]=25d4d164ba1b70c5387d8da4817f0aeb8e74b205, not stripped
+```
+
+*main.c*
+```c
+#include <stdio.h>
+
+int main(int argc, char *argv[]) 
+{
+
+    int total;
+    total = addnumers(6, 7);
+
+    printf("total = %d\n", total);
+
+    return 0;
+}
+```
+
+```sh
+gcc -o main main.c -L. -ladd
+./main
+`=>
+./main: error while loading shared libraries: libadd.so: cannot open shared object file: No such file or directory
+```
+
+```sh
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+```
+=>
+```sh
+export LD_LIBRARY_PATH=.
+./main 
+`=>
+total = 13
+```
+
+```sh
+ldd main
+`=>
+        linux-vdso.so.1 (0x00007ffe12199000)
+        libadd.so => ./libadd.so (0x00007f5af475a000)
+        libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f5af4556000)
+        /lib64/ld-linux-x86-64.so.2 (0x00007f5af4766000)
+```
+
+## #041 - Static Shared Libraries
+
+```sh
+gcc -c add.c
+ls
+`=>
+add.c add.o libadd.so ...
+```
+
+```sh
+ar -cvq libadd.a add.o
+`=>
+a - add.o
+```
+```sh
+ls
+`=>
+add.c add.o libadd.a libadd.so ...
+```
+
+```sh
+ nm libadd.a
+`=>
+add.o:
+0000000000000000 T addnumbers
+```
+
+```sh
+ranlib libadd.a
+```
+```sh
+gcc -o main main.c libadd.a
+./main 
+`=>
+total = 13
+```
+
+```sh
+ldd main
+`=>
+        linux-vdso.so.1 (0x00007ffe759a6000)
+        libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f81059d6000)
+        /lib64/ld-linux-x86-64.so.2 (0x00007f8105be1000)
+```
+```sh
+nm main
+`=>
+000000000000118b T addnumbers
+0000000000004010 B __bss_start
+0000000000004010 b completed.8060
+                 w __cxa_finalize@@GLIBC_2.2.5
+0000000000004000 D __data_start
+0000000000004000 W data_start
+0000000000001090 t deregister_tm_clones
+0000000000001100 t __do_global_dtors_aux
+0000000000003dc0 d __do_global_dtors_aux_fini_array_entry
+0000000000004008 D __dso_handle
+0000000000003dc8 d _DYNAMIC
+0000000000004010 D _edata
+0000000000004018 B _end
+0000000000001228 T _fini
+0000000000001140 t frame_dummy
+0000000000003db8 d __frame_dummy_init_array_entry
+0000000000002184 r __FRAME_END__
+0000000000003fb8 d _GLOBAL_OFFSET_TABLE_
+                 w __gmon_start__
+0000000000002010 r __GNU_EH_FRAME_HDR
+0000000000001000 t _init
+0000000000003dc0 d __init_array_end
+0000000000003db8 d __init_array_start
+0000000000002000 R _IO_stdin_used
+                 w _ITM_deregisterTMCloneTable
+                 w _ITM_registerTMCloneTable
+0000000000001220 T __libc_csu_fini
+00000000000011b0 T __libc_csu_init
+                 U __libc_start_main@@GLIBC_2.2.5
+0000000000001149 T main
+                 U printf@@GLIBC_2.2.5
+00000000000010c0 t register_tm_clones
+0000000000001060 T _start
+0000000000004010 D __TMC_END__
+```
