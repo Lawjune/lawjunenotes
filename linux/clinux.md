@@ -2200,3 +2200,289 @@ Month: 12
 Day of Month: 24
 DST: 0
 ```
+
+## #045 - toupper() tolower() Functions
+
+```c
+#include <stdio.h>
+#include <ctype.h>
+
+int main(int argc, char *argv[]) 
+{   
+    char mystr[] = "Hello World!";
+    char *p;
+    int i;
+
+    printf("%s\n", mystr);
+
+    p = mystr;
+    while (*p != '\0')
+    {
+        *p = (char) toupper((char) *p);
+        p++;
+    }
+    printf("%s\n", mystr);
+
+    i = 0;
+    while (mystr[i] != '\0')
+    {
+        mystr[i] = (char) tolower((char) mystr[i]);
+        i++;
+    }
+    printf("%s\n", mystr);
+
+    return 0;
+}
+```
+```output
+Hello World!
+HELLO WORLD!
+hello world!
+```
+
+## #046 - Semaphore pthread
+
+```c
+#include <stdio.h>
+#include <pthread.h>
+#include <semaphore.h>
+
+void *myfunc1(void *ptr);
+void *myfunc2(void *ptr);
+
+char buf[24]; // 24 bytes
+sem_t mutex;
+
+int main(int argc, char *argv[]) 
+{
+
+    pthread_t thread1;
+    pthread_t thread2;
+    char *msg1 = "Thread 1";
+    char *msg2 = "Thread 2";
+
+    sem_init(&mutex, 0, 1);
+
+    pthread_create(&thread1, NULL, (void *) myfunc1, (void *)msg1);
+    pthread_create(&thread2, NULL, (void *) myfunc2, (void *)msg2);
+
+    pthread_join(thread1, NULL);
+    pthread_join(thread2, NULL);
+
+    sem_destroy(&mutex);
+
+    return 0;
+}
+
+void *myfunc1(void *ptr)
+{   
+
+    char *msg = (char *) ptr;
+    printf("msg: %s\n", msg);
+    sem_wait(&mutex);
+    sprintf(buf, "%s", "Hello there!");
+    sem_post(&mutex);
+    pthread_exit(0);
+}
+
+void *myfunc2(void *ptr)
+{   
+    char *msg = (char *) ptr;
+    printf("msg: %s\n", msg);
+    sem_wait(&mutex);
+    printf("%s\n", buf);
+    sem_post(&mutex);
+    pthread_exit(0);
+}
+```
+```output
+msg: Thread 1
+msg: Thread 2
+Hello there!
+```
+
+## #047 - system() Function
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) 
+{
+    int ret;
+    printf("Call system...\n");
+    
+    ret = system("ls -l");
+
+    printf("Existing system... ret = %d\n", ret);
+
+    return 0;
+}
+```
+```output
+Call system...
+total 112
+-rw-rw-r-- 1 lawjune lawjune    98 12月 23 07:28 add.c
+-rw-rw-r-- 1 lawjune lawjune  1392 12月 23 07:41 add.o
+-rwxrwxr-x 1 lawjune lawjune 16872 12月 21 07:38 client
+-rw-rw-r-- 1 lawjune lawjune   596 12月 21 07:36 client.c
+-rw-rw-r-- 1 lawjune lawjune  1540 12月 23 07:45 libadd.a
+-rwxrwxr-x 1 lawjune lawjune 15640 12月 23 07:29 libadd.so
+-rwxrwxr-x 1 lawjune lawjune 16784 12月 28 07:31 main
+-rw-rw-r-- 1 lawjune lawjune   221 12月 28 07:30 main.c
+-rw-rw-r-- 1 lawjune lawjune  3024 12月 17 07:48 main.o
+-rw-rw-r-- 1 lawjune lawjune    22 12月 22 07:31 mytext.txt
+-rwxrwxr-x 1 lawjune lawjune 16912 12月 21 07:37 server
+-rw-rw-r-- 1 lawjune lawjune   633 12月 21 07:39 server.c
+-rw-rw-r-- 1 lawjune lawjune   106 12月 24 07:24 static_var.c
+Existing system... ret = 0
+```
+
+## #048 - setenv() Function
+
+*main.c*
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) 
+{
+    char *p;
+
+    p = getenv("MYENV");
+
+    printf("p = %s\n", p);
+
+    return 0;
+}
+```
+*myenv.c*
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int agrc, char *argv[])
+{
+    int ret;
+
+    ret = 0
+
+    ret = system("./main");
+    perror("system");
+    printf("ret = %d\n", ret);
+
+    return 0;
+}
+```
+```output
+p = (null)
+system: Success
+ret = 0
+```
+=>
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int agrc, char *argv[])
+{
+    int ret;
+
+    ret = putenv("MYENV=hello");
+    if(ret == -1)
+    {
+        perror("putenv");
+        printf("ret = %d\n", ret);
+    }
+
+    ret = system("./main");
+    perror("system");
+    printf("ret = %d\n", ret);
+
+    return 0;
+}
+```
+```output
+p = hello
+system: Success
+ret = 0
+```
+=> Same result.
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int agrc, char *argv[])
+{
+    int ret;
+
+    // ret = putenv("MYENV=hello");
+    ret = setenv("MYENV", "hello", 0);
+    if(ret == -1)
+    {
+        perror("putenv");
+        printf("ret = %d\n", ret);
+    }
+
+    ret = system("./main");
+    perror("system");
+    printf("ret = %d\n", ret);
+
+    return 0;
+}
+```
+```sh
+export MYENV=nice
+./main
+`=>
+p = nice
+```
+```sh
+unset MYENV
+./main
+`=>
+p = (null)
+```
+
+## #049 - Bit Shift Operation
+
+```c
+#include <stdio.h>
+
+int main(int agrc, char *argv[])
+{
+    char bits;
+    bits = 1;
+    printf("%d\n", bits);
+    bits = bits << 1;
+    printf("%d\n", bits);
+
+    return 0;
+}
+```
+```output
+1
+2
+```
+```c
+#include <stdio.h>
+
+int main(int agrc, char *argv[])
+{
+    char bits;
+    bits = 16;
+    printf("%d\n", bits);
+    bits = bits >> 1;
+    printf("%d\n", bits);
+
+    return 0;
+}
+```
+```output
+16
+4
+```
+```output >>
+7
+3
+```
