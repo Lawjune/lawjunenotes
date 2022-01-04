@@ -1141,6 +1141,758 @@ Unknown
 ```
 
 
+## Implicit Conversion and the Explicit Keyword in C++
+
+```cpp
+#include <iostream>
+#include <string>
+
+class Entity
+{
+private:
+    std::string m_name;
+    int m_age;
+public:
+    explicit Entity(int age) : m_name("Unknown"), m_age(age) {}
+    
+    explicit Entity(const std::string& name) : m_name(name), m_age(-1) {}
+    
+    const std::string& get_name() const
+    {
+        return m_name;
+    }
+};
+
+
+int main(int argc, const char * argv[])
+{
+    Entity a("Lawjune");
+    Entity b(37);
+    
+    std::cout << a.get_name() << std::endl;
+    std::cout << b.get_name() << std::endl;
+    
+    return 0;
+}
+```
+```output
+Lawjune
+Unknown
+```
+
+## OPERATORS and OPERATOR OVERLOADING in C++
+
+```cpp
+#include <iostream>
+#include <string>
+
+struct vector2
+{
+    float x, y;
+    
+    vector2(float x, float y) : x(x), y(y) {}
+    
+    vector2 add(const vector2& other) const {
+//        return vector2(x + other.x, y + other.y);
+        return vector2(x + other.x, y + other.y);
+    }
+    
+    vector2 multiply(const vector2& other) const {
+        return vector2(x * other.x, y * other.y);
+    }
+    
+    vector2 operator+(const vector2& other) {
+        return vector2(x + other.x, y + other.y);
+    }
+    
+    vector2 operator*(const vector2& other) {
+        return vector2(x * other.x, y * other.y);
+    }
+};
+
+std::ostream& operator<<(std::ostream& stream, const vector2& other)
+{
+    stream << other.x << ", " << other.y;
+    return stream;
+}
+
+int main(int argc, const char * argv[])
+{
+    vector2 position(4.0f, 4.0f);
+    vector2 speed(0.5f, 1.5f);
+    vector2 powerup(1.1f, 1.1f);
+    
+    vector2 result1 = position.add(speed.multiply(powerup));
+    vector2 result2 = position.add(speed.multiply(powerup));
+    vector2 result3 = position + speed * powerup;
+    
+    std::cout << result1 << std::endl;
+    std::cout << result2 << std::endl;
+    std::cout << result3 << std::endl;
+    
+    return 0;
+}
+```
+```output
+4.55, 5.65
+4.55, 5.65
+4.55, 5.65
+```
+
+## The "this" keyword in C++
+
+```cpp
+#include <iostream>
+#include <string>
+
+//void print_entity(const Entity& e);
+
+class Entity
+{
+public:
+    int x, y;
+    
+    Entity(int x, int y)
+    {
+        this->x = x;
+        this->y = y;
+
+//        print_entity(*this);
+    }
+    
+    int get_x() const
+    {
+        const Entity& e = *this;
+    }
+};
+
+void print_entity(Entity* e)
+{
+    // Print
+}
+
+int main(int argc, const char * argv[])
+{
+    
+    return 0;
+}
+
+```
+
+## Object Lifetime in C++ (Stack/Scope Lifetimes)
+
+```cpp
+#include <iostream>
+#include <string>
+
+class Entity
+{
+private:
+    int x;
+public:
+    Entity()
+    {
+        std::cout << "Created Entiity!" << std::endl;
+    }
+    ~Entity()
+    {
+        std::cout << "Destroyed Entiity!" << std::endl;
+    }
+};
+
+int main(int argc, const char * argv[])
+{
+    {
+//        Entity e;
+        Entity* e = new Entity();
+    }
+    
+    return 0;
+}
+```
+
+***Stack-based variable***
+```cpp
+Entity e;
+```
+```output
+Created Entiity!
+Destroyed Entiity!
+```
+
+***Heap-based variable***
+```cpp
+Entity* e = new Entity();
+```
+```output
+Created Entiity!
+```
+*The memory does get cleaned by the operating system when our application terminates.*
+
+*A heap-based variable gets free and destroyed as soon as we go out of scope.*
+
+*If you create a variable on the stack it's going to cease to exist when it goes out of start.*
+
+```cpp
+#include <iostream>
+#include <string>
+
+int* create_array()
+{
+//    int array[50]; -> It doesn't work!
+    int* array = new int[50];
+    return array;
+}
+
+void fill_array(int* array)
+{
+    // It does not work!
+    // Because the array is in the stack!
+    array[1] = 1;
+}
+
+int main(int argc, const char * argv[])
+{
+    int* new_array = create_array();
+    std::cout << new_array[0] << std::endl;
+    fill_array(new_array);
+    std::cout << new_array[0] << std::endl;
+    
+    int array[50];
+    std::cout << array[0] << std::endl;
+    fill_array(array);
+    std::cout << array[0] << std::endl;
+    
+    return 0;
+}
+```
+```output
+0
+0
+371929088  
+371929088
+```
+
+```cpp
+#include <iostream>
+#include <string>
+
+class Entity
+{
+private:
+    int x;
+    std::string name;
+public:
+    Entity(std::string entity_name)
+    {
+        name = entity_name;
+        std::cout << "Created Entiity: " << name << std::endl;
+    }
+    ~Entity()
+    {
+        std::cout << "Destroyed Entiity: " << name << std::endl;
+    }
+};
+
+class ScopedPtr
+{
+private:
+    Entity* m_ptr;
+public:
+    ScopedPtr(Entity* ptr) : m_ptr(ptr) {}
+    
+    ~ScopedPtr() {
+        delete m_ptr;
+    }
+};
+
+int main(int argc, const char * argv[])
+{
+    {
+        ScopedPtr e1(new Entity("e1"));
+    }
+    
+    ScopedPtr e1(new Entity("e1"));
+    
+    return 0;
+}
+```
+
+## SMART POINTERS in C++ 
+
+### SMART POINTERS in C++ - std::unique_ptr
+
+*The unique_ptr is a scope pointer. This pointer has to be unique you can't copy a unique pointer because if you copy a unique pointer the memory that it's pointing to they'll bascically you'll have two unique pointers pointing to the same block memory and when one of them dies it will free that memory.* 
+
+```cpp
+#include <iostream>
+#include <string>
+#include <memory>
+
+class Entity
+{
+private:
+    int x;
+    std::string name;
+public:
+    Entity(std::string entity_name)
+    {
+        name = entity_name;
+        std::cout << "Created Entiity: " << name << std::endl;
+    }
+    ~Entity()
+    {
+        std::cout << "Destroyed Entiity: " << name << std::endl;
+    }
+    
+    void print()
+    {
+        std::cout << name << std::endl;
+    }
+};
+
+int main(int argc, const char * argv[])
+{
+    {
+        // Make exception safety
+        // make_unique only exists since c++14
+        // std::unique_ptr<Entity> entity = std::make_unique<Entity>("entity");
+        std::unique_ptr<Entity> entity(new Entity("entity"));
+        entity->print();
+    }
+    return 0;
+}
+```
+```output
+Created Entiity: entity
+entity
+Destroyed Entiity: entity
+```
+
+### SMART POINTERS in C++ - std::shared_ptr
+
+```cpp
+#include <iostream>
+#include <string>
+#include <memory>
+
+class Entity
+{
+private:
+    int x;
+    std::string name;
+public:
+    Entity(std::string entity_name)
+    {
+        name = entity_name;
+        std::cout << "Created Entiity: " << name << std::endl;
+    }
+    ~Entity()
+    {
+        std::cout << "Destroyed Entiity: " << name << std::endl;
+    }
+    
+    void print()
+    {
+        std::cout << name << std::endl;
+    }
+};
+
+int main(int argc, const char * argv[])
+{
+    {
+        std::shared_ptr<Entity> e0;
+        {
+            std::shared_ptr<Entity> shared_entity(new Entity("shared_entity"));
+            shared_entity->print();
+            e0 = shared_entity;
+            e0->print();
+        }
+    }
+
+    return 0;
+}
+```
+
+### SMART POINTERS in C++ - std::weak_ptr
+
+```cpp
+...
+...
+int main(int argc, const char * argv[])
+{
+    {
+        std::weak_ptr<Entity> e0;
+        {
+            std::shared_ptr<Entity> shared_entity(new Entity("shared_entity"));
+            shared_entity->print();
+            std::weak_ptr<Entity> weak_entity = shared_entity;
+            // weak_entity->print(); // It doesn't work!
+            e0 = shared_entity;
+            // e0->print(); // It doesn't work!
+        }
+    }
+
+    return 0;
+}
+```
+
+### Copying and Copy Constructors in C++
+
+```cpp
+#include <iostream>
+#include <string>
+
+struct vector2
+{
+    float x, y;
+};
+
+int main(int argc, const char * argv[])
+{
+    vector2* a = new vector2();
+    vector2* b = a;
+    b->x=2;
+
+    std::cout << a->x << std::endl;
+    return 0;
+}
+```
+```output
+2
+```
+
+```cpp
+#include <iostream>
+#include <string>
+
+class String
+{
+private:
+    char* m_buffer;
+    unsigned int m_size;
+public:
+    String(const char* string)
+    {
+        std::cout << "Copy string!" << std::endl;
+        m_size = (unsigned int) strlen(string);
+        m_buffer = new char[m_size+1];
+        memcpy(m_buffer, string, m_size+1);
+        m_buffer[m_size] = 0;
+    }
+    
+    String(const String& other) : m_size(other. m_size)
+    {
+        m_buffer = new char[m_size + 1];
+        memcpy(m_buffer, other.m_buffer, m_size);
+    }
+    
+    ~String()
+    {
+        delete[] m_buffer;
+    }
+    char& operator[](unsigned int index)
+    {
+        return m_buffer[index];
+    }
+    
+    friend std::ostream& operator<<(std::ostream& stream, const String& string);
+};
+
+std::ostream& operator<<(std::ostream& stream, const String& string)
+{
+    stream << string.m_buffer;
+    return stream;
+}
+
+void print_string(const String& string)
+{
+    std::cout << string << std::endl;
+}
+
+int main(int argc, const char * argv[])
+{
+    String string = "Lawjune";
+    String second = string;
+    second[2] = 'a';
+//    std::cout << string << std::endl;
+//    std::cout << second << std::endl;
+    print_string(string);
+    print_string(second);
+    return 0;
+}
+```
+```output
+Copy string!
+Lawjune
+Laajune
+```
+
+### The Arrow Operator in C++
+
+```cpp
+#include <iostream>
+#include <string>
+
+class Entity
+{
+public:
+    void print() const
+    {
+        std::cout << "Hello!" << std::endl;
+    }
+};
+
+class ScopedPtr
+{
+private:
+    Entity* m_obj;
+public:
+    ScopedPtr(Entity* entity) : m_obj(entity) {}
+    ~ScopedPtr() { delete m_obj; }
+    Entity* operator->() { return m_obj; }
+    const Entity* operator->() const { return m_obj; }
+    
+};
+
+int main(int argc, const char * argv[])
+{
+    Entity e;
+    e.print();
+    
+    Entity* ptr = &e;
+    Entity& entity = *ptr;
+    (*ptr).print();
+    ptr->print();
+    entity.print();
+    
+    const ScopedPtr ptr_entity = new Entity();
+    ptr_entity->print();
+}
+```
+```output
+Hello!
+Hello!
+Hello!
+Hello!
+Hello!
+```
+```cpp
+#include <iostream>
+#include <string>
+
+struct vector3
+{
+    float x, y, z;
+    
+};
+
+
+int main(int argc, const char * argv[])
+{
+    int offset = (int)(size_t)&((vector3*)nullptr)->z;
+    std::cout << offset << std::endl;
+    
+    return 0;
+}
+```
+```output
+8
+```
+
+## Containers: std:vector
+
+### Dynamic Arrays in C++
+
+```cpp
+#include <iostream>
+#include <string>
+#include <vector>
+
+struct Vertex
+{
+    float x, y, z;
+};
+
+std::ostream& operator<<(std::ostream& stream, const Vertex& vertex)
+{
+    stream << vertex.x << ", " << vertex.y << ", " << vertex.z;
+    return stream;
+}
+
+int main(int argc, const char * argv[])
+{
+    std::vector<Vertex> vertices;
+    vertices.push_back((Vertex){1, 2, 3});
+    vertices.push_back((Vertex){4, 5, 6});
+    for (int i = 0; i < vertices.size(); i++)
+        std::cout << vertices[i] << std::endl;
+    for (Vertex& v: vertices)
+        std::cout << v << std::endl;
+    vertices.erase(vertices.begin() + 1);
+    for (Vertex& v: vertices)
+        std::cout << v << std::endl;
+    return 0;
+}
+```
+```output
+1, 2, 3
+4, 5, 6
+1, 2, 3
+4, 5, 6
+1, 2, 3
+```
+
+### Optimizing the usage of std::vector in C++
+
+--> Construct the vertex in the same place as it will be stored. Rather than constructing it in the current method and then copying it to the vertex location.
+--> use emplace_back rather than push_back and only pass the parameter list for the constructor.
+
+```cpp
+#include <iostream>
+#include <string>
+#include <vector>
+
+struct Vertex
+{
+    float x, y, z;
+    
+    Vertex(float x, float y, float z) : x(x), y(y), z(z) {}
+
+    Vertex(const Vertex& vertex) : x(vertex.x), y(vertex.y), z(vertex.z)
+    {
+        std::cout << "Copied! " << vertex.x << " at " << &vertex << std::endl;
+    }
+};
+
+
+int main(int argc, const char * argv[])
+{
+    std::vector<Vertex> vertices;
+//    vertices.reserve(3);
+    vertices.push_back(Vertex(1, 2, 3));
+    vertices.push_back(Vertex(4, 5, 6));
+    vertices.push_back(Vertex(7, 8, 9));
+    return 0;
+}
+```
+```output
+Copied! 1 at 0x7ffeebb77948
+Copied! 4 at 0x7ffeebb77930
+Copied! 1 at 0x7f9d48c05940
+Copied! 7 at 0x7ffeebb77920
+Copied! 4 at 0x7f9d48c059fc
+Copied! 1 at 0x7f9d48c059f0
+```
+
+**Optimized**
+```cpp
+int main(int argc, const char * argv[])
+{
+    std::vector<Vertex> vertices;
+    vertices.reserve(3);
+    vertices.push_back(Vertex(1, 2, 3));
+    vertices.push_back(Vertex(4, 5, 6));
+    vertices.push_back(Vertex(7, 8, 9));
+    return 0;
+}
+```
+```output
+Copied! 1 at 0x7ffee1d97940
+Copied! 4 at 0x7ffee1d97930
+Copied! 7 at 0x7ffee1d97920
+```
+
+## Using Libraries in C++
+
+### Using Libraries in C++ (Static Linking)
+
+*Download the pre-compiled binaries from https://www.glfw.org/download, extract and copy to the development project directory.*
+
+
+### Using Dynamic Libraries in C++
+
+### Making and Working with Libraries in C++ (Multiple Projects in Visual Studio)
+
+https://blog.ntechdevelopers.com/setup-opengl-environment-on-xcode/
+
+Preparing Libraries:
+CMake:
+Since most of the libraries provide cmake files to generate files, it is better to have a CMake on your Mac. I do not know a lot about CMake. I just explain how to install it.
+
+For convenience, I installed CMake by Homebrew. Here is the link for installing Homebrew:http://brew.sh
+After installing Homebrew, just type “brew install cmake” command in Terminal and CMake will be installed.
+
+GLFW:
+1. Go to website and download the file: http://www.glfw.org
+2. Unzip the downloaded file.
+3. Open Terminal and go to the root directory of glfw, like “glfw-3.2”.
+4. Type commands:
+cmake .
+make
+sudo make install
+It means GLFW is successfully installed.
+
+GLEW:
+1. Go to website and download the file:http://glew.sourceforge.net
+2. Open Terminal and go to the root directory of glew, like “glfw-3.1.2”.
+3. Type commands:
+make
+make install
+make clean
+You may have problem like “no permission”. Because users do not have the permission to directly modify the folder /usr/local/include and /usr/local/lib. You may use command in Terminal to get the permission if you like to install in these folders. Otherwise you can modify the Makefile so that it will generate into different folder. The commands to get the permission are
+sudo chown -R $(whoami) /usr/local/include/GL
+sudo chown -R $(whoami) /usr/local/lib
+
+What’s more, you can also install glew by Homebrew.
+
+
+Build in Xcode
+1. Create a new Xcode project
+2. Choose OSX->Application->Command Line Tool. Then give a name and path for this project.
+3. Add framework.
+a. click project name -> Build Phases -> link binary with libraries
+b. Add these framework by click “+”:
+OpenGL.framework
+IOKit.framework
+CoreVideo.framework
+Cocoa.framework
+c. Add extra library. Click “Add Other…”, use shortcuts “command+shift+G”, and input path “/usr/local/lib”
+(If you do not change the path while installing, you will find all required library here). Add this library in:
+libglfw3.a
+libGLEW.a
+4. Add header and library path.
+a. Go to “Build Settings”.
+b. Find “Header Search Path”. Input “/usr/local/include” (or the other folder contains the header)
+c. Find “Library Search Path”. Input “/usr/local/lib” (or the other folder contains the header)
+
+Since GLFW is supported by these framework on Mac, we need to include four frameworks in Step 3. However, from GLFW website:
+
+If you are using the dynamic library version of GLFW, simply add it to the project dependencies.
+If you are using the static library version of GLFW, add it and the Cocoa, OpenGL, IOKit and CoreVideo frameworks to the project as dependencies. They can all be found in /System/Library/Frameworks.
+Other Libraries
+GLM:
+1. Go to website and download: http://glm.g-truc.net/0.9.7/index.html
+2. Unzip downloaded file.
+3. Go to “Build Settings” in project on Xcode. Find “Header Search Path”. Input “/<root directory of glm>”
+GLM just needs to be included in the project. You can also copy “/<root directory of glm>/glm” folder to other place and include that path in the project. I just copy it into my “/usr/local/include”. It is convenient for me to organize it.
+
+SOIL:
+SOIL is a library to import pictures. It supports several types of pictures. Since the latest version is 07-07-2008, to make it work, I took much time to build it up.
+1. Go to the website and download the “old” latest version http://www.lonesock.net/soil.html.
+2. Unzip downloaded file.
+3. Go to the root directory of SOIL.
+4. Edit Makefile.
+a. Add “-m64” after CFLAGS. Then this line become “CFLAGS += -c -O2 -Wall -m64”
+(Resource: http://stackoverflow.com/a/35862048)
+b. Modify “INCLUDEDIR” to the folder that you want to put in the header. For example, mine is “/usr/local/include/SOIL”.
+c. Modify “LIBDIR” to the folder that you want to put in the library. For example, mine is “/usr/local/lib”.
+d. Use Terminal to the root directory of SOIL. Type command
+make
+make install
+make clean
+e. Go to Build Phases -> link binary with libraries in project. Add other -> find “libSOIL.a”.
+
 
 
 
