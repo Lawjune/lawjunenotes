@@ -4236,3 +4236,382 @@ $1 = 7
 $2 = 0xe6e3b345c63f0200 <error: Cannot access memory at address 0xe6e3b345c63f0200>
 (gdb) 
 ```
+
+#057 - GDB debugger (2/2)
+
+```c
+#include <stdio.h>
+
+int addnum(int a, int b)
+{
+    int total;
+    total = a + b;
+    return total;
+}
+
+int main(int argc, char *argv[])
+{
+    int a, b;
+    int sum;
+
+    a = 4;
+    b = 7;
+
+    sum = addnum(a, b);
+    printf("sum = %d\n", sum);
+    return 0;
+}
+```
+
+```sh
+gcc -g -o main main.c
+gdb main
+`=>
+GNU gdb (Ubuntu 9.2-0ubuntu1~20.04) 9.2
+Copyright (C) 2020 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from main...
+(gdb) b 16
+Breakpoint 1 at 0x1181: file main.c, line 16.
+(gdb) run
+Starting program: /home/lawjune/Projects/justc/main 
+
+Breakpoint 1, main (argc=1, argv=0x7fffffffdd88) at main.c:16
+16      b = 7;
+(gdb) list
+11  {
+12      int a, b;
+13      int sum;
+14  
+15      a = 4;
+16      b = 7;
+17  
+18      sum = addnum(a, b);
+19      printf("sum = %d\n", sum);
+20      return 0;
+(gdb) print a
+$1 = 4
+(gdb) print b
+$2 = 0
+(gdb) next
+18      sum = addnum(a, b);
+(gdb) print b
+$3 = 7
+(gdb) step
+addnum (a=32767, b=-9097) at main.c:4
+4   {
+(gdb) print a
+$4 = 32767
+(gdb) print b
+$5 = -9097
+(gdb) next
+6       total = a + b;
+(gdb) step
+7       return total;
+(gdb) print a
+$6 = 4
+(gdb) print b
+$7 = 7
+(gdb) print total
+$8 = 11
+(gdb) print sum
+No symbol "sum" in current context.
+(gdb) next
+8   }
+(gdb) next
+main (argc=1, argv=0x7fffffffdd88) at main.c:19
+19      printf("sum = %d\n", sum);
+(gdb) print sum
+$9 = 11
+(gdb) next
+sum = 11
+20      return 0;
+(gdb) next
+21  }
+(gdb) next
+__libc_start_main (main=0x555555555167 <main>, argc=1, argv=0x7fffffffdd88, 
+    init=<optimized out>, fini=<optimized out>, rtld_fini=<optimized out>, 
+    stack_end=0x7fffffffdd78) at ../csu/libc-start.c:342
+342 ../csu/libc-start.c: No such file or directory.
+(gdb) next
+[Inferior 1 (process 6078) exited normally]
+(gdb) run
+Starting program: /home/lawjune/Projects/justc/main 
+
+Breakpoint 1, main (argc=1, argv=0x7fffffffdd88) at main.c:16
+16      b = 7;
+(gdb) next
+18      sum = addnum(a, b);
+(gdb) step
+addnum (a=32767, b=-9097) at main.c:4
+4   {
+(gdb) fin
+Run till exit from #0  addnum (a=32767, b=-9097) at main.c:4
+0x0000555555555197 in main (argc=1, argv=0x7fffffffdd88) at main.c:18
+18      sum = addnum(a, b);
+Value returned is $10 = 11
+(gdb) print sum
+$11 = 0
+(gdb) next
+19      printf("sum = %d\n", sum);
+(gdb) print sum
+$12 = 11
+(gdb) cont
+Continuing.
+sum = 11
+[Inferior 1 (process 7664) exited normally]
+(gdb) help
+List of classes of commands:
+
+aliases -- Aliases of other commands.
+breakpoints -- Making program stop at certain points.
+data -- Examining data.
+files -- Specifying and examining files.
+internals -- Maintenance commands.
+obscure -- Obscure features.
+running -- Running the program.
+stack -- Examining the stack.
+status -- Status inquiries.
+support -- Support facilities.
+tracepoints -- Tracing of program execution without stopping the program.
+user-defined -- User-defined commands.
+
+Type "help" followed by a class name for a list of commands in that class.
+Type "help all" for the list of all commands.
+Type "help" followed by command name for full documentation.
+Type "apropos word" to search for commands related to "word".
+Type "apropos -v word" for full documentation of commands related to "word".
+Command name abbreviations are allowed if unambiguous.
+(gdb) helo running
+Undefined command: "helo".  Try "help".
+(gdb) help running
+Running the program.
+
+List of commands:
+
+advance -- Continue the program up to the given location (same form as args for break command).
+attach -- Attach to a process or file outside of GDB.
+continue -- Continue program being debugged, after signal or breakpoint.
+detach -- Detach a process or file previously attached.
+detach checkpoint -- Detach from a checkpoint (experimental).
+detach inferiors -- Detach from inferior ID (or list of IDS).
+disconnect -- Disconnect from a target.
+finish -- Execute until selected stack frame returns.
+handle -- Specify how to handle signals.
+inferior -- Use this command to switch between inferiors.
+interrupt -- Interrupt the execution of the debugged program.
+jump -- Continue program being debugged at specified line or address.
+kill -- Kill execution of program being debugged.
+kill inferiors -- Kill inferior ID (or list of IDs).
+next -- Step program, proceeding through subroutine calls.
+nexti -- Step one instruction, but proceed through subroutine calls.
+queue-signal -- Queue a signal to be delivered to the current thread when it is resumed.
+--Type <RET> for more, q to quit, c to continue without paging--q\q
+Quit
+(gdb) 
+```
+
+#058 - Code Optimization
+
+https://www.rapidtables.com/code/linux/gcc/gcc-o.html
+
+*From https://stackoverflow.com/questions/1778538/how-many-gcc-optimization-levels-are-there*
+```
+From the man page:
+
+-O (Same as -O1)
+-O0 (do no optimization, the default if no optimization level is specified)
+-O1 (optimize minimally)
+-O2 (optimize more)
+-O3 (optimize even more)
+-Ofast (optimize very aggressively to the point of breaking standard compliance)
+-Og (Optimize debugging experience. -Og enables optimizations that do not interfere with debugging. It should be the optimization level of choice for the standard edit-compile-debug cycle, offering a reasonable level of optimization while maintaining fast compilation and a good debugging experience.)
+-Os (Optimize for size. -Os enables all -O2 optimizations that do not typically increase code size. It also performs further optimizations designed to reduce code size. -Os disables the following optimization flags: -falign-functions -falign-jumps -falign-loops -falign-labels -freorder-blocks -freorder-blocks-and-partition -fprefetch-loop-arrays -ftree-vect-loop-version)
+```
+
+#059 - Code Instrumentation
+
+```c
+#include <stdio.h>
+
+int addnum(int a, int b)
+{
+    int sum;
+
+#ifdef INSTDDEBUG
+    printf("Debug: Entering addnum %s %d\n", __FILE__, __LINE__);
+    printf("Debug: a = %d\n", a);
+    printf("Debug: b = %d\n", b);
+#endif
+
+    sum = a + b;
+
+#ifdef INSTDDEBUG
+    printf("Debug: sum = %d\n", sum);
+    printf("Debug: Leaving addnum %s %d\n", __FILE__, __LINE__);
+#endif
+
+    return sum;
+}
+
+int main(int argc, char *argv[])
+{
+    int a, b;
+    int total;
+
+    a = 4;
+    b = 7;
+
+    total = addnum(a, b);
+    printf("total = %d\n", total);
+    return 0;
+}
+```
+
+```sh
+gcc -DINSTDDEBUG -o main main.c
+./main
+`=> 
+Debug: Entering addnum main.c 8
+Debug: a = 4
+Debug: b = 7
+Debug: sum = 11
+Debug: Leaving addnum main.c 17
+total = 11
+```
+
+#060 - (Part 1/2) getopt() Function
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[])
+{
+    int c;
+    int xflg = 0, yflg = 0, zflg = 0;
+
+    while ((c = getopt(argc, argv, "x:yz:")) != -1)
+    {
+        switch (c)
+        {
+        case 'x':
+            xflg = 1;
+            break;
+        case 'y':
+            yflg = 1;
+            break;
+        case 'z':
+            zflg = 1;
+            break;
+        case '?':
+            if(optopt == 'x' || optopt == 'z')
+                fprintf(stderr, "Option -%c needs argument\n", optopt);
+            else
+                fprintf(stderr, "Unknown option -%c needs argument\n", optopt);
+            fprintf(stderr, "Unknown option -%c. \n", optopt);
+            break;
+        
+        default:
+            fprintf(stderr, "getopt");
+            break;
+        }
+    }
+     
+    printf("xflg = %d, yflg = %d, zflg = %d\n", xflg, yflg, zflg);
+
+    return 0;
+}
+```
+
+```sh
+./main -x 2 -y -z rt
+`=>
+xflg = 1, yflg = 1, zflg = 1
+```
+
+```sh
+./main -x 2 -y -z
+`=>
+./main: option requires an argument -- 'z'
+Option -z needs argument
+Unknown option -z. 
+xflg = 1, yflg = 1, zflg = 0
+```
+
+#060 - (Part 2/2) getopt() Function
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[])
+{
+    int c;
+    int xflg = 0, yflg = 0, zflg = 0;
+
+    while ((c = getopt(argc, argv, "x:yz:")) != -1)
+    {
+        switch (c)
+        {
+        case 'x':
+            xflg = 1;
+            printf("optarg = %s\n", optarg);
+            printf("optarg in int = %d\n", atoi(optarg));
+            break;
+        case 'y':
+            yflg = 1;
+            printf("optarg = %s\n", optarg);
+            if(optarg != NULL)
+                printf("optarg in int = %d\n", atoi(optarg));
+            break;
+        case 'z':
+            zflg = 1;
+            printf("optarg = %s\n", optarg);
+            printf("optarg in int = %d\n", atoi(optarg));
+            break;
+        case '?':
+            if(optopt == 'x' || optopt == 'z')
+                fprintf(stderr, "Option -%c needs argument\n", optopt);
+            else
+                fprintf(stderr, "Unknown option -%c needs argument\n", optopt);
+            fprintf(stderr, "Unknown option -%c. \n", optopt);
+            break;
+        
+        default:
+            fprintf(stderr, "getopt");
+            break;
+        }
+    }
+     
+    printf("xflg = %d, yflg = %d, zflg = %d\n", xflg, yflg, zflg);
+
+    return 0;
+}
+```
+
+```sh
+./main -x 2 -y -z rt
+`=>
+optarg = 2
+optarg in int = 2
+optarg = (null)
+optarg = rt
+optarg in int = 0
+xflg = 1, yflg = 1, zflg = 1
+```
+
+#061 - Math Library
