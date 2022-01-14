@@ -1,6 +1,6 @@
-# Getting Started
+# 1. Getting Started
 
-## What is SQL?
+## 1.1  What is SQL?
 
 A **DATABASE** 
 is a collection of data stored in a format
@@ -9,7 +9,7 @@ that can easily be accessed.
 **DBMS**: Database Management System
 
 **RELATIONAL DATABASE**
-[Customers] - [Orders] - [Products] 
+[customers] - [Orders] - [Products] 
 
 **RDBMS**
 - MySQL
@@ -18,9 +18,9 @@ that can easily be accessed.
 
 **NoSQL** systems don't understand SQL
 
-## Creating Database
+## 1.2 Creating Database
 
-## What You'll Learn
+## 1.3 What You'll Learn
 
 - Retrieving Data
 - Inserting Data
@@ -43,9 +43,9 @@ that can easily be accessed.
 - Securing Databases
 
 
-# Retrieving Data From a Single Table 
+# 2 Retrieving Data From a Single Table 
 
-## The SELECT Statement
+## 2.1 The SELECT Statement
 
 ```sql
 USE sql_store;
@@ -56,7 +56,7 @@ FROM customers
 -- ORDER BY first_name
 ```
 
-## The SELECT Clause
+## 2.2 The SELECT Clause
 
 ```sql
 SELECT 
@@ -71,51 +71,53 @@ FROM customers
 SELECT name, unit_price, unit_price*1.1 AS 'new_price' FROM sql_store.products;
 ```
 
-## The WHERE Clause
+## 2.3 The WHERE Clause
 
 ```sql
 SELECT *
-FROM Customers
+FROM customers
 WHERE points > 3000
 ```
 
 ```sql
 SELECT *
-FROM Customers
+FROM customers
 -- WHERE state != 'VA'
 -- WHERE state <> 'VA'
 WHERE birth_date > '1990-01-01'
 ```
 
+**Exercise:**
+*Get the orders placed this year (2019)*
 ```sql
 SELECT *
 FROM orders
 WHERE order_date > '2019-01-01'
 ```
 
-## The AND, OR and NOT Operators
+## 2.4 The AND, OR and NOT Operators
 
-## The IN Operator
+## 2.5 The IN Operator
 
 ```sql
 SELECT *
-FROM Customers
+FROM customers
 WHERE state NOT IN ('VA', 'GA', 'FL')
 ```
 
-## The BETWEEN Operator
+## 2.6 The BETWEEN Operator
 
 ```sql
 SELECT *
-FROM Customers
+FROM customers
 WHERE points BETWEEN 1000 AND 3000
 ```
 
-## The LIKE Operator
+## 2.7 The LIKE Operator
 
 ```sql
 SELECT *
-FROM Customers
+FROM customers
 -- WHERE last_name LIKE 'b%'
 -- WHERE last_name LIKE '%b%'
 WHERE last_name LIKE 'b____y'
@@ -124,20 +126,26 @@ WHERE last_name LIKE 'b____y'
 % any number of characters
 _ single character
 
+
+**Exercise:**
+*Get the customres whose*
+    *addresses contain TRAIL or AVENUE*
+    *phone numbers end with 9*
 ```sql
 SELECT *
-FROM Customers
-WHERE address LIKE '%trail%' OR 
-	  address LIKE 'AVENUE'
+FROM customers
+WHERE (address LIKE '%trail%' OR address LIKE 'AVENUE')
+    AND phone LIKE '%9'
 ```
 
-## The REGEXP Operator
+## 2.8 The REGEXP Operator
 
 ```sql
 SELECT *
-FROM Customers
+FROM customers
 -- WHERE last_name LIKE '%field%'
-WHERE last_name REGEXP '^field|mac|rose'
+-- WHERE last_name REGEXP '^field|mac|rose'
+WHERE last_name REGEXP 'field$|mac|rose'
 ```
 
 ```sql
@@ -155,6 +163,12 @@ $ end
 [a-f]
 ```
 
+**Exercise:**
+*Get the customres whose*
+    *first names are ELKA or AMBUR*
+    *last names end with EY or ON*
+    *last names start with MY or contains SE*
+    *last names contain B followed by R or U*
 ```sql
 WHERE first_name REGEXP 'ELKA|AMBUR'
 WHERE last_name REGEXP 'EY$|ON$'
@@ -162,46 +176,64 @@ WHERE last_name REGEXP '^MY|SE'
 WHERE last_name REGEXP 'B[RU]'
 ```
 
-## The IS NULL Operator
+## 2.9 The IS NULL Operator
 
 ```sql
 SELECT *
-FROM Customers
+FROM customers
 WHERE phone IS NOT NULL
 ```
 
-## The ORDER BY Clause
+## 2.10 The ORDER BY Clause
 
 ```sql
 SELECT first_name, last_name, 10 AS points
-FROM Customers
+FROM customers
 ORDER BY state DESC, birth_date DESC
 ```
 
-## The LIMIT Clause
+## The 2.11 LIMIT Clause
 
 ```sql
 SELECT *
-FROM Customers
-LIMIT 6, 3
+FROM customers
+LIMIT 6, 3 -- skip 6 records and pick 3 records
 -- page 1: 1 - 3
 -- page 2: 4 - 6
 -- page 3: 7 - 9
 ```
 
-
-# Retrieving Data From Multiple Tables
-
-## Inner Joins
-
+**Exercise:**
+*Get the top three loyal customers*
 ```sql
-SELECT order_id, o.customer_id, first_name, last_name
-FROM orders o 
-INNER JOIN customers c
-	ON o.customer_id = c.customer_id
+SELECT *
+FROM customers
+ORDER BY points DESC
+LIMIT 3
 ```
 
-## Joinning Across Databases
+# 3 Retrieving Data From Multiple Tables
+
+## 3.1 Inner Joins
+
+```sql
+SELECT order_id, o.product_id, quantity, o.unit_price, name
+FROM sql_store.order_items o 
+INNER JOIN sql_store.products p 
+    ON o.product_id = p.product_id
+    ORDER BY o.quantity DESC
+```
+
+**Exercise:**
+```sql
+SELECT * FROM sql_store.order_items o 
+INNER JOIN sql_store.products p 
+    ON o.product_id = p.product_id
+    ORDER BY o.quantity DESC
+```
+
+
+## 3.2 Joinning Across Databases
 
 ```sql
 USE sql_store;
@@ -212,7 +244,7 @@ JOIN sql_inventory.products p
 	ON oi.product_id = p.product_id
 ```
 
-## Self Joins
+## 3.3 Self Joins
 
 ```sql
 USE sql_hr;
@@ -226,7 +258,8 @@ JOIN employees m
 	ON e.reports_to = m.employee_id
 ``` 
 
-## Joining Multiple Tables
+
+## 3.4 Joining Multiple Tables
 
 ```sql
 USE sql_store;
@@ -244,6 +277,7 @@ JOIN order_statuses os
 	ON o.status = os.order_status_id
 ```
 
+**Exercise:**
 ```sql
 USE sql_invoicing;
 
@@ -260,7 +294,7 @@ JOIN payment_methods pm
 	ON p.payment_method = pm.payment_method_id
 ```
 
-## Compound Join Conditions
+## 3.5 Compound Join Conditions
 
 ```sql
 USE sql_store;
@@ -272,7 +306,7 @@ JOIN order_item_notes oin
     AND oi.product_id = oin.product_id
 ```
 
-## Implict Join Syntax
+## 3.6 Implict Join Syntax
 
 ```sql
 USE sql_store;
@@ -288,7 +322,7 @@ FROM orders o, customers c
 WHERE o.customer_id = c.customer_id
 ```
 
-## Outer Joins
+## 3.7 Outer Joins
 
 ```sql
 USE sql_store;
@@ -304,7 +338,7 @@ LEFT JOIN orders o
 ORDER BY c.customer_id
 ```
 
-## Outer Join Between Multiple Tables
+## 3.8 Outer Join Between Multiple Tables
 
 ```sql
 USE sql_store;
@@ -323,7 +357,18 @@ LEFT JOIN shippers sh
 ORDER BY c.customer_id
 ```
 
-## Self Outer Joins
+**Exercise:**
+```sql
+USE sql_store;
+
+SELECT p.product_id, p.name, oi.quantity
+FROM products p
+LEFT JOIN order_items oi
+ON
+    p.product_id = oi.product_id
+```
+
+## 3.9 Self Outer Joins
 
 ```sql
 USE sql_hr;
@@ -337,7 +382,7 @@ LEFT JOIN employees m
     ON e.reports_to = m.employee_id
 ```
 
-## The USING Clause
+## 3.10 The USING Clause
 
 ```sql
 USE sql_store;
@@ -365,6 +410,7 @@ JOIN order_item_notes oin
     USING (order_id, product_id)
 ```
 
+**Exercise:**
 ```sql
 USE sql_invoicing;
 
@@ -380,12 +426,12 @@ JOIN payment_methods pm
     ON p.payment_method = pm.payment_method_id
 ```
 
-## Natural Joins
+## 3.11 Natural Joins
 
 ***DISCOURAGE TO USE THEM***
 
 
-## Cross Join
+## 3.12 Cross Join
 
 ```sql
 USE sql_store;
@@ -398,7 +444,27 @@ CROSS JOIN products p
 ORDER BY c.first_name
 ```
 
-## Unions
+**Excercise:**
+*Do a cross join between shippers and products*
+    *using the implict syntax*
+    *and then using the explicit syntax*
+
+```sql
+USE sql_store;
+
+SELECT *
+FROM shippers, products
+```
+
+```sql
+USE sql_store;
+
+SELECT *
+FROM shippers
+CROSS JOIN products
+```
+
+## 3.13 Unions
 
 ```sql
 USE sql_store;
@@ -428,6 +494,7 @@ SELECT name
 FROM shippers
 ```
 
+**Exercise:**
 ```sql
 USE sql_store;
 
@@ -457,7 +524,7 @@ WHERE points BETWEEN > 000
 ORDER BY first_name
 ```
 
-# Inserting, Updating, and Deleting Data
+# 4 Inserting, Updating, and Deleting Data
 
 ## Column Attributes
 
@@ -467,7 +534,7 @@ ORDER BY first_name
 INSERT INTO customers (
     first_name,
     last_name,
-    birth_date,
+    birth_d4ate,
     address,
     city,
     state
