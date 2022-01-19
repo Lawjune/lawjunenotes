@@ -181,6 +181,48 @@ k = 2af6393c
 *k = 10
 ```
 
+***An integer***
+```c
+int a;
+```
+
+***A pointer to an integer***
+```c
+int *a;
+```
+
+***A pointer to a pointer to an integer***
+```c
+int **a;
+```
+
+***An array of 10 integers***
+```c
+int a[10];
+```
+
+***An array of 10 pointers to integers***
+```c
+int *a[10]
+```
+
+***A pointer to an array of 10 integers***
+```c
+int (*a)[10]
+```
+
+***A pointer to a function that takes an integer as an argument and returns an integer***
+```c
+int (*a)(int a)
+```
+
+***An array of ten pointers to functions that take an integer argument and return an integer***
+```c
+int (*a[10])(int)
+```
+
+
+
 #006 - Data Types: Array
 
 ```c
@@ -1169,6 +1211,246 @@ Parent process: 9
 Child process: 9
 ```
 
+https://www.geeksforgeeks.org/fork-system-call/
+
+*Fork system call is used for creating a new process, which is called **child process**, which runs concurrently with the process that makes the fork() call (parent process). After a new child process is created, both processes will execute the next instruction following the fork() system call. **A child process uses the same pc(program counter), same CPU registers, same open files which use in the parent process.***
+
+
+- ***Negative Value:** creation of a child process was unsuccessful.*
+- ***Zero:** Returned to the newly created child process.*
+- ***Positive value:** Returned to parent or caller. The value contains process ID of newly created child process.*
+
+**1. Predict the Output of the following program:**
+
+```c
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+int main()
+{
+  
+    // make two process which run same
+    // program after this instruction
+    fork();
+  
+    printf("Hello world!\n");
+    return 0;
+}
+```
+```output
+Hello world!
+Hello world!
+```
+
+**2. Calculate number of times hello is printed:**
+
+```c
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+int main()
+{
+    fork();
+    fork();
+    fork();
+    printf("hello\n");
+    return 0;
+}
+```
+```output
+hello
+hello
+hello
+hello
+hello
+hello
+hello
+hello
+```
+
+*The number of times ‘hello’ is printed is equal to number of process created. Total Number of Processes = 2n, where n is number of fork system calls. So here n = 3, 23 = 8*
+
+**Let us put some label names for the three lines:**
+```
+fork ();   // Line 1
+fork ();   // Line 2
+fork ();   // Line 3
+
+       L1       // There will be 1 child process 
+    /     \     // created by line 1.
+  L2      L2    // There will be 2 child processes
+ /  \    /  \   //  created by line 2
+L3  L3  L3  L3  // There will be 4 child processes 
+                // created by line 3
+```
+
+*So there are total eight processes (new child processes and one original process).*
+
+*If we want to represent the relationship between the processes as a tree hierarchy it would be the following:*
+
+- **The main process: P0**
+- **Processes created by the 1st fork: P1**
+- **Processes created by the 2nd fork: P2, P3**
+- **Processes created by the 3rd fork: P4, P5, P6, P7**
+```
+             P0
+         /   |   \
+       P1    P4   P2
+      /  \          \
+    P3    P6         P5
+   /
+ P7
+ ```
+
+ **3. Predict the Output of the following program:**
+
+```c
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+void forkexample()
+{
+    // child process because return value zero
+    if (fork() == 0)
+        printf("Hello from Child!\n");
+
+    // parent process because return value non-zero.
+    else
+        printf("Hello from Parent!\n");
+}
+int main()
+{
+    forkexample();
+    return 0;
+}
+```
+```output
+1.
+Hello from Child!
+Hello from Parent!
+     (or)
+2.
+Hello from Parent!
+Hello from Child!
+```
+
+*In the above code, a child process is created. fork() returns 0 in the child process and positive integer in the parent process.
+Here, two outputs are possible because the parent process and child process are running concurrently. So we don’t know whether the OS will first give control to the parent process or the child process.*
+
+***Important:** Parent process and child process are running the same program, but it does not mean they are identical. OS allocate different data and states for these two processes, and the control flow of these processes can be different.* 
+
+
+**4. Predict the Output of the following program:**
+```c
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+void forkexample()
+{
+    int x = 1;
+
+    if (fork() == 0)
+        printf("Child has x = %d\n", ++x);
+    else
+        printf("Parent has x = %d\n", --x);
+}
+int main()
+{
+    forkexample();
+    return 0;
+}
+```
+```output
+Parent has x = 0
+Child has x = 2
+     (or)
+Child has x = 2
+Parent has x = 0
+```
+*Here, global variable change in one process does not affected two other processes because data/state of two processes are different. And also parent and child run simultaneously so two outputs are possible.*
+
+**GATE-CS-2005**
+
+```c
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+void forkexample()
+{
+    int a = 5;
+    if (fork() == 0) {
+        a = a + 5;
+        printf("%d, %x\n", a, &a);
+    }
+    else {
+        a = a - 5;
+        printf("%d, %x\n", a, &a);
+}
+
+}
+int main()
+{
+    forkexample();
+    return 0;
+}
+```
+```output
+0, 2b5e6224
+10, 2b5e6224
+```
+
+*The physical addresses of ‘a’ in parent and child must be different. But our program accesses virtual addresses (assuming we are running on an OS that uses virtual memory). The child process gets an exact copy of parent process and virtual address of ‘a’ doesn’t change in child process. Therefore, we get same addresses in both parent and child. But in python3 v and y will not be equal.*
+
+https://www.geeksforgeeks.org/fork-and-binary-tree/
+
+**A note on C/C++ logical operators:**
+
+*The logical operator && has more precedence than ||, and have left to right associativity. After executing left operand, the final result will be estimated and execution of right operand depends on outcome of left operand as well as type of operation.*
+
+```c
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int print_num(int num)
+{
+    printf(" %d ", num);
+    return num;
+}
+
+int main()
+{
+    print_num(0) && print_num(0) || print_num(0);
+    printf("\n");
+    print_num(1) && print_num(0) || print_num(0);
+    printf("\n");
+    print_num(0) && print_num(1) || print_num(0);
+    printf("\n");
+    print_num(0) && print_num(0) || print_num(1);
+    printf("\n");
+    print_num(1) && print_num(1) || print_num(0);
+    printf("\n");
+    print_num(0) && print_num(1) || print_num(1);
+    printf("\n");
+    print_num(1) && print_num(0) || print_num(1);
+    printf("\n");
+    print_num(1) && print_num(1) || print_num(1);
+    printf("\n");
+    return 0;
+}
+```
+```output
+0  0 
+1  0  0 
+0  0 
+0  1 
+1  1 
+0  1 
+1  0  1 
+1  1 
+```
 
 #027 - Bubble Sort
 ```c
@@ -3058,6 +3340,91 @@ key        shmid      owner      perms      bytes      nattch     status
 0x00000000 35         lawjune    600        33554432   2          dest   
 ```
 
+***Inter Process Communication** through shared memory is a concept where two or more process can access the common memory. And communication is done via this shared memory where changes made by one process can be viewed by another process.*
+
+*The problem with pipes, fifo and message queue – is that for two process to exchange information. The information has to go through the kernel.*
+
+- Server reads from the input file.
+- The server writes this data in a message using either a pipe, fifo or message queue.
+- The client reads the data from the IPC channel,again requiring the data to be copied from kernel’s IPC buffer to the client’s buffer.
+- Finally the data is copied from the client’s buffer.
+*A total of four copies of data are required (2 read and 2 write). So, shared memory provides a way by letting two or more processes share a memory segment. With Shared Memory the data is only copied twice – from input file into shared memory and from shared memory to the output file.*
+
+**SYSTEM CALLS USED ARE:**
+
+- ***ftok():** is use to generate a unique key.*
+
+- ***shmget(): int shmget(key_t,size_tsize,intshmflg); **upon successful completion, shmget() returns an identifier for the shared memory segment.*
+
+- ***shmat():** Before you can use a shared memory segment, you have to attach yourself
+to it using shmat(). void *shmat(int shmid ,void *shmaddr ,int shmflg);
+shmid is shared memory id. shmaddr specifies specific address to use but we should set
+it to zero and OS will automatically choose the address.*
+
+- ***shmdt():** When you’re done with the shared memory segment, your program should
+detach itself from it using shmdt(). int shmdt(void *shmaddr);*
+
+- ***shmctl():** when you detach from shared memory,it is not destroyed. So, to destroy
+shmctl() is used. shmctl(int shmid,IPC_RMID,NULL);*
+
+*shm_writer.c*
+```c
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <stdio.h>
+  
+int main()
+{
+    // ftok to generate unique key
+    key_t key = ftok("shmfile",65);
+  
+    // shmget returns an identifier in shmid
+    int shmid = shmget(key,1024,0666|IPC_CREAT);
+  
+    // shmat to attach to shared memory
+    char *str = (char*) shmat(shmid,(void*)0,0);
+  
+    puts("Write Data : ");
+    gets(str);
+  
+    printf("Data written in memory: %s\n",str);
+      
+    //detach from shared memory 
+    shmdt(str);
+  
+    return 0;
+}
+```
+
+*shm_reader.c*
+```c
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <stdio.h>
+  
+int main()
+{
+    // ftok to generate unique key
+    key_t key = ftok("shmfile",65);
+  
+    // shmget returns an identifier in shmid
+    int shmid = shmget(key,1024,0666|IPC_CREAT);
+  
+    // shmat to attach to shared memory
+    char *str = (char*) shmat(shmid,(void*)0,0);
+  
+    printf("Data read from memory: %s\n",str);
+      
+    //detach from shared memory 
+    shmdt(str);
+    
+    // destroy the shared memory
+    shmctl(shmid,IPC_RMID,NULL);
+     
+    return 0;
+}
+```
+
 #037 - pipe() Function
 
 ```c
@@ -3159,6 +3526,230 @@ int main(int argc, char *argv[])
 Parent process
 Child process
 buf: Hello there!
+```
+
+*Conceptually, a pipe is a connection between two processes, such that the standard output from one process becomes the standard input of the other process. In UNIX Operating System, Pipes are useful for communication between related processes(inter-process communication).*
+
+- *Pipe is one-way communication only i.e we can use a pipe such that One process write to the pipe, and the other process reads from the pipe. It opens a pipe, which is an area of main memory that is treated as a **“virtual file”**.*
+
+- *The pipe can be used by the creating process, as well as all its child processes, for reading and writing. One process can write to this “virtual file” or pipe and another related process can read from it.*
+
+- *If a process tries to read before something is written to the pipe, the process is suspended until something is written.*
+
+- *The pipe system call finds the first two available positions in the process’s open file table and allocates them for the read and write ends of the pipe.*
+
+**Syntax in C language:**
+```c
+int pipe(int fds[2]);
+
+Parameters :
+fd[0] will be the fd(file descriptor) for the 
+read end of pipe.
+fd[1] will be the fd for the write end of pipe.
+Returns : 0 on Success.
+-1 on error.
+```
+
+*Pipes behave **FIFO**(First in First out), Pipe behave like a queue data structure. Size of read and write don’t have to match here. We can write **512** bytes at a time but we can read only **1** byte at a time in a pipe.*
+
+```c
+// C program to illustrate
+// pipe system call in C
+#include <stdio.h>
+#include <unistd.h>
+#define MSGSIZE 16
+char* msg1 = "hello, world #1";
+char* msg2 = "hello, world #2";
+char* msg3 = "hello, world #3";
+  
+int main()
+{
+    char inbuf[MSGSIZE];
+    int p[2], i;
+  
+    if (pipe(p) < 0)
+        exit(1);
+  
+    /* continued */
+    /* write pipe */
+  
+    write(p[1], msg1, MSGSIZE);
+    write(p[1], msg2, MSGSIZE);
+    write(p[1], msg3, MSGSIZE);
+  
+    for (i = 0; i < 3; i++) {
+        /* read pipe */
+        read(p[0], inbuf, MSGSIZE);
+        printf("% s\n", inbuf);
+    }
+    return 0;
+}
+```
+```output
+hello, world #1
+hello, world #2
+hello, world #3
+```
+
+```c
+// C program to illustrate
+// pipe system call in C
+// shared by Parent and Child
+#include <stdio.h>
+#include <unistd.h>
+#define MSGSIZE 16
+char* msg1 = "hello, world #1";
+char* msg2 = "hello, world #2";
+char* msg3 = "hello, world #3";
+
+int main()
+{
+    char inbuf[MSGSIZE];
+    int p[2], pid, nbytes;
+
+    if (pipe(p) < 0)
+        exit(1);
+
+    /* continued */
+    if ((pid = fork()) > 0) {
+        write(p[1], msg1, MSGSIZE);
+        write(p[1], msg2, MSGSIZE);
+        write(p[1], msg3, MSGSIZE);
+
+        // Adding this line will
+        // not hang the program
+        // close(p[1]);
+        wait(NULL);
+    }
+
+    else {
+        // Adding this line will
+        // not hang the program
+        // close(p[1]);
+        while ((nbytes = read(p[0], inbuf, MSGSIZE)) > 0)
+            printf("% s\n", inbuf);
+        if (nbytes != 0)
+            exit(2);
+        printf("Finished reading\n");
+    }
+    return 0;
+}
+```
+```output
+hello world, #1
+hello world, #2
+hello world, #3
+(hangs)         //program does not terminate but hangs
+```
+
+*Here, In this code After finishing reading/writing, both parent and child block instead of terminating the process and that’s why program hangs. This happens because read system call gets as much data it requests or as much data as the pipe has, whichever is less.*
+
+- *If pipe is empty and we call read system call then Reads on the pipe will return **EOF** (return value 0) if no process has the write end open.*
+- *If some other process has the pipe open for writing, read will block in anticipation of new data so this code output hangs because here write ends parent process and also child process doesn’t close.*
+
+**C program to demonstrate fork() and pipe():**
+*Write Linux C program to create two processes P1 and P2. P1 takes a string and passes it to P2. P2 concatenates the received string with another string without using string function and sends it back to P1 for printing.*
+
+**Examples:**
+```
+Other string is: forgeeks.org
+
+Input  : www.geeks
+Output : www.geeksforgeeks.org
+        
+Input :  www.practice.geeks
+Output : practice.geeksforgeeks.org
+```
+
+```c
+// C program to demonstrate use of fork() and pipe()
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+int main()
+{
+    // We use two pipes
+    // First pipe to send input string from parent
+    // Second pipe to send concatenated string from child
+
+    int fd1[2]; // Used to store two ends of first pipe
+    int fd2[2]; // Used to store two ends of second pipe
+
+    char fixed_str[] = "forgeeks.org";
+    char input_str[100];
+    pid_t p;
+
+    if (pipe(fd1) == -1) {
+        fprintf(stderr, "Pipe Failed");
+        return 1;
+    }
+    if (pipe(fd2) == -1) {
+        fprintf(stderr, "Pipe Failed");
+        return 1;
+    }
+
+    scanf("%s", input_str);
+    p = fork();
+
+    if (p < 0) {
+        fprintf(stderr, "fork Failed");
+        return 1;
+    }
+
+    // Parent process
+    else if (p > 0) {
+        char concat_str[100];
+
+        close(fd1[0]); // Close reading end of first pipe
+
+        // Write input string and close writing end of first
+        // pipe.
+        write(fd1[1], input_str, strlen(input_str) + 1);
+        close(fd1[1]);
+
+        // Wait for child to send a string
+        wait(NULL);
+
+        close(fd2[1]); // Close writing end of second pipe
+
+        // Read string from child, print it and close
+        // reading end.
+        read(fd2[0], concat_str, 100);
+        printf("Concatenated string %s\n", concat_str);
+        close(fd2[0]);
+    }
+
+    // child process
+    else {
+        close(fd1[1]); // Close writing end of first pipe
+
+        // Read a string using first pipe
+        char concat_str[100];
+        read(fd1[0], concat_str, 100);
+
+        // Concatenate a fixed string with it
+        int k = strlen(concat_str);
+        int i;
+        for (i = 0; i < strlen(fixed_str); i++)
+            concat_str[k++] = fixed_str[i];
+
+        concat_str[k] = '\0'; // string ends with '\0'
+
+        // Close both reading ends
+        close(fd1[0]);
+        close(fd2[0]);
+
+        // Write concatenated string and close writing end
+        write(fd2[1], concat_str, strlen(concat_str) + 1);
+        close(fd2[1]);
+
+        exit(0);
+    }
+}
 ```
 
 #038 - fopen() fread() fwrite() Functions
@@ -3278,6 +3869,176 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
 thret2 = 0
 ```
 
+***Thread synchronization** is defined as a mechanism which ensures that two or more concurrent processes or threads do not simultaneously execute some particular program segment known as a critical section. Processes’ access to critical section is controlled by using synchronization techniques. When one thread starts executing the critical section (a serialized segment of the program) the other thread should wait until the first thread finishes. If proper synchronization techniques are not applied, it may cause a race condition where the values of variables may be unpredictable and vary depending on the timings of context switches of the processes or threads.*
+
+
+**Thread Synchronization Problems**
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+pthread_t tid[2];
+int counter;
+
+void* trythis(void* arg)
+{
+    unsigned long i = 0;
+    counter += 1;
+    printf("\n Job %d has started\n", counter);
+
+    for (i = 0; i < (0xFFFFFFFF); i++)
+        ;
+    printf("\n Job %d has finished\n", counter);
+
+    return NULL;
+}
+
+int main(void)
+{
+    int i = 0;
+    int error;
+
+    while (i < 2) {
+        error = pthread_create(&(tid[i]), NULL, &trythis, NULL);
+        if (error != 0)
+            printf("\nThread can't be created : [%s]", strerror(error));
+        i++;
+    }
+
+    pthread_join(tid[0], NULL);
+    pthread_join(tid[1], NULL);
+
+    return 0;
+}
+```
+```output
+Job 1 has started
+Job 2 has started
+Job 2 has finished
+Job 2 has finished
+```
+***Problem:** From the last two logs, one can see that the log ‘Job 2 has finished’ is repeated twice while no log for ‘Job 1 has finished’ is seen.*
+
+**Why it has occurred ?**
+*On observing closely and visualizing the execution of the code, we can see that :
+- The log ‘Job 2 has started’ is printed just after ‘Job 1 has Started’ so it can easily be concluded that while thread 1 was processing the scheduler scheduled the thread 2.
+- If we take the above assumption true then the value of the ‘counter’ variable got incremented again before job 1 got finished.
+- So, when Job 1 actually got finished, then the wrong value of counter produced the log ‘Job 2 has finished’ followed by the ‘Job 2 has finished’ for the actual job 2 or vice versa as it is dependent on scheduler.
+- So we see that its not the repetitive log but the wrong value of the ‘counter’ variable that is the problem.
+- The actual problem was the usage of the variable ‘counter’ by a second thread when the first thread was using or about to use it.
+- In other words, we can say that lack of synchronization between the threads while using the shared resource ‘counter’ caused the problems or in one word we can say that this problem happened due to ‘Synchronization problem’ between two threads.*
+
+**How to solve it ?**
+
+**Mutex**
+- A Mutex is a lock that we set before using a shared resource and release after using it.
+- When the lock is set, no other thread can access the locked region of code.
+- So we see that even if thread 2 is scheduled while thread 1 was not done accessing the shared resource and the code is locked by thread 1 using mutexes then thread 2 cannot even access that region of code.
+- So this ensures synchronized access of shared resources in the code.
+
+The most popular way of achieving thread synchronization is by using Mutexes.
+
+**Working of a mutex**
+
+1. Suppose one thread has locked a region of code using mutex and is executing that piece of code.
+2. Now if scheduler decides to do a context switch, then all the other threads which are ready to execute the same region are unblocked.
+3. Only one of all the threads would make it to the execution but if this thread tries to execute the same region of code that is already locked then it will again go to sleep.
+4. Context switch will take place again and again but no thread would be able to execute the locked region of code until the mutex lock over it is released.
+5. Mutex lock will only be released by the thread who locked it.
+6. So this ensures that once a thread has locked a piece of code then no other thread can execute the same region until it is unlocked by the thread who locked it.
+
+**A mutex is initialized and then a lock is achieved by calling the following two functions :** The first function initializes a mutex and through second function any critical region in the code can be locked.
+
+1. **`int pthread_mutex_init(pthread_mutex_t *restrict mutex, const pthread_mutexattr_t *restrict attr)` :** Creates a mutex, referenced by mutex, with attributes specified by attr. If attr is NULL, the default mutex attribute (NONRECURSIVE) is used.
+**Returned value**
+If successful, pthread_mutex_init() returns 0, and the state of the mutex becomes initialized and unlocked.
+If unsuccessful, pthread_mutex_init() returns -1.
+
+2. **`int pthread_mutex_lock(pthread_mutex_t *mutex)`** : Locks a mutex object, which identifies a mutex. If the mutex is already locked by another thread, the thread waits for the mutex to become available. The thread that has locked a mutex becomes its current owner and remains the owner until the same thread has unlocked it. When the mutex has the attribute of recursive, the use of the lock may be different. When this kind of mutex is locked multiple times by the same thread, then a count is incremented and no waiting thread is posted. The owning thread must call pthread_mutex_unlock() the same number of times to decrement the count to zero.
+**Returned value**
+If successful, pthread_mutex_lock() returns 0.
+If unsuccessful, pthread_mutex_lock() returns -1.
+
+**The mutex can be unlocked and destroyed by calling following two functions :** The first function releases the lock and the second function destroys the lock so that it cannot be used anywhere in future.
+
+1. **`int pthread_mutex_unlock(pthread_mutex_t *mutex)` :** Releases a mutex object. If one or more threads are waiting to lock the mutex, pthread_mutex_unlock() causes one of those threads to return from pthread_mutex_lock() with the mutex object acquired. If no threads are waiting for the mutex, the mutex unlocks with no current owner. When the mutex has the attribute of recursive the use of the lock may be different. When this kind of mutex is locked multiple times by the same thread, then unlock will decrement the count and no waiting thread is posted to continue running with the lock. If the count is decremented to zero, then the mutex is released and if any thread is waiting for it is posted.
+**Returned value**
+If successful, pthread_mutex_unlock() returns 0.
+If unsuccessful, pthread_mutex_unlock() returns -1
+
+2. **`int pthread_mutex_destroy(pthread_mutex_t *mutex)` :** Deletes a mutex object, which identifies a mutex. Mutexes are used to protect shared resources. mutex is set to an invalid value, but can be reinitialized using pthread_mutex_init().
+Returned value
+If successful, pthread_mutex_destroy() returns 0.
+If unsuccessful, pthread_mutex_destroy() returns -1.
+
+**An example to show how mutexes are used for thread synchronization**
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+  
+pthread_t tid[2];
+int counter;
+pthread_mutex_t lock;
+  
+void* trythis(void* arg)
+{
+    pthread_mutex_lock(&lock);
+  
+    unsigned long i = 0;
+    counter += 1;
+    printf("\n Job %d has started\n", counter);
+  
+    for (i = 0; i < (0xFFFFFFFF); i++)
+        ;
+  
+    printf("\n Job %d has finished\n", counter);
+  
+    pthread_mutex_unlock(&lock);
+  
+    return NULL;
+}
+  
+int main(void)
+{
+    int i = 0;
+    int error;
+  
+    if (pthread_mutex_init(&lock, NULL) != 0) {
+        printf("\n mutex init has failed\n");
+        return 1;
+    }
+  
+    while (i < 2) {
+        error = pthread_create(&(tid[i]),
+                               NULL,
+                               &trythis, NULL);
+        if (error != 0)
+            printf("\nThread can't be created :[%s]",
+                   strerror(error));
+        i++;
+    }
+  
+    pthread_join(tid[0], NULL);
+    pthread_join(tid[1], NULL);
+    pthread_mutex_destroy(&lock);
+  
+    return 0;
+}
+```
+```output
+Job 1 started
+Job 1 finished
+Job 2 started
+Job 2 finished
+```
+
 #040 - Dynamic Shared Libraries
 
 *add.c*
@@ -3340,6 +4101,12 @@ ldd main
         libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f5af4556000)
         /lib64/ld-linux-x86-64.so.2 (0x00007f5af4766000)
 ```
+
+- The file VDSO is fast implementation of system call interface and some other stuff, it is not our focus (on some older systems you may see different file name in liue of *.vsdo.*). Ignore this file. We have interest in the other two files. 
+
+-The file libc.so.6 is C implementation of various standard functions. It is the file where we see printf definition needed for our printing. It is the shared library needed to be loaded into memory to run our main program. 
+
+- The file /lib64/ld-linux-x86-64.so.2 is infact an executable that runs when an application is invoked. When we invoke the program on bash terminal, typically the bash forks itself and replaces its address space with image of program to run (so called fork-exec pair). The kernel verifies whether the libc.so.6 resides in the memory. If not, it will load the file into memory and does the relocation of libc.so.6 symbols. It then invokes the dynamic linker (/lib64/ld-linux-x86-64.so.2) to resolve unresolved symbols of application code (printf in the present case). Then the control transfers to our program main. (I have intentionally omitted many details in the process, our focus is to understand basic details). 
 
 #041 - Static Shared Libraries
 
@@ -3423,6 +4190,8 @@ nm main
 0000000000001060 T _start
 0000000000004010 D __TMC_END__
 ```
+https://www.geeksforgeeks.org/working-with-shared-libraries-set-1/?ref=gcse
+https://www.geeksforgeeks.org/working-with-shared-libraries-set-2/
 
 #042 - Static Variables
 
@@ -3520,6 +4289,38 @@ i = 6
 i = 8
 ```
 
+*Following are some interesting facts about static variables in C.
+1) A static int variable remains in memory while the program is running. A normal or auto variable is destroyed when a function call where the variable was declared is over. 
+2) Static variables are allocated memory in data segment, not stack segment. 
+3) Static variables (like global variables) are initialized as 0 if not initialized explicitly.
+4) In C, static variables can only be initialized using constant literals. For example, following program fails in compilation.
+```c
+#include<stdio.h>
+int initializer(void)
+{
+    return 50;
+}
+  
+int main()
+{
+    static int i = initializer();
+    printf(" value of i = %d", i);
+    getchar();
+    return 0;
+}
+```
+```output
+In function 'main':
+9:5: error: initializer element is not constant
+     static int i = initializer();
+     ^
+```
+5) Static global variables and functions are also possible in C/C++. The purpose of these is to limit scope of a variable or function to a file. 
+6) Static variables should not be declared inside structure. The reason is C compiler requires the entire structure elements to be placed together (i.e.) memory allocation for structure members should be contiguous. It is possible to declare structure inside the function (stack segment) or allocate memory dynamically(heap segment) or it can be even global (BSS or data segment). Whatever might be the case, all structure members should reside in the same memory segment because the value for the structure element is fetched by counting the offset of the element from the beginning address of the structure. Separating out one member alone to data segment defeats the purpose of static variable and it is possible to have an entire structure as static.*
+
+https://www.geeksforgeeks.org/memory-layout-of-c-program/
+
+
 #043 - String to Integer Conversion
 
 ```c
@@ -3550,6 +4351,7 @@ b = 5927.457800
 
 #044 - Time Functions
 
+## 44.1 Basic Usage
 ```c
 #include <stdio.h>
 #include <time.h>
@@ -3564,6 +4366,7 @@ int main(int argc, char *argv[])
     printf("%s\n", ctime(&mytime));
 
     mytm = localtime(&mytime);
+    printf("%s\n", asctime(mytm));
     printf("Year: %d\n", 1900 + mytm->tm_year);
     printf("Month: %d\n", 1 + mytm->tm_mon);
     printf("Day of Month: %d\n", mytm->tm_mday);
@@ -3573,12 +4376,28 @@ int main(int argc, char *argv[])
 }
 ```
 ```output
-Fri Dec 24 07:46:05 2021
+Wed Jan 12 13:23:13 2022
+
+Wed Jan 12 13:23:13 2022
 
 Year: 2021
 Month: 12
 Day of Month: 24
 DST: 0
+```
+
+## 44.2 How to measure time taken by a function in C
+*To calculate time taken by a process, we can use clock() function which is available time.h. We can call the clock function at the beginning and end of the code for which we measure time, subtract the values, and then divide by CLOCKS_PER_SEC (the number of clock ticks per second) to get processor time, like following.*
+```c
+     #include <time.h>
+     
+     clock_t start, end;
+     double cpu_time_used;
+     
+     start = clock();
+     ... /* Do the work. */
+     end = clock();
+     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 ```
 
 #045 - toupper() tolower() Functions
@@ -3642,7 +4461,6 @@ int main(int argc, char *argv[])
     char *msg2 = "Thread 2";
 
     sem_init(&mutex, 0, 1);
-
     pthread_create(&thread1, NULL, (void *) myfunc1, (void *)msg1);
     pthread_create(&thread2, NULL, (void *) myfunc2, (void *)msg2);
 
@@ -3660,6 +4478,7 @@ void *myfunc1(void *ptr)
     char *msg = (char *) ptr;
     printf("msg: %s\n", msg);
     sem_wait(&mutex);
+    printf("Writing buf...\n");
     sprintf(buf, "%s", "Hello there!");
     sem_post(&mutex);
     pthread_exit(0);
@@ -3670,6 +4489,7 @@ void *myfunc2(void *ptr)
     char *msg = (char *) ptr;
     printf("msg: %s\n", msg);
     sem_wait(&mutex);
+    printf("Reading buf...\n");
     printf("%s\n", buf);
     sem_post(&mutex);
     pthread_exit(0);
@@ -3677,8 +4497,78 @@ void *myfunc2(void *ptr)
 ```
 ```output
 msg: Thread 1
+Writing buf...
 msg: Thread 2
+Reading buf...
 Hello there!
+```
+
+*A mutex is a **locking mechanism** used to synchronize access to a resource. Only one task (can be a thread or process based on OS abstraction) can acquire the mutex. It means there is ownership associated with a mutex, and only the owner can release the lock (mutex).* 
+
+*Semaphore is **signaling mechanism** (“I am done, you can carry on” kind of signal). For example, if you are listening to songs (assume it as one task) on your mobile phone and at the same time, your friend calls you, an interrupt is triggered upon which an interrupt service routine (ISR) signals the call processing task to wakeup.* 
+
+*Semaphore was proposed by Dijkstra in 1965 which is a very significant technique to manage concurrent processes by using a simple integer value, which is known as a semaphore. Semaphore is simply an integer variable that is shared between threads. This variable is used to solve the critical section problem and to achieve process synchronization in the multiprocessing environment. 
+Semaphores are of two types:*
+
+1. **Binary Semaphore** – 
+    *This is also known as mutex lock. It can have only two values – 0 and 1. Its value is initialized to 1. It is used to implement the solution of critical section problems with multiple processes.*
+2. **Counting Semaphore** – 
+    *Its value can range over an unrestricted domain. It is used to control access to a resource that has multiple instances.*
+
+*First, look at two operations that can be used to access and change the value of the semaphore variable.*
+
+```c
+P(Semaphore s) {
+    // Note that there is semicolon after while.
+    // The code gets stuck here while s is 0.
+    while(s == 0); /* wait until s=0 */
+}
+
+V(Semaphore s) {
+    s = s+1;
+}
+```
+
+***Some point regarding P and V operation:***
+
+1. *P operation is also called wait, sleep, or down operation, and V operation is also called signal, wake-up, or up operation.*
+
+2. *Both operations are atomic and semaphore(s) is always initialized to one. Here atomic means that variable on which read, modify and update happens at the same time/moment with no pre-emption i.e. in-between read, modify and update no other operation is performed that may change the variable.*
+
+3. *A critical section is surrounded by both operations to implement process synchronization. See the below image. The critical section of Process P is in between P and V operation.*
+
+```c
+// Process P
+    // Some code
+    P(s);
+    // Critical section
+    V(s);
+    // Remainder section
+```
+
+
+```state_1
+process_1 -> Executing in non-critical section
+s=1
+process_2 -> Executing in non-critical section
+```
+
+```state_2
+process_1 -> Executing critical section updates s=0
+s=0
+process_2 -> Executing in non-critical section
+```
+
+```state_3
+process_1 -> Executing critical section updates s=0
+s=0
+process_2 -> Wants to enter critical section but can't as s = 0
+```
+
+```state_4
+process_1 -> Exits critical section and updates s=1
+s=1
+process_2 -> Enters critical section as s=1 and updates s=0
 ```
 
 #047 - system() Function
@@ -3935,6 +4825,79 @@ int main(int agrc, char *argv[])
 }
 ```
 
+# 50.1 Classic Usage - Seconds of A Year
+
+*Essence is the `UL` unsigned long*
+```c
+#define SEC_YEAR  (365*24*60*60)UL
+```
+
+# 50.2 Classic Usage - Return the Less Value
+
+```c
+#define MIN(a,b)  ((a)<=(b)?(a):(b))
+```
+
+*How to eleminate the side-effenct of `least = MIN(*p++, b);`*
+```c
+#include <stdio.h>
+#define min_i(x,y)      ((x)<=(y)?(x):(y))     
+#define min_t(type,x,y) ({  type _x = x;\  
+                            type _y = y;\
+                            _x<_y?_x:_y;\
+                        })
+#define min(x,y)        ({  const typeof(x) _x = (x);\  
+                            const typeof(y) _y = (y);\
+                            int *__x = &_x;\
+                            (void)(__x=&_y);\    
+                             _x<_y?_x:_y;\  
+                        })
+
+int main()
+{
+    int a = 10;
+    int b = 20;
+    printf("min_i(a++,b++)=%d\n",min_i(a++,b++));  //11
+    printf("a=%d\n",a);  //12
+    printf("b=%d\n",b);  //21
+
+    a=10;
+    b=20;
+    printf("min_t(int,a++,b++)=%d\n",min_t(int,a++,b++));  //10
+    printf("a=%d\n",a);  //11
+    printf("b=%d\n",b);  //21
+
+    a=10;
+    b=20;
+    printf("min(a++,b++)=%d\n",min(a++,b++));  //10
+    printf("a=%d\n",a);  //11
+    printf("b=%d\n",b);  //21
+  
+}
+```
+```output
+min_i(a++,b++)=11
+a=12
+b=21
+min_t(int,a++,b++)=10
+a=11
+b=21
+min(a++,b++)=10
+a=11
+b=21
+```
+
+# 50.3 Classic Usage - #error
+
+```c
+#ifdef XXX
+...
+#error "XXX has been defined"
+#else
+
+#endif
+```
+
 #051 - Double Pointer
 
 ```c
@@ -4081,6 +5044,62 @@ Saturday = 16
 myday = 13
 ```
 
+**Interesting facts about initialization of enum.**
+
+1. *Two enum names can have same value. For example, in the following C program both ‘Failed’ and ‘Freezed’ have same value 0.*
+
+```c
+enum State {Working = 1, Failed = 0, Freezed = 0};
+  
+int main()
+{
+   printf("%d, %d, %d", Working, Failed, Freezed);
+   return 0;
+}
+```
+```output
+1, 0, 0
+```
+
+2. *If we do not explicitly assign values to enum names, the compiler by default assigns values starting from 0. For example, in the following C program, sunday gets value 0, monday gets 1, and so on.*
+
+```c
+#include <stdio.h>
+enum day {sunday, monday, tuesday, wednesday, thursday, friday, saturday};
+  
+int main()
+{
+    enum day d = thursday;
+    printf("The day number stored in d is %d", d);
+    return 0;
+}
+```
+```output
+4
+```
+
+3. *We can assign values to some name in any order. All unassigned names get value as value of previous name plus one.*
+
+```c
+#include <stdio.h>
+enum day {sunday = 1, monday, tuesday = 5,
+          wednesday, thursday = 10, friday, saturday};
+  
+int main()
+{
+    printf("%d %d %d %d %d %d %d", sunday, monday, tuesday,
+            wednesday, thursday, friday, saturday);
+    return 0;
+}
+```
+```output
+1 2 5 6 10 11 12
+```
+
+4. *The value assigned to enum names must be some integral constant, i.e., the value must be in range from minimum possible integer value to maximum possible integer value.*
+
+5. All enum constants must be unique in their scope. For example, the following program fails in compilation.
+
 #055 - Signals
 
 ```c
@@ -4138,6 +5157,97 @@ i = 43
 i = 44
 ...
 ...
+```
+*In this post, the communication between child and parent processes is done using kill() and signal(), fork() system call.*
+
+- *fork() creates the child process from the parent. The pid can be checked to decide whether it is the child (if pid == 0) or the parent (pid = child process id).*
+- *The parent can then send messages to child using the pid and kill().*
+- *The child picks up these signals with signal() and calls appropriate functions.*
+```c
+// C program to implement sighup(), sigint()
+// and sigquit() signal functions
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+  
+// function declaration
+void sighup();
+void sigint();
+void sigquit();
+  
+// driver code
+void main()
+{
+    int pid;
+  
+    /* get child process */
+    if ((pid = fork()) < 0) {
+        perror("fork");
+        exit(1);
+    }
+  
+    if (pid == 0) { /* child */
+        signal(SIGHUP, sighup);
+        signal(SIGINT, sigint);
+        signal(SIGQUIT, sigquit);
+        for (;;)
+            ; /* loop for ever */
+    }
+  
+    else /* parent */
+    { /* pid hold id of child */
+        printf("\nPARENT: sending SIGHUP\n\n");
+        kill(pid, SIGHUP);
+  
+        sleep(3); /* pause for 3 secs */
+        printf("\nPARENT: sending SIGINT\n\n");
+        kill(pid, SIGINT);
+  
+        sleep(3); /* pause for 3 secs */
+        printf("\nPARENT: sending SIGQUIT\n\n");
+        kill(pid, SIGQUIT);
+        sleep(3);
+    }
+}
+  
+// sighup() function definition
+void sighup()
+  
+{
+    signal(SIGHUP, sighup); /* reset signal */
+    printf("CHILD: I have received a SIGHUP\n");
+}
+  
+// sigint() function definition
+void sigint()
+  
+{
+    signal(SIGINT, sigint); /* reset signal */
+    printf("CHILD: I have received a SIGINT\n");
+}
+  
+// sigquit() function definition
+void sigquit()
+{
+    printf("My DADDY has Killed me!!!\n");
+    exit(0);
+}
+```
+```output
+
+PARENT: sending SIGHUP
+
+CHILD: I have received a SIGHUP
+
+PARENT: sending SIGINT
+
+CHILD: I have received a SIGINT
+
+PARENT: sending SIGQUIT
+
+My DADDY has Killed me!!!
 ```
 
 #056 - GDB debugger (1/2)
@@ -4615,3 +5725,122 @@ xflg = 1, yflg = 1, zflg = 1
 ```
 
 #061 - Math Library
+
+```math
+F = ma/cos(angle in radians)
+```
+
+```c
+#include <stdio.h>
+#include <math.h>
+
+int main()
+{
+    double Force, masss, accel;
+    double angle; /* in angle */
+
+    printf("Enter mass (kg): ");
+    scanf("%lf", &masss);
+
+    printf("Enter acceleration (m/s^2): ");
+    scanf("%lf", &accel);
+
+    printf("Enter angle (degrees): ");
+    scanf("%lf", &angle);
+
+    Force = (masss * accel)/cos(angle * M_PI/180.0);
+    printf("Force = %lf Newtons\n", Force);
+
+    return 0;
+}
+```
+```sh
+gcc -o main main.c -lm
+./main
+`=>
+Enter mass (kg): 10
+Enter acceleration (m/s^2): 2
+Enter angle (degrees): 30
+Force = 23.094011 Newtons
+```
+
+#062 - Binary Search Tree
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct mynode_tag {
+    int data;
+    struct mynode_tag *left; 
+    struct mynode_tag *right;
+} mynode;
+
+void insert(mynode **rt, int num)
+{
+    mynode *tmp;
+
+    if(*rt == NULL) {
+        tmp = (mynode *) malloc(sizeof(mynode));
+        if (tmp == NULL) {
+            fprintf(stderr, "Unable to allocate mynode\n");
+            exit(1);
+        }
+
+        tmp->data = num;
+        *rt = tmp;
+    } else {
+        if(num > (*rt)->data)
+            insert(&(*rt)->right, num);
+        else
+            insert(&(*rt)->left, num);
+    }
+}
+
+void print_nodes(mynode *root)
+{
+
+    if(root == NULL)
+        return;
+
+    /* Go to the left/less first */
+    if(root->left != NULL)
+        print_nodes(root->left);
+    printf("data = %d\n", root->data);
+
+    /* Go to the right/greater then */
+    if(root->right != NULL)
+        print_nodes(root->right);
+}
+
+int main(int argc, char *argv[])
+{
+    int numbers[14] = { 19, 6, 85, 2, 25, 90, 41, 23, 11, 7, 99, 82, 48, 32 };
+    int i;
+    mynode *root = NULL;
+
+    for (i = 0; i < 14; i++) {
+        insert(&root, numbers[i]);
+    }
+
+    print_nodes(root);
+
+    return 0;
+}
+```
+```output
+data = 2
+data = 6
+data = 7
+data = 11
+data = 19
+data = 23
+data = 25
+data = 32
+data = 41
+data = 48
+data = 82
+data = 85
+data = 90
+data = 99
+```
