@@ -1894,7 +1894,100 @@ make clean
 e. Go to Build Phases -> link binary with libraries in project. Add other -> find “libSOIL.a”.
 
 
+## Templates in C++
 
+```cpp
+#include <iostream>
+
+template<typename T>
+void print(T value)
+{
+    std::cout << value << std::endl;
+}
+
+int main(int argc, const char * argv[])
+{
+    print<int>(6);
+    print<std::string>("Hello World!");
+    print<float>(6.66f);
+    
+    return 0;
+}
+```
+```output
+6
+Hello World!
+6.66
+```
+
+```sh
+nm main
+`=>
+0000000100003e90 s GCC_except_table0
+0000000100003ed0 s GCC_except_table12
+0000000100003f10 s GCC_except_table16
+0000000100003f34 s GCC_except_table37
+0000000100003eb0 s GCC_except_table8
+                 U __Unwind_Resume
+...... (a bunch of compiled stuff)
+...... (a bunch of compiled stuff)
+...... (a bunch of compiled stuff)
+00000001000080e0 d __dyld_private
+0000000100000000 T __mh_execute_header
+0000000100002de0 T _main
+                 U _strlen
+                 U dyld_stub_binder
+```
+
+```cpp
+#include <iostream>
+
+template<typename T>
+void print(T value)
+{
+    std::cout << value << std::endl;
+}
+
+int main(int argc, const char * argv[])
+{
+    // print<int>(6);
+    // print<std::string>("Hello World!");
+    // print<float>(6.66f);
+    
+    return 0;
+}
+```
+*Actually the template "doesn't exit' if we never use it!"
+```sh
+g++ main.cpp -o main
+nm main
+`=>
+0000000100000000 T __mh_execute_header
+0000000100003fa0 T _main
+                 U dyld_stub_binder
+```
+
+```cpp
+#include <iostream>
+
+template<typename T, int N>
+class Array
+{
+private:
+    T m_array[N];
+public:
+    int get_size() const { return N; }
+};
+
+int main(int argc, const char * argv[])
+{
+    Array<int, 7> array;
+    std::cout << array.get_size() << std::endl;
+    return 0;
+}
+```
+
+## Stack vs Heap Memory in C++
 
 
 

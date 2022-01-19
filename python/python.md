@@ -685,7 +685,7 @@ second code =  0.0018724469999999993
 
 
 ## Classes 
-### Classes - Introduction
+### Classes - 1 - Introduction
 
 ### Classes - 2 - Creating Classes
 
@@ -961,6 +961,36 @@ print(product.price)
 
 ### Classes - 12 -  Inheritance
 
+
+```python
+class Animal:
+    def __init__(self):
+        self.age = 1
+
+    def move(self):
+        print("move")
+
+    def eat(self):
+        print("eat")
+
+
+class Fish(Animal):
+    def swim(self):
+        print("swim")
+
+fish = Fish()
+print(fish.age)
+fish.move()
+fish.eat()
+fish.swim()
+```
+```output
+1
+move
+eat
+swim
+```
+
 ### Classes - 13 -  The Object Class
 
 ```python
@@ -985,6 +1015,990 @@ True
 True
 True
 True
+```
+
+### Classes - 14 -  Method Overriding
+
+```python
+class Animal:
+    def __init__(self):
+        print("Animal Constructor")
+        self.age = 1
+
+    def move(self):
+        print("move")
+
+    def eat(self):
+        print("eat")
+
+
+class Fish(Animal):
+    def __init__(self):
+        super().__init__()
+        print("FIsh Constructor")
+
+    def swim(self):
+        print("swim")
+
+    def move(self):
+        self.swim()
+
+fish = Fish()
+print(fish.age)
+fish.move()
+fish.eat()
+fish.swim()
+```
+```output
+Animal Constructor
+FIsh Constructor
+1
+swim
+eat
+swim
+```
+
+### Classes - 15 - Multi-level Inheritance
+
+***Should avoid it all the time!***
+
+
+### Classes - 16 - Multiple Inheritance
+
+```python
+class Employee:
+    def greet(self):
+        print("Employee Greet")
+
+class Player:
+    def greet(self):
+        print("Player Greet")
+
+class Manager(Employee, Player):
+    pass
+
+manager = Manager()
+manager.greet()
+```
+```output
+Employee Greet
+```
+
+### Classes - 17 - A Good Example of Inheritance
+
+```python
+class InvalidOperationError(Exception):
+    pass
+
+class Stream:
+    def __init__(self):
+        self.opened = False
+
+    def open(self):
+        if self.opened:
+            raise InvalidOperationError("Stream is already opened")
+        self.opened = True
+
+    def close(self):
+        if not self.opened:
+            raise InvalidOperationError("Stream is already closed")
+        self.opened = False
+
+
+class FileStream(Stream):
+    def read(self):
+        print("Reading data from a file")
+
+
+class NetworkStream(Stream):
+    def read(self):
+        print("Reading data from a network")
+```
+
+### Classes - 18 - Abstract Base Classes
+
+```python
+from abc import ABC, abstractmethod
+
+class InvalidOperationError(Exception):
+    pass
+
+class Stream(ABC):
+    def __init__(self):
+        self.opened = False
+
+    def open(self):
+        if self.opened:
+            raise InvalidOperationError("Stream is already opened")
+        self.opened = True
+
+    def close(self):
+        if not self.opened:
+            raise InvalidOperationError("Stream is already closed")
+        self.opened = False
+
+    @abstractmethod
+    def read(self):
+        pass
+
+
+class FileStream(Stream):
+    def read(self):
+        print("Reading data from a file")
+
+
+class NetworkStream(Stream):
+    def read(self):
+        print("Reading data from a network")
+        
+```
+
+### Classes - 19 - Polymorphism
+
+```python
+from abc import ABC, abstractmethod
+
+class UIControl(ABC):
+
+    @abstractmethod
+    def draw(self):
+        pass
+
+class TextBox(UIControl):
+    def draw(self):
+        print("TextBox")
+
+class DropDownList(UIControl):
+    def draw(self):
+        print("DropDownList")
+
+def draw(controls):
+    for control in controls:
+        control.draw()
+
+ddl = DropDownList()
+tb = TextBox()
+draw([ddl, tb])
+```
+
+### Classes - 20 - Duck Typing
+
+```python
+class TextBox():
+    def draw(self):
+        print("TextBox")
+
+class DropDownList():
+    def draw(self):
+        print("DropDownList")
+
+def draw(controls):
+    for control in controls:
+        control.draw()
+
+ddl = DropDownList()
+tb = TextBox()
+draw([ddl, tb])
+```
+
+### Classes - 21 - Extending Built-in Types
+
+```python
+class Text(str):
+    def duplicate(self):
+        return self + self
+
+class TrackableList(list):
+    def append(self, object):
+        print("Append called")
+        super().append(object)
+
+text = Text("Python")
+print(text.duplicate())
+print(text.lower())
+
+list = TrackableList()
+list.append("1")
+print(list)
+```
+```output
+PythonPython
+python
+Append called
+['1']
+```
+
+### Classes - 22 - Data Classes
+
+```python
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
+p1 = Point(1, 2)
+p2 = Point(1, 2)
+print(hex(id(p1)))
+print(hex(id(p2)))
+print(p1 == p2)
+```
+```output
+0x7fe9ac798dc0
+0x7fe9ada000a0
+True
+```
+
+```python
+from collections import namedtuple
+
+Point = namedtuple("Point", ["x", "y"])
+
+p1 = Point(x=1, y=2)
+p2 = Point(1, 2)
+print(hex(id(p1)))
+print(hex(id(p2)))
+print(p1 == p2)
+
+# p1.x = 10 # Error! nametuple is immutable
+p1 = Point(x=10, y=2)
+print(p1)
+```
+```output
+0x7fcf1fa17280
+0x7fcf1fa54b00
+True
+Point(x=10, y=2)
+```
+
+
+## Python Standard Library
+
+### Python Standard Library - 1 - Introduction
+
+### Python Standard Library - 2 - Working With Paths
+
+```python
+from pathlib import Path
+
+Path(r"C:\Program Files\Microsoft")
+Path("/usr/local/bin")
+Path()
+Path("ecommerce/__init__.py")
+Path() / "ecommerce" / "__init__.py"
+Path.home()
+```
+
+*Google `python 3 pathlib`*
+
+```python
+from pathlib import Path
+
+path = Path("ecommerce/__init__.py")
+print(path.exists())
+print(path.is_dir())
+print(path.is_file())
+print(path.name)
+print(path.stem)
+print(path.suffix)
+print(path.parent)
+new_path = path.with_name("file.txt")
+print(path.absolute())
+print(new_path.absolute())
+suf_path = path.with_suffix(".txt")
+print(suf_path)
+```
+```output
+True
+False
+True
+__init__.py
+__init__
+.py
+ecommerce
+/Users/mac/PycharmProjects/demo/ecommerce/__init__.py
+/Users/mac/PycharmProjects/demo/ecommerce/file.txt
+ecommerce/__init__.txt
+```
+
+### Python Standard Library - 3 - Working With Directories
+
+```python
+from pathlib import Path
+
+path = Path("ecommerce")
+
+paths = [p for p in path.iterdir() if p.is_dir()]
+py_files = [p for p in path.glob("*.py")]
+recursive_py_files = [p for p in path.rglob("*.py")]
+print(paths)
+print(py_files)
+print(recursive_py_files)
+```
+```output
+[PosixPath('ecommerce/shopping'), PosixPath('ecommerce/customer')]
+[PosixPath('ecommerce/__init__.py')]
+[PosixPath('ecommerce/__init__.py'), PosixPath('ecommerce/shopping/__init__.py'), PosixPath('ecommerce/customer/__init__.py')]
+```
+
+### Python Standard Library - 4 - Working With Files
+
+```python
+from pathlib import Path
+from time import ctime
+
+path = Path("ecommerce/__init__.py")
+# path.exists()
+# path.rename("init.txt")
+# path.unlink()
+print(path.stat())
+print(ctime(path.stat().st_ctime))
+```
+```output
+os.stat_result(st_mode=33188, st_ino=12893556958, st_dev=16777220, st_nlink=1, st_uid=501, st_gid=20, st_size=0, st_atime=1641648319, st_mtime=1641648319, st_ctime=1641648319)
+Sat Jan  8 21:25:19 2022
+```
+
+```python
+path.read_text()
+path.read_bytes()
+path.write_text("...")
+path.write_bytes(b'000111')
+```
+
+```python
+from pathlib import Path
+import shutil
+
+source = Path("ecommerce/__init__.py")
+target = Path() / "__init__.py"
+
+# target.write_text((source.read_text()))
+shutil.copy(source, target)
+```
+
+### Python Standard Library - 5 - Working Zip Paths
+
+```python
+from pathlib import Path
+from zipfile import ZipFile
+
+# with ZipFile("files.zip", "w") as z:
+#     for path in Path("ecommerce").rglob("*.*"):
+#         z.write(path)
+
+with ZipFile("files.zip") as zip:
+    print(zip.namelist())
+    info = zip.getinfo("ecommerce/__init__.py")
+    print(info.file_size)
+    print(info.compress_size)
+
+    # Extract all the files to the folder named "extract"
+    zip.extract("extract")
+```
+```output
+['ecommerce/__init__.py', 'ecommerce/shopping/__init__.py', 'ecommerce/customer/__init__.py']
+0
+0
+```
+
+### Python Standard Library - 6 - Working With CSV Files
+
+```python
+import csv
+
+with open("data.csv", "w") as file:
+    writer = csv.writer(file)
+    writer.writerow(["transaction_id", "product_id", "price"])
+    writer.writerow([1000, 1, 5])
+    writer.writerow([1001, 2, 15])
+
+with open("data.csv") as file:
+    reader = csv.reader(file)
+    # print(list(reader)) # Only iterate once
+    for row in reader:
+        print(row)
+
+```
+```output
+['transaction_id', 'product_id', 'price']
+['1000', '1', '5']
+['1001', '2', '15']
+```
+
+### Python Standard Library - 7 - Working With JSON Paths
+
+```python
+import json
+from pathlib import Path
+
+movies = [
+    {"id": 1, "title": "Terminator", "year": 1990},
+    {"id": 2, "title": "Kindergarten Cop", "year": 1993}
+]
+
+data = json.dumps(movies)
+Path("movies.json").write_text(data)
+
+json_data = Path("movies.json").read_text()
+print(json_data)
+```
+```output
+[
+    {"id": 1, "title": "Terminator", "year": 1990},
+    {"id": 2, "title": "Kindergarten Cop", "year": 1993}
+]
+```
+
+### Python Standard Library - 8 - Working a SQLite Database
+
+- *Download and instlall `sqlite db browser`.*
+- *Create a new database and table before running python program.*
+
+```python
+import sqlite3
+import json
+from pathlib import Path
+
+movies = json.loads(Path("movies.json").read_text())
+print(movies)
+
+with sqlite3.connect("db.sqlite3") as conn:
+    command = "INSERT INTO movies VALUES(?, ?, ?)"
+    for movie in movies:
+        conn.execute(command, tuple(movie.values()))
+    conn.commit()
+```
+=> *To browsing the db browser.*
+
+```python
+import sqlite3
+
+with sqlite3.connect("db.sqlite3") as conn:
+    command = "SELECT * FROM Movies"
+    cursor = conn.execute(command)
+    # for row in cursor: # cursor only can be iterated once
+    #     print(row)
+
+    movies = cursor.fetchall()
+    print(movies)
+```
+```output
+[(1, 'Terminator', 1990), (2, 'Kindergarten Cop', 1993)]
+```
+
+### Python Standard Library - 9 - Working With Timestamps
+
+```python
+import time
+
+def send_emails():
+    for i in range(1000000):
+        pass
+
+start = time.time()
+send_emails()
+end = time.time()
+duration = end - start
+print(duration)
+```
+```output
+0.03973817825317383
+```
+
+### Python Standard Library - 10 - Working With DateTimes
+
+```python
+from datetime import datetime
+import time
+
+print(datetime(2022, 1, 10))
+print(datetime.now())
+print(datetime.strptime("2021/01/10", "%Y/%m/%d"))
+dt = datetime.fromtimestamp(time.time())
+print(dt)
+print(f"{dt.year}/{dt.month}")
+print(dt.strftime("%Y/%m"))
+```
+```output
+2022-01-10 00:00:00
+2022-01-10 22:14:43.650436
+2021-01-10 00:00:00
+2022-01-10 22:14:43.673962
+2022/1
+2022/01
+```
+
+### Python Standard Library - 11 - Working with Time Deltas
+
+```python
+from datetime import datetime, timedelta
+
+dt1 = datetime(2020, 1, 1) + timedelta(days=1, seconds=1000)
+dt2 = datetime.now()
+
+duration = dt2 - dt1
+print(duration)
+print('days', duration.days)
+print('seconds', duration.seconds)
+print('total_seconds', duration.total_seconds())
+```
+```output
+747 days, 22:03:57.331225
+days 747
+seconds 79437
+total_seconds 64620237.331225
+```
+
+### Python Standard Library - 12 - Generating Random Values
+
+```python
+import random
+import string
+
+print(random.random())
+print(random.randint(1, 10))
+print(random.choice([1, 2, 3, 4, 5, 6, 7]))
+print(random.choices([1, 2, 3, 4, 5, 6, 7], k=2))
+print(random.choices([1, 2, 3, 4, 5, 6, 7], k=4))
+print(random.choices('hello lawjune', k=4))
+print("".join(random.choices('hello lawjune', k=4)))
+print(",".join(random.choices('hello lawjune', k=4)))
+
+print(string.ascii_letters)
+print(string.digits)
+
+print("Random Password:", "".join(random.choices(string.ascii_letters + string.digits, k=6)))
+```
+```output
+0.7916912303647569
+6
+6
+[4, 7]
+[3, 5, 6, 5]
+['j', 'w', 'n', 'u']
+ lau
+a,u,n,u
+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
+0123456789
+Random Password: cpzDjP
+```
+
+### Python Standard Library - 13 - Opening the Browser
+
+```python
+import webbrowser
+
+print("Deployment completed")
+webbrowser.open("http://google.com")
+```
+
+### Python Standard Library - 14 - Sending Emails
+
+```python
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from pathlib import Path
+import smtplib
+
+message = MIMEMultipart()
+message["from"] = "18516315041@163.com"
+message["to"] = "lawjune@163.com"
+message["subject"] = "This is a test"
+message.attach(MIMEText("Body"))
+message.attach(MIMEImage(Path("me.jpg").read_bytes()))
+
+with smtplib.SMTP_SSL(host="smtp.163.com", port=465) as smtp:
+    smtp.ehlo()
+    # smtp.starttls()
+    smtp.login("18516315041@163.com", "cheryl1108")
+    smtp.send_message(message)
+    print("Sent...")
+```
+
+### Python Standard Library - 15 - Templates
+
+```python
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from pathlib import Path
+from string import Template
+import smtplib
+
+template = Template(Path("template.html").read_text())
+
+message = MIMEMultipart()
+message["from"] = "18516315041@163.com"
+message["to"] = "lawjune@163.com"
+message["subject"] = "This is a test"
+body = template.substitute({"name": "Jun"})
+message.attach(MIMEText(body, "html"))
+message.attach(MIMEImage(Path("me.jpg").read_bytes()))
+
+with smtplib.SMTP_SSL(host="smtp.163.com", port=465) as smtp:
+    smtp.ehlo()
+    # smtp.starttls()
+    smtp.login("18516315041@163.com", "cheryl1108")
+    smtp.send_message(message)
+    print("Sent...")
+```
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+</head>
+<body>
+    Hi <strong>$name</strong>, this is our test email.
+</body>
+</html>
+```
+
+### Python Standard Library - 16 - Command-line Arguments
+
+```python
+import sys
+
+if len(sys.argv) == 1:
+    print("USAGE: python main.py <password>")
+else:
+    password = sys.argv[1]
+    print("Password", password)
+```
+```sh
+python main.py -a -b -c
+`=>
+Password -a
+```
+
+### Python Standard Library - 17 - Running External Programs
+
+```python
+import subprocess
+
+"""
+Old legacy:
+subprocess.call()
+subprocess.check_call()
+subprocess.check_output()
+subprocess.Popen
+"""
+
+completed = subprocess.run(["ls", "-lart"],
+                           capture_output=True,
+                           text=True)
+print("args", completed.args)
+print("returncode", completed.returncode)
+print("stderr", completed.stderr)
+print("stdout", completed.stdout)
+```
+```output
+args ['ls', '-lart']
+returncode 0
+stderr 
+stdout total 160
+-rw-r--r--@  1 mac  staff  40289 Aug  3 23:29 me.jpg
+-rw-r--r--   1 mac  staff    412 Jan  8 22:00 files.zip
+drwxr-xr-x   8 mac  staff    256 Jan 10 21:33 .idea
+drwxr-xr-x   6 mac  staff    192 Jan 10 21:35 ecommerce
+drwxr-xr-x   7 mac  staff    224 Jan 10 21:35 venv
+drwxr-xr-x   6 mac  staff    192 Jan 10 21:35 ..
+-rw-r--r--@  1 mac  staff     54 Jan 10 21:38 data.csv
+-rw-r--r--   1 mac  staff    102 Jan 10 21:45 movies.json
+-rw-r--r--   1 mac  staff  12288 Jan 10 21:58 db.sqlite3
+-rw-r--r--@  1 mac  staff   6148 Jan 18 22:50 .DS_Store
+-rw-r--r--   1 mac  staff    125 Jan 18 23:04 template.html
+-rw-r--r--   1 mac  staff    395 Jan 18 23:20 main.py
+drwxr-xr-x  13 mac  staff    416 Jan 18 23:20 .
+```
+
+```python
+import subprocess
+
+completed = subprocess.run(["python", "other.py"],
+                           capture_output=True,
+                           text=True)
+print("args", completed.args)
+print("returncode", completed.returncode)
+print("stderr", completed.stderr)
+print("stdout", completed.stdout)
+```
+```output
+args ['python', 'other.py']
+returncode 0
+stderr 
+stdout This is a complicated program!
+```
+
+```python
+import subprocess
+
+try:
+    completed = subprocess.run(["false"],
+                               capture_output=True,
+                               text=True,
+                               check=True)
+except subprocess.CalledProcessError as ex:
+    print(ex)
+```
+```output
+Command '['false']' returned non-zero exit status 1.
+```
+
+## Python Package Index
+
+### Python Package Index - 1 - Pypi
+
+```sh
+pip3 list
+`=>
+Package                           Version
+--------------------------------- ---------
+backports.entry-points-selectable 1.1.0
+certifi                           2021.10.8
+distlib                           0.3.3
+filelock                          3.3.2
+pip                               21.2.3
+pipenv                            2021.5.29
+platformdirs                      2.4.0
+setuptools                        57.4.0
+six                               1.16.0
+virtualenv                        20.10.0
+virtualenv-clone                  0.5.7
+WARNING: You are using pip version 21.2.3; however, version 21.3.1 is available.
+You should consider upgrading via the '/Library/Frameworks/Python.framework/Versions/3.10/bin/python3.10 -m pip install --upgrade pip' command.
+```
+
+```sh
+pip3 install --upgrade pip
+```
+
+```sh
+pip3 install requests
+pip3 list
+`=>
+Package                           Version
+--------------------------------- ---------
+backports.entry-points-selectable 1.1.0
+certifi                           2021.10.8
+charset-normalizer                2.0.10
+distlib                           0.3.3
+filelock                          3.3.2
+idna                              3.3
+pip                               21.3.1
+pipenv                            2021.5.29
+platformdirs                      2.4.0
+requests                          2.27.1
+setuptools                        57.4.0
+six                               1.16.0
+urllib3                           1.26.8
+virtualenv                        20.10.0
+virtualenv-clone                  0.5.7
+```
+
+```sh
+pip3 install requests==2.20.*
+```
+
+```sh
+pip3 install requests~=2.20.0
+```
+
+```sh
+pip3 uninstall requests
+```
+
+### Python Package Index - 3 - Virtual Environments
+
+```sh
+python3 -m venv env
+source env/bin/activate
+```
+
+```sh
+deactivate
+```
+
+### Python Package Index - 4 - Pipenv
+
+*Combind pip and virtualenv.*
+
+```sh
+pip3 install pipenv
+```
+
+```sh
+pipenv install requests
+```
+
+```sh
+pipenv --venv
+`=>
+/Users/mac/.local/share/virtualenvs/pythondemo-kvyUC8O7
+```
+
+***Activate***
+```sh
+pipenv shell
+```
+
+```sh
+exit
+```
+
+### Python Package Index - 5 - Virtual Environments in VSCode
+
+### Python Package Index - 6 - Pipfile
+
+```sh
+➜  pythondemo pipenv --venv
+`=>
+/Users/mac/.local/share/virtualenvs/pythondemo-kvyUC8O7
+➜  pythondemo rm -rf /Users/mac/.local/share/virtualenvs/pythondemo-kvyUC8O7
+➜  pythondemo pipenv --venv
+`=>
+No virtualenv has been created for this project(/Users/mac/Projects/pythondemo) yet!
+Aborted!
+```
+
+```sh
+pipenv install
+pipenv --venv
+`=>
+/Users/mac/.local/share/virtualenvs/pythondemo-kvyUC8O7
+```
+
+**Use the pipfile.lock**
+```sh
+pipenv install --ignore-pipfile
+```
+
+### Python Package Index - 7 - Managing Dependencies
+
+```sh
+pipenv graph
+requests==2.27.1
+  - certifi [required: >=2017.4.17, installed: 2021.10.8]
+  - charset-normalizer [required: ~=2.0.0, installed: 2.0.10]
+  - idna [required: >=2.5,<4, installed: 3.3]
+  - urllib3 [required: >=1.21.1,<1.27, installed: 1.26.8]
+```
+
+**The dependencies leave after removing the `requests` package**
+*But the left dependencies will not be installed in another new machine.*
+```sh
+pipenv uninstall requests
+pipenv graph
+`=>
+certifi==2021.10.8
+charset-normalizer==2.0.10
+idna==3.3
+urllib3==1.26.8
+```
+
+```sh
+pipenv update --outdated
+```
+*To modify the as the latest version if receiving warning.*
+
+### Python Package Index - 8 - Publishing Packages
+
+```sh
+ pip3 install setuptools wheel twine
+ ```
+
+ https://choosealicense.com/
+
+*sdist - short distribution*
+*bdist_wheel - build distribution*
+```sh
+python3 setup.py sdist bdist_wheel
+```
+
+*setup.py*
+```python
+import setuptools
+from pathlib import Path
+
+setuptools.setup(
+    name="ljpdf",
+    version=1.0,
+    long_desription=Path("README.md").read_text(),
+    packages=setuptools.find_packages(exclude=["tests", "data"])
+)
+```
+
+```sh
+twine upload dist/*
+```
+
+### Python Package Index - 9 - Docstrings
+
+""" One line description.
+
+    A more detailed explanation.
+"""
+
+```python
+""" This module provides functions to convert a PDF to text. """
+
+def convert():
+    """ 
+    Convert the given PDF to text. 
+
+    Parameters:
+    path (str): The path to a PDF file.
+
+    Returns:
+    str: The content of the PDF file a text.    
+    """
+    print("pdf2text")
+```
+
+```python
+""" This module provides functions to convert a PDF to image. """
+
+class ImageConverter:
+    """ A simple converter for converting PDFs to image."""
+
+    def convert(path):
+        """ 
+        Convert the given PDF to image. 
+
+        Parameters:
+        path (str): The path to a PDF file.
+
+        Returns:
+        str: The content of the PDF file a image.    
+        """
+        print("pdf2text")
+```
+
+### Python Package Index - 10 - Pydoc
+
+```sh
+pydoc3 math
+```
+
+```sh
+pydoc3 -w ljpdf.pdf2image
+`=>
+wrote ljpdf.pdf2image.html
+```
+```sh
+ls | grep html
+`=>
+jpdf.pdf2image.html
+```
+
+```sh
+ljpdf pydoc3 -p 1234
+`=>
+pydoc server ready at http://localhost:1234/
 ```
 
 
