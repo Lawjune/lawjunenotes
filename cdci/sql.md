@@ -526,15 +526,30 @@ ORDER BY first_name
 
 # 4 Inserting, Updating, and Deleting Data
 
-## Column Attributes
+## 4.1 Column Attributes
 
-## Inserting a Single Row
+## 4.2 Inserting a Single Row
+
+```sql
+INSERT INTO customers 
+VALUES (
+    DEFAULT, 
+    'John', 
+    'Smith', 
+    '1990-01-01', 
+    NULL,
+    'address',
+    'city',
+    'CA'
+    DEFAULT
+    )
+```
 
 ```sql
 INSERT INTO customers (
     first_name,
     last_name,
-    birth_d4ate,
+    birth_date,
     address,
     city,
     state
@@ -552,7 +567,7 @@ VALUES (
     )
 ```
 
-## Inserting Multiple Rows
+## 4.3 Inserting Multiple Rows
 
 ```sql
 INSERT INTO shippers (name)
@@ -562,7 +577,38 @@ VALUES
     ('Shipper3')
 ```
 
-## Inserting Hierarchical Rows
+**Exercise:**
+*Insert three rows in the products table*
+
+```sql
+USE sql_store;
+
+INSERT INTO products 
+VALUES 
+    (DEFAULT, 'product_1', 1, 1.0), 
+    (DEFAULT, 'product_2', 2, 2.0),
+    (DEFAULT, 'product_3', 3, 3.0)
+```
+
+## 4.4 Inserting Hierarchical Rows
+
+*Each order in orders table has several order_items.*
+*Or orders table is the parent of order_items table.*
+
+
+*Use to **LAST_INSERT_ID()** function*
+```sql
+INSERT INTO orders (
+    customer_id,
+    order_date,
+    status
+    )
+VALUES (
+    1, '2019-01-02', 1
+    );
+SELECT LAST_INSERT_ID()
+```
+
 
 ```sql
 INSERT INTO orders (
@@ -580,7 +626,7 @@ VALUES
     (LAST_INSERT_ID(), 2, 1, 3.95)
 ```
 
-## Creating a Copy of A Table
+## 4.5 Creating a Copy of A Table
 
 ```sql
 CREATE TABLE orders_archived  AS
@@ -588,7 +634,17 @@ SELECT *
 FROM orders
 WHERE order_date < '2019-01-01'
 ```
+***We don't have the `Primary Key` on orders_archived table!***
 
+*Use `Truncate Table` to delete all of the data on rders_archived table*
+```sql
+INSERT INTO orders_archived
+SELECT * 
+FROM orders
+WHERE order_date < '2019-01-01'
+```
+
+**Exercise:**
 ```sql
 USE sql_invoicing;
 
@@ -599,13 +655,23 @@ JOIN clients c USING (client_id)
 WHERE payment_date IS NOT NULL
 ```
 
-## Updating a Single Row
+## 4.6 Updating a Single Row
 
 ```sql
 UPDATE invoices
 SET 
     payment_total = 10, 
     payment_date = '2019-03-01'
+WHERE invoice_id = 1
+```
+
+```sql
+USE sql_invoicing;
+
+UPDATE invoices
+SET 
+    payment_total = DEFAULT, 
+    payment_date = DEFAULT
 WHERE invoice_id = 1
 ```
 
@@ -618,14 +684,26 @@ WHERE invoice_id = 3
 ```
 
 
-## Updating Multiple Rows
+## 4.7 Updating Multiple Rows
 
+*Disable the SQL-Workbench `Safe Updates` function in Edit->Preferences->SQL Editor.*
 ```sql
 UPDATE invoices
 SET 
     payment_total = invoice_total * 0.5, 
     payment_date = due_date
-WHERE client_id IN (3, 4)
+WHERE invoice_id IN (3, 4)
+```
+
+*Write a SQL statement to*
+    *give any customers born before 1990*
+    *50 extra points*
+```sql
+USE sql_store;
+
+UPDATE customers
+SET points = points + 50
+WHERE birth_date < '1990-01-01'
 ```
 
 ## Using Subqueries in Updates

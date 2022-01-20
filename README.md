@@ -1,3 +1,3 @@
-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
+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
 
-git push https://Lawjune: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@github.com/Lawjune/lawjunenotes.git
+git push https://Lawjune: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@github.com/Lawjune/lawjunenotes.git
