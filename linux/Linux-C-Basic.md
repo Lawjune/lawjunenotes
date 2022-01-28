@@ -7090,6 +7090,8 @@ __GI_raise (sig=sig@entry=6)
 
 #067 - Memory Map using mmap() Function
 
+*stat (C System Call) stat is a system call that is used to determine information about a file based on its file path.*
+
 ```c
 #include <stdio.h>
 #include <stdlib.h>
@@ -7271,4 +7273,1034 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+```
+
+# 070 - Wide Characters
+
+```c
+#include <stdio.h>
+#include <wchar.h>
+
+int main(int argc, char *argv[])
+{
+    wchar_t buf[128] = L"Hello World!";
+    wchar_t buf2[128];
+
+    wprintf(L"%ls\n", buf);
+
+    wcscpy(buf2, buf);
+    wprintf(L"%ls\n", buf2);
+
+    return 0;
+}
+```
+```output
+Hello World!
+Hello World!
+```
+
+# 071 - fsync() Function
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[])
+{
+    char *str = "This is a strin to go to the file.\n";
+
+    int fd;
+    int ret;
+
+    fd = creat("mytext.txt", S_IRUSR | S_IRUSR);
+
+    if(fd < -1) {
+        perror("creat()");
+        exit(1);
+    }
+
+    ret = write(fd, str, strlen(str));
+
+    if(ret < -1) {
+        perror("write()");
+        exit(1);
+    }
+
+    fsync(fd);
+
+    /*
+        Very long lines of code ...
+    */
+
+    close(fd);
+
+    return 0;
+}
+```
+```sh
+gcc -o main main.c
+./main
+cat mytext.txt
+`=> 
+This is a strin to go to the file.
+```
+
+# 072 - sendfile() Function
+
+***Using while()***
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[])
+{
+    int fd1;
+    int fd2;
+    int ret;
+    char buf[20];
+
+    if((fd1 = open("file1.txt", O_RDONLY)) < 0) {
+        perror("open() read");
+        exit(1);
+    }
+
+    if((fd2 = open("file2.txt", O_CREAT | O_WRONLY, 0600)) < 0) {
+        perror("open() write");
+        close(fd1);
+        exit(1);
+    }
+
+    while ((ret = read(fd1, buf, 20)) > 0) 
+    {
+        if(write(fd2, buf, ret) < 0) {
+            perror("write");
+            exit(1);
+        }
+    }
+    
+    close(fd1);
+    close(fd2);
+
+    return 0;
+}
+```
+```sh
+gcc -o main main.c
+./main
+cat file2.txt 
+`=>
+This is the first line.
+This is the second line.
+```
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/sendfile.h>
+
+int main(int argc, char *argv[])
+{
+    int fd1;
+    int fd2;
+    int ret;
+    struct stat stbuf;
+
+    if((fd1 = open("file1.txt", O_RDONLY)) < 0) {
+        perror("open() read");
+        exit(1);
+    }
+
+    fstat(fd1, &stbuf);
+
+    if((fd2 = open("file2.txt", O_CREAT | O_WRONLY, 0600)) < 0) {
+        perror("open() write");
+        close(fd1);
+        exit(1);
+    }
+
+    sendfile(fd2, fd1, 0, stbuf.st_size);
+    
+    close(fd1);
+    close(fd2);
+
+    return 0;
+}
+```
+
+# 073 - GDBM Embedded Database
+
+```sh
+sudo apt install libgdbm-dev
+```
+
+```c
+#include <stdio.h>
+#include <string.h>
+#include <gdbm.h>
+
+typedef struct myd_tag {
+    char first[24];
+    char last[24];
+} myd;
+
+int main(int argc, char *argv[])
+{
+    GDBM_FILE file;
+
+    datum key1, data1, ndata1;
+    datum key2, data2, ndata2;
+
+    char *k1 = "msg1";
+    char *d1 = "I love C programming.";
+
+    char *k2 = "msg2";
+    myd d2 = { "John", "Doe" };
+
+    key1.dptr = k1;
+    key1.dsize = strlen(k1) + 1;
+    data1.dptr = d1;
+    data1.dsize = strlen(d1) + 1;
+
+    key2.dptr = k2;
+    key2.dsize = strlen(k2) + 1;
+    data2.dptr = (char *) &d2;
+    data2.dsize = sizeof(d2);
+
+    file = gdbm_open("mydatabase", 0, GDBM_WRCREAT | GDBM_READER, 0660, 0);
+
+    gdbm_store(file, key1, data1, GDBM_INSERT);
+    gdbm_store(file, key2, data2, GDBM_INSERT);
+
+    ndata1 = gdbm_fetch(file, key1);
+    ndata2 = gdbm_fetch(file, key2);
+
+    printf("ndata1: %s\n", ndata1.dptr);
+    printf("ndata2: %s\n", ((myd *)ndata2.dptr)->first);
+    printf("ndata2: %s\n", ((myd *)ndata2.dptr)->last);
+
+    gdbm_close(file);
+
+    return 0;
+}
+```
+```sh
+gcc -o main main.c -lgdbm
+./main
+`=> 
+ndata1: I love C programming.
+ndata2: John
+ndata2: Doe
+```
+
+# 074 - libusb
+
+```sh
+sudo apt-get install libusb-1.0-0-dev
+```
+
+```sh
+dpkg -l libusb-1.0*
+`=>
+Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                   Version          Architecture Description
++++-======================-================-============-=====================>
+ii  libusb-1.0-0:amd64     2:1.0.23-2build1 amd64        userspace USB program>
+ii  libusb-1.0-0-dev:amd64 2:1.0.23-2build1 amd64        userspace USB program>
+ii  libusb-1.0-doc         2:1.0.23-2build1 all          documentation for use>
+```
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <libusb-1.0/libusb.h>
+
+void print_devices(libusb_device *dev)
+{
+    struct libusb_device_descriptor desc;
+    struct libusb_config_descriptor *config;
+    const struct libusb_interface *interface;
+    const struct libusb_interface_descriptor *intfdesc; 
+    const struct libusb_endpoint_descriptor *endpointdesc;
+
+    int ret;
+    int i, j, k;
+
+    ret = libusb_get_device_descriptor(dev, &desc);
+    if(ret < 0) {
+        fprintf(stderr, "Error in getting device descriptor!\n");
+        return;
+    }
+
+    printf("Number of possible configs is %d\n", desc.bNumConfigurations);
+    printf("Device class: %d\n", desc.idVendor);
+    printf("Product ID: %d\n", desc.idProduct);
+
+    libusb_get_config_descriptor(dev, 0, &config);
+    printf("Interface: %d\n", config->bNumInterfaces);
+
+    for(i = 0; i < config->bNumInterfaces; i++) {
+        interface = &config->interface[i];
+        printf("Number of alt settings: %d\n", interface->num_altsetting);
+        for(j = 0; j < interface->num_altsetting; j++) {
+            intfdesc = &interface->altsetting[j];
+            printf("    Interface number: %d,   ", intfdesc->bInterfaceNumber);
+            printf("    Num of endpoints: %d\n  ", intfdesc->bNumEndpoints);
+            for(k = 0; k < intfdesc->bNumEndpoints; k++) {
+                endpointdesc = &intfdesc->endpoint[k];
+                printf("    Desc Type: %d,   ", endpointdesc->bDescriptorType);
+                printf("    EP Addr: %d\n", endpointdesc->bEndpointAddress);
+            }
+        }
+    }
+
+    printf("\n\n");
+    libusb_free_config_descriptor(config);
+
+}
+
+int main(int argc, char *argv[])
+{
+    libusb_device **devs;
+    libusb_context *context= NULL;
+
+    size_t list;
+    size_t i;
+    int ret;
+
+    ret = libusb_init(&context);
+    if(ret < 0) {
+        perror("libusb_init");
+        exit(1);
+    }
+
+    list = libusb_get_device_list(context, &devs);
+    if(list < 0) {
+        fprintf(stderr, "Error in getting device list\n");
+        libusb_free_device_list(devs, 1);
+        libusb_exit(context);
+        exit(1);
+    }
+
+    printf("There are %ld devices found\n", list);
+
+    for(i = 0; i < list; i++) {
+        /* print devices specs */
+        print_devices(devs[i]);
+    }
+
+    libusb_free_device_list(devs, 1);
+    libusb_exit(context);
+
+    return 0;
+}
+```
+
+```sh
+gcc -o main main.c -lusb-1.0
+./main
+`=>
+There are 10 devices found
+Number of possible configs is 1
+Device class: 9390
+Product ID: 4352
+Interface: 2
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 129
+Number of alt settings: 1
+    Interface number: 1,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 130
+
+
+Number of possible configs is 1
+Device class: 32903
+Product ID: 36
+Interface: 1
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 129
+
+
+Number of possible configs is 1
+Device class: 7531
+Product ID: 2
+Interface: 1
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 129
+
+
+Number of possible configs is 1
+Device class: 1266
+Product ID: 45802
+Interface: 2
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 129
+Number of alt settings: 6
+    Interface number: 1,       Num of endpoints: 0
+      Interface number: 1,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 130
+    Interface number: 1,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 130
+    Interface number: 1,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 130
+    Interface number: 1,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 130
+    Interface number: 1,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 130
+
+
+Number of possible configs is 1
+Device class: 32903
+Product ID: 36
+Interface: 1
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 129
+
+
+Number of possible configs is 1
+Device class: 7531
+Product ID: 2
+Interface: 1
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 129
+
+
+Number of possible configs is 1
+Device class: 7531
+Product ID: 3
+Interface: 1
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 129
+
+
+Number of possible configs is 4
+Device class: 1452
+Product ID: 4776
+Interface: 1
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 3
+      Desc Type: 5,       EP Addr: 2
+    Desc Type: 5,       EP Addr: 129
+    Desc Type: 5,       EP Addr: 131
+
+
+Number of possible configs is 1
+Device class: 2578
+Product ID: 1
+Interface: 2
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 3
+      Desc Type: 5,       EP Addr: 129
+    Desc Type: 5,       EP Addr: 2
+    Desc Type: 5,       EP Addr: 130
+Number of alt settings: 6
+    Interface number: 1,       Num of endpoints: 2
+      Desc Type: 5,       EP Addr: 3
+    Desc Type: 5,       EP Addr: 131
+    Interface number: 1,       Num of endpoints: 2
+      Desc Type: 5,       EP Addr: 3
+    Desc Type: 5,       EP Addr: 131
+    Interface number: 1,       Num of endpoints: 2
+      Desc Type: 5,       EP Addr: 3
+    Desc Type: 5,       EP Addr: 131
+    Interface number: 1,       Num of endpoints: 2
+      Desc Type: 5,       EP Addr: 3
+    Desc Type: 5,       EP Addr: 131
+    Interface number: 1,       Num of endpoints: 2
+      Desc Type: 5,       EP Addr: 3
+    Desc Type: 5,       EP Addr: 131
+    Interface number: 1,       Num of endpoints: 2
+      Desc Type: 5,       EP Addr: 3
+    Desc Type: 5,       EP Addr: 131
+
+
+Number of possible configs is 1
+Device class: 7531
+Product ID: 2
+Interface: 1
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 129
+```
+
+```sh
+lsusb -t
+`=>
+/:  Bus 04.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/4p, 5000M
+/:  Bus 03.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/4p, 480M
+    |__ Port 1: Dev 2, If 0, Class=Wireless, Driver=btusb, 12M
+    |__ Port 1: Dev 2, If 1, Class=Wireless, Driver=btusb, 12M
+    |__ Port 2: Dev 7, If 0, Class=Imaging, Driver=usbfs, 480M
+    |__ Port 2: Dev 7, If 1, Class=Vendor Specific Class, Driver=usbfs, 480M
+    |__ Port 2: Dev 7, If 2, Class=Vendor Specific Class, Driver=ipheth, 480M
+/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=ehci-pci/3p, 480M
+    |__ Port 1: Dev 2, If 0, Class=Hub, Driver=hub/8p, 480M
+        |__ Port 5: Dev 3, If 0, Class=Human Interface Device, Driver=usbhid, 12M
+        |__ Port 5: Dev 3, If 1, Class=Human Interface Device, Driver=usbhid, 12M
+/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=ehci-pci/3p, 480M
+    |__ Port 1: Dev 2, If 0, Class=Hub, Driver=hub/6p, 480M
+        |__ Port 6: Dev 4, If 0, Class=Video, Driver=uvcvideo, 480M
+        |__ Port 6: Dev 4, If 1, Class=Video, Driver=uvcvideo, 480M
+
+```
+
+# 075 - Redirect
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[])
+{
+    int fd;
+    int ret;
+    
+    fd = open("out.txt", O_CREAT | O_APPEND | O_WRONLY);
+    if(fd < 0) {
+        perror("open");
+        exit(1);
+    }
+
+    ret = dup2(fd, 1);
+    if(ret < 0) {
+        perror("dup2");
+        exit(1);
+    }
+
+    system("ls");
+    close(fd);
+
+    return 0;
+}
+```
+```sh
+gcc -o main main.c 
+./main
+cat out.txt
+`=>
+add.c
+add.o
+client
+client.c
+file1.txt
+file2.txt
+hello
+hello.c
+...
+...
+```
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[])
+{
+    int fd, fd2;
+    int ret;
+    
+    fd = open("out.txt", O_CREAT | O_APPEND | O_WRONLY);
+    if(fd < 0) {
+        perror("open");
+        exit(1);
+    }
+
+    fd2 = open("outerr.txt", O_CREAT | O_APPEND | O_WRONLY);
+    if(fd2 < 0) {
+        perror("open err");
+        exit(1);
+    }
+
+    ret = dup2(fd, 1);
+    if(ret < 0) {
+        perror("dup2");
+        exit(1);
+    }
+
+    ret = dup2(fd2, 2);
+    if(ret < 0) {
+        perror("dup2 err");
+        exit(1);
+    }
+
+    system("ls");
+    close(fd);
+
+    return 0;
+}
+```
+```sh
+gcc -o main main.c 
+./main
+cat outerr.txt
+`=>
+cat: outerr.txt: Permission denied
+```
+
+# 076 - lseek() Function
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+
+int main(int argc, char *argv[])
+{
+    int fd;
+    int ret;
+    int a[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+    int buf;
+
+    fd = open("outfile", O_CREAT | O_APPEND | O_RDWR, 0600);
+    if(fd < 0) {
+        perror("open");
+        exit(1);
+    }
+
+    /* write something */
+    ret = write(fd, (void *) a, sizeof(a));
+    if(ret < 0) {
+        perror("write");
+        close(fd);
+        exit(1);
+    }    
+
+    /* seek using lseek */
+    ret = lseek(fd, 0, SEEK_SET);
+    if(fd < 0) {
+        perror("lseek");
+        close(fd);
+        exit(1);
+    }
+
+    /* read from that position set by lseek */
+    ret = read(fd, &buf, sizeof(int));
+    if(fd < 0) {
+        perror("read");
+        close(fd);
+        exit(1);
+    }
+
+    printf("buf = %d\n", buf);
+
+    /* seek using lseek */
+    ret = lseek(fd, 3*sizeof(int), SEEK_SET);
+    if(fd < 0) {
+        perror("lseek");
+        close(fd);
+        exit(1);
+    }
+
+    /* read from that position set by lseek */
+    ret = read(fd, &buf, sizeof(int));
+    if(fd < 0) {
+        perror("read");
+        close(fd);
+        exit(1);
+    }
+
+    printf("buf = %d\n", buf);
+
+    close(fd);
+
+    return 0;
+}
+```
+```output
+buf = 1
+buf = 4
+```
+
+# 077 - stat() Function
+
+```sh
+man 2 stat
+```
+
+```c
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <string.h>
+#include <time.h>
+
+int main(int argc, char *argv[])
+{   
+    struct stat buf;
+    char mtime[100];
+
+    stat("mytext.txt", &buf);
+
+    printf("st_mode = %o\n", buf.st_mode);
+
+    strcpy(mtime, ctime(&buf.st_mtime));
+    printf("st_time = %s\n", mtime);
+
+    return 0;
+}
+```
+```output
+st_mode = 100664
+st_time = Thu Jan 27 16:21:55 2022
+```
+
+```c
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/sysmacros.h>
+
+int
+main(int argc, char *argv[])
+{
+    struct stat sb;
+
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <pathname>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    if (lstat(argv[1], &sb) == -1) {
+        perror("lstat");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("ID of containing device:  [%lx,%lx]\n",
+            (long) major(sb.st_dev), (long) minor(sb.st_dev));
+
+    printf("File type:                ");
+
+    switch (sb.st_mode & q) {
+    case S_IFBLK:  printf("block device\n");            break;
+    case S_IFCHR:  printf("character device\n");        break;
+    case S_IFDIR:  printf("directory\n");               break;
+    case S_IFIFO:  printf("FIFO/pipe\n");               break;
+    case S_IFLNK:  printf("symlink\n");                 break;
+    case S_IFREG:  printf("regular file\n");            break;
+    case S_IFSOCK: printf("socket\n");                  break;
+    default:       printf("unknown?\n");                break;
+    }
+    printf("I-node number:            %ld\n", (long) sb.st_ino);
+
+    printf("Mode:                     %lo (octal)\n",
+            (unsigned long) sb.st_mode);
+
+    printf("Link count:               %ld\n", (long) sb.st_nlink);
+    printf("Ownership:                UID=%ld   GID=%ld\n",
+            (long) sb.st_uid, (long) sb.st_gid);
+
+    printf("Preferred I/O block size: %ld bytes\n",
+            (long) sb.st_blksize);
+    printf("File size:                %lld bytes\n",
+            (long long) sb.st_size);
+    printf("Blocks allocated:         %lld\n",
+            (long long) sb.st_blocks);
+
+    printf("Last status change:       %s", ctime(&sb.st_ctime));
+    printf("Last file access:         %s", ctime(&sb.st_atime));
+    printf("Last file modification:   %s", ctime(&sb.st_mtime));
+
+    exit(EXIT_SUCCESS);
+}
+
+
+```
+```sh
+./main .
+`=>
+ID of containing device:  [8,2]
+File type:                directory
+I-node number:            24644357
+Mode:                     40775 (octal)
+Link count:               4
+Ownership:                UID=1000   GID=1000
+Preferred I/O block size: 4096 bytes
+File size:                4096 bytes
+Blocks allocated:         8
+Last status change:       Thu Jan 27 16:29:20 2022
+Last file access:         Thu Jan 27 16:27:19 2022
+Last file modification:   Thu Jan 27 16:29:20 2022
+```
+
+# 078 - va_start(), va_end(), va_arg() Functions
+
+```c
+#include <stdio.h>
+#include <stdarg.h>
+
+int sumnum(int num, ...)
+{
+    int sum = 0;
+    int count = 0;
+
+    va_list argptr;
+    va_start(argptr, num);
+
+    while (count < num)
+    {       
+        sum += va_arg(argptr, int);
+        count++;
+    }
+
+    va_end(argptr);
+
+    return sum;
+}
+
+void printstr(int num, ...)
+{
+    int count = 0;
+    char *ptr;
+    va_list argptr;
+
+    va_start(argptr, num);
+
+    while (count < num)
+    {
+        ptr = va_arg(argptr, char *);
+        printf("ptr = %s\n", ptr);
+        count++;
+    }
+
+    va_end(argptr);
+    
+}
+
+int main(int argc, char *argv[])
+{   
+
+    int total;
+
+    total = sumnum(5, 3, 5, 7, 6, 4);
+
+    printf("total = %d\n", total);
+    printstr(3, "one", "two", "three");
+
+    return 0;
+}
+```
+```output
+total = 25
+ptr = one
+ptr = two
+ptr = three
+```
+
+# 079 - union
+
+In structure each member get separate space in memory. ... In union, the **total memory space allocated is equal to the member with largest size by overlapping.** All other members share the same memory space. This is the biggest difference between structure and union.
+
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char *argv[])
+{   
+    union {
+        int a;
+        int b;
+        char s[8];
+    } myunion;
+
+    myunion.a = 3;
+
+    printf("a =  %d\n", myunion.a);
+    printf("b =  %d\n", myunion.b);
+    printf("s = %s\n", myunion.s);
+
+    myunion.a = 7;
+
+    printf("a =  %d\n", myunion.a);
+    printf("b =  %d\n", myunion.b);
+    printf("s = %s\n", myunion.s);
+
+    myunion.b = 9;
+
+    printf("a =  %d\n", myunion.a);
+    printf("b =  %d\n", myunion.b);
+    printf("s = %s\n", myunion.s);
+
+    strcpy(myunion.s, "happy");
+    printf("s = %s\n", myunion.s);
+    printf("a =  %d\n", myunion.a);
+    printf("a =  %x\n", myunion.a);
+    printf("b =  %a\n", myunion.b);
+    printf("b =  %x\n", myunion.b);
+
+    return 0;
+}
+```
+```output
+a =  3
+b =  3
+s = 
+a =  7
+b =  7
+s = 
+a =  9
+b =  9
+s = 
+s = happy
+a =  1886413160
+a =  70706168
+b =  1886413160
+b =  70706168
+```
+a [h] [a] [p] [p]
+b [h] [a] [p] [p]
+s [h] [a] [p] [p] [y] [] [] []
+h->68
+a->61
+p->70
+p->70
+
+
+# 080 - Trimming out end spaces in a string
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+void trimstring(char *s)
+{
+    char *p = s;
+    int len;
+
+    while (*p == ' ' && *p != '\0')
+        p++;
+
+    len = strlen(p);
+
+    memmove(s, p, len+1);
+
+    p = s + len - 1;
+    while (*p == ' ' && p > s)
+        p--;
+
+    *(++p) = '\0';
+
+}
+
+int main(int argc, char *argv[])
+{   
+    char str[64] = "          Hello World!       ";
+
+    printf("Before trimming str = >%s<\n", str);
+
+    trimstring(str);
+
+    printf("Post trimming str = >%s<\n", str);
+
+    return 0;
+}
+```
+```output
+Before trimming str = >          Hello World!       <
+Post trimming str = >Hello World!<
+```
+
+# 081 - Field extraction from one-line record of flat file database
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int breakfields(char *s, char **data, int n)
+{
+    int fields = 0;
+    int i;
+    char *start = s;
+    char *end = s;
+
+    for (i = 0; i < n; i++) {
+        while (*end != ',' && *end != '\0') 
+            end++;
+
+        if (*end == '\0') {
+            data[i] = (char *) malloc(strlen(start) + 1);
+            strcpy(data[i], start);
+            fields++;
+            break;
+        } else if (*end == ',') {
+            *end = '\0';
+            data[i] = (char *) malloc(strlen(start) + 1);
+            strcpy(data[i], start);
+            start = end + 1;
+            end = start;
+            fields++;
+        }
+    }
+
+    return fields;
+}
+
+int main(int argc, char *argv[])
+{   
+    char str[128] = "Steve,28 Palm St, Honolulu, HI, 98765";
+
+    char *data[5];
+    int ret;
+    int i;
+
+    printf("str = %s\n", str);
+
+    ret = breakfields(str, data, 5);
+
+    for (i = 0; i < 5; i++) {
+        printf("data[%d] = %s\n", i, data[i]);
+        free(data[i]);
+    }
+
+    printf("Number of fields processed = %d\n", ret);
+
+    return 0;
+}
+```
+```output
+str = Steve,28 Palm St, Honolulu, HI, 98765
+data[0] = Steve
+data[1] = 28 Palm St
+data[2] =  Honolulu
+data[3] =  HI
+data[4] =  98765
+Number of fields processed = 5
 ```

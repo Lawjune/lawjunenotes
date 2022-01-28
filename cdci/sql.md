@@ -706,19 +706,35 @@ SET points = points + 50
 WHERE birth_date < '1990-01-01'
 ```
 
-## Using Subqueries in Updates
+## 4.8 Using Subqueries in Updates
 
 ```sql
+use sql_invoicing;
+
 UPDATE invoices
 SET 
     payment_total = invoice_total * 0.5, 
     payment_date = due_date
 WHERE client_id = 
-    (SELECT client_id 
-    FROM clients
-    WHERE state IN ('CA', 'NY'))
+        (SELECT client_id 
+        FROM clients
+        WHERE name = "Myworks")
 ```
 
+```sql
+use sql_invoicing;
+
+UPDATE invoices
+SET 
+    payment_total = invoice_total * 0.5, 
+    payment_date = due_date
+WHERE client_id IN
+        (SELECT client_id 
+        FROM clients
+        WHERE state IN ('CA', 'NY'))
+```
+
+**Exercise:**
 ```sql
 USE sql_store;
 
@@ -730,7 +746,7 @@ WHERE customer_id IN
     WHERE points > 3000)
 ```
 
-## Deleting Rows
+## 4.9 Deleting Rows
 
 ```sql
 USE sql_invoicing;
@@ -742,12 +758,12 @@ WHERE client_id =
     WHERE name = 'Myworks')
 ```
 
-## Restoring the Databases
+## 4.10 Restoring the Databases
 
 
-# Summarizing Data
+# 5 Summarizing Data
 
-## Aggregate Functions
+## 5.1 Aggregate Functions
 
 ```sql
 MAX()
@@ -773,6 +789,7 @@ FROM invoices
 WHERE invoice_date > '2019-07-01'
 ```
 
+**Exercise:**
 ```sql
 USE sql_invoicing;
 
@@ -804,7 +821,7 @@ WHERE invoice_date
     BETWEEN '2019-01-01' AND '2019-12-31'
 ```
 
-## The GROUP BY Clause
+## 5.2 The GROUP BY Clause
 
 ```sql
 SELECT
@@ -827,6 +844,7 @@ GROUP BY state, city
 ORDER BY total_sales DESC
 ```
 
+**Exercise:**
 ```sql
 SELECT 
     date,

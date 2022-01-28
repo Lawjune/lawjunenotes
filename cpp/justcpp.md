@@ -157,7 +157,7 @@ player.y = 7
 
 ### How to Write a C++ Class
 
-***Just a fair enough clean code, not the final code!!!**
+***Just a fair enough clean code, not the final code!!!***
 
 ```cpp
 #include <iostream>
