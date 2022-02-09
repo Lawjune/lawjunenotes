@@ -2001,6 +2001,310 @@ ljpdf pydoc3 -p 1234
 pydoc server ready at http://localhost:1234/
 ```
 
+## Populate Python Packages
+
+### Populate Python Packages - 1 - Introduction
+
+- Excel Spreadsheet
+- PDFs
+- Sending Text
+- Browser Automation
+- Web Scraping
+
+### Populate Python Packages - 2 - What are APIs
+
+### Populate Python Packages - 3 - Yelp API
+
+https://www.yelp.com/developers
+
+*To create an app*
+
+Client ID
+awDq-mwWxAWrJY7dncThUg
+
+API Key
+KtpK3R419eapFObedVBP_9b1vfz4u-JFdTIuWf8qQRF19107F-JymsgkwHeM6tEV69aGwmbrMpJLj3XFkzYrF8rj8Z4Cxxn90dzKQWGeqoE_ZF9SACTDns0kb3rpYXYx
+
+### Populate Python Packages - 4 - Searching for Businesses
+
+```python
+import requests
+
+url = "https://api.yelp.com/v3/businesses/search"
+api_key = "KtpK3R419eapFObedVBP_9b1vfz4u-JFdTIuWf8qQRF19107F-JymsgkwHeM6tEV69aGwmbrMpJLj3XFkzYrF8rj8Z4Cxxn90dzKQWGeqoE_ZF9SACTDns0kb3rpYXYx"
+headers = {
+    "Authorization": "Bearer " + api_key
+}
+
+params = {
+    "term": "Barber",
+    "location": "NYC"
+}
+
+response = requests.get(url, headers=headers, params=params)
+businesses = response.json()['businesses']
+names = [business['name'] for business in businesses if business['rating'] > 4.5] 
+print(names)
+```
+```output
+['Next Level Barber Shop', 'The Kinsman Barber Shop', '12 Pell', "Barber's Point", 'Hairrari East Village', 'The Flying Row']
+```
+
+### Populate Python Packages - 5 - Hiding API Keys
+
+### Populate Python Packages - 6 - Sending Text Messages
+
+https://console.twilio.com/?frameUrl=%2Fconsole%3Fx-target-region%3Dus1&newCustomer=true
+Jluo33@shcheryl1108
+
+### Populate Python Packages - 7 - Web Scraping
+
+```python
+import requests
+from bs4 import BeautifulSoup
+
+response =requests.get("https://stackoverflow.com/questions")
+soup = BeautifulSoup(response.text, "html.parser")
+
+questions = soup.select(".question-summary")
+# print(type(questions))
+# print(questions[0].attrs)
+# print(questions[0].get("id", 0))
+# print(questions[0].select(".question-hyperlink"))
+# print(questions[0].select_one(".question-hyperlink").get_text())
+for question in questions:
+    print(question.select_one(".question-hyperlink").get_text())
+    print(question.select_one(".vote-count-post").get_text)
+```
+
+### Populate Python Packages - 8 - Browser Automation
+
+*Install the driver*
+*Search `selenium` in https://pypi.org/*
+
+```sh
+cp chromedriver /usr/local/bin
+```
+
+```python
+from selenium import webdriver
+
+browser = webdriver.Chrome()
+browser.get("https://github.com")
+
+signin_Link = browser.find_element_by_link_text("Sign in")
+signin_Link.click()
+
+username_box = browser.find_element_by_id("login_field")
+username_box.send_keys("Lawjune")
+password_box = browser.find_element_by_id("password")
+password_box.send_keys("Jluo33@sh")
+password_box.submit()
+
+assert "Lawjune" in browser.page_source
+
+profile_link = browser.find_element_by_class_name("user-profile-link")
+link_label = profile_link.get_attribute("innerHTML")
+assert "Lawjune" in link_label
+
+browser.quit()
+```
+
+https://selenium-python.readthedocs.io/
+***TO READ `Waits` and `Page Object` to organize re-used objects***
+5. Waits
+5.1. Explicit Waits
+5.2. Implicit Waits
+6. Page Objects
+6.1. Test case
+6.2. Page object classes
+6.3. Page elements
+6.4. Locators
+
+### Populate Python Packages - 9 - Working with PDFs
+
+```sh
+pipenv install pypdf2
+```
+
+```python
+import PyPDF2
+
+with open("first.pdf", "rb") as file:
+    reader = PyPDF2.PdfFileReader(file)
+    print(reader.numPages)
+    page = reader.getPage(0)
+    page.rotateClockwise(90)
+    writer = PyPDF2.PdfFileWriter()
+    writer.addPage(page)
+    with open("rotated.pdf", "wb") as output:
+        writer.write(output)
+```
+
+```python
+import PyPDF2
+
+merger = PyPDF2.PdfFileMerger()
+file_names = ["first.pdf", "second.pdf"]
+for file_name in file_names:
+    merger.append(file_name)
+merger.write("combined.pdf")
+```
+
+### Populate Python Packages - 10 - Working with Excel Spreadsheets
+
+```python
+import openpyxl
+
+# wb = openpyxl.Workbook()
+wb = openpyxl.load_workbook("transactions.xlsx")
+print(wb.sheetnames)
+
+sheet = wb["Sheet1"]
+# wb.create_sheet("Sheet2", 0)
+
+cell = sheet["a1"] # cell = sheet.cell(row=1, column=1)
+# print(cell.value)
+# print(cell.row)
+# print(cell.column)
+# print(cell.coordinate)
+
+for row in range(1, sheet.max_row + 1):
+    for column in range(1, sheet.max_column + 1):
+        cell = sheet.cell(row, column)
+        print(cell.value)
+
+column = sheet["a"]
+print(column)
+
+cells = sheet["a:c"]
+print(cells)
+
+print(sheet["a1:c3"])
+
+sheet.append([1, 2, 3])
+# sheet.insert_rows
+
+wb.save("transactions2.xlsx")
+```
+
+### Populate Python Packages - 11 - Command Query Separation Principle
+
+```python
+import openpyxl
+
+wb = openpyxl.load_workbook("transactions.xlsx")
+
+sheet = wb["Sheet1"]
+for row in range(1, 10):
+    cell = sheet.cell(row, 1) # Violated the query separation principle here, which will unexpectedly create new rows
+    print(cell.value)
+
+sheet.append([1, 2, 3]) # Actually appended after 5 empty rows
+wb.save("transactions2.xlsx")
+```
+
+### Populate Python Packages - 12 - NumPy
+
+```python
+import numpy as np
+
+array = np.array([ [1, 2, 3], [4, 5, 6] ])
+print(type(array))
+print(array)
+print(array.shape)
+```
+```output
+<class 'numpy.ndarray'>
+[[1 2 3]
+ [4 5 6]]
+(2, 3)
+```
+
+```python
+import numpy as np
+
+# array = np.zeros((4, 7), dtype=int)
+# print(array)
+
+# array = np.ones((4, 7), dtype=int)
+# print(array)
+
+# array = np.full((4, 7), 7, dtype=int)
+# print(array)
+
+array = np.random.random((4, 7))
+# print(array)
+# print(array[0, 0])
+print(array > 0.4)
+print(array[array > 0.4])
+print(np.sum(array))
+print(np.round(array))
+```
+```output
+[[False False  True  True  True False  True]
+ [False  True  True  True False  True False]
+ [ True  True  True False  True False  True]
+ [ True False False False  True  True False]]
+[0.77559397 0.64522334 0.98530438 0.98014357 0.68748266 0.77433526
+ 0.78416883 0.60188274 0.70635682 0.4800991  0.76557062 0.93770749
+ 0.60251335 0.74376297 0.79870406 0.88573593]
+14.607254974067338
+[[0. 0. 1. 1. 1. 0. 1.]
+ [0. 1. 1. 1. 0. 1. 0.]
+ [1. 0. 1. 0. 1. 0. 1.]
+ [1. 0. 0. 0. 1. 1. 0.]]
+```
+
+```python
+import numpy as np
+
+first = np.array([1, 2, 3])
+second = np.array([1, 2, 3])
+print(first + second)
+print(first + 4)
+```
+```output
+[2 4 6]
+[5 6 7]
+```
+
+```python
+import numpy as np
+
+dimensions_inch = np.array([1, 2, 3])
+dimensions_cm = dimensions_inch * 2.54
+
+print(dimensions_cm)
+
+dimensions_inch = [1, 2, 3]
+dimensions_cm = [x * 2.54 for x in dimensions_inch]
+print(dimensions_cm)
+```
+```output
+[2.54 5.08 7.62]
+[2.54, 5.08, 7.62]
+```
+
+## Machine Learning with Python
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
