@@ -5604,6 +5604,20 @@ total = 11
 
 #060 - (Part 1/2) getopt() Function
 
+**Syntax:**
+```c
+getopt(int argc, char *const argv[], const char *optstring)
+```
+***ptstring** is simply  a list of characters, each representing a single character option.*
+
+***Return Value:** The getopt() function returns different values:*
+
+- *If the option takes a value, that value is pointer to the external variable **optarg**.*
+- *‘-1’ if there are no more options to process.*
+- *‘?’ when there is an unrecognized option and it stores into external variable **optopt**.*
+- *If an option requires a value (such as -f in our example) and no value is given, getopt normally returns ?. By placing a colon as the first character of the options string, getopt returns: instead of ? when no value is given.*
+
+
 ```c
 #include <stdio.h>
 #include <unistd.h>
@@ -5764,7 +5778,313 @@ Enter angle (degrees): 30
 Force = 23.094011 Newtons
 ```
 
+```c
+#include <stdio.h>
+#include <math.h>
+ 
+int main ()
+{
+float val1, val2, val3, val4;
+ 
+val1 = 1.6;
+val2 = 1.2;
+val3 = -2.8;
+val4 = -2.3;
+ 
+printf ("value1 = %.1lf\n", ceil(val1));
+printf ("value2 = %.1lf\n", ceil(val2));
+printf ("value3 = %.1lf\n", ceil(val3));
+printf ("value4 = %.1lf\n", ceil(val4));
+     
+return(0);
+}
+```
+```sh
+gcc -o main main.c -lm
+./main
+`=>
+value1 = 2.0
+value2 = 2.0
+value3 = -2.0
+value4 = -2.0
+```
+
+```c
+#include <stdio.h>
+#include <math.h>
+ 
+int main ()
+{
+   float val1, val2, val3, val4;
+ 
+   val1 = 1.6;
+   val2 = 1.2;
+   val3 = -2.8;
+   val4 = -2.3;
+ 
+   printf("Value1 = %.1lf\n", floor(val1));
+   printf("Value2 = %.1lf\n", floor(val2));
+   printf("Value3 = %.1lf\n", floor(val3));
+   printf("Value4 = %.1lf\n", floor(val4));
+    
+   return(0);
+}
+```
+```sh
+gcc -o main main.c -lm
+./main
+`=>
+Value1 = 1.0
+Value2 = 1.0
+Value3 = -3.0
+Value4 = -3.0
+```
+
+```c
+#include <stdio.h>
+#include <math.h>
+ 
+int main ()
+{
+   int a, b;
+   a = 1234;
+   b = -344;
+   
+   printf("The absolute value of %d is %lf\n", a, fabs(a));
+   printf("The absolute value of %d is %lf\n", b, fabs(b));
+    
+   return(0);
+}
+```
+```sh
+gcc -o main main.c -lm
+./main
+`=>
+The absolute value of 1234 is 1234.000000
+The absolute value of -344 is 344.000000
+```
+
+**natural logarithm (base-e logarithm) of x**
+```c
+#include <stdio.h>
+#include <math.h>
+ 
+int main ()
+{
+   double x, ret;
+   x = 2.7;
+ 
+   /* finding log(2.7) */
+   ret = log(x);
+   printf("log(%lf) = %lf\n", x, ret);
+    
+   return(0);
+}
+```
+```sh
+gcc -o main main.c -lm
+./main
+`=>
+log(2.700000) = 0.993252
+```
+
+```c
+#include <stdio.h>
+#include <math.h>
+ 
+int main ()
+{
+   double x, ret;
+   x = 10000;
+   
+   /* finding value of log1010000 */
+   ret = log10(x);
+   printf("log10(%lf) = %lf\n", x, ret);
+    
+   return(0);
+}
+```
+```output
+log10(10000.000000) = 4.000000
+```
+
+```c
+#include <stdio.h>
+#include <math.h>
+ 
+int main ()
+{
+   float a, b;
+   int c;
+   a = 8.2;
+   b = 5.7;
+   c = 3;
+   printf("Remainder of %f / %d is %lf\n", a, c, fmod(a, c));
+   printf("Remainder of %f / %f is %lf\n", a, b, fmod(a, b));
+    
+   return(0);
+}
+```
+```output
+Remainder of 8.200000 / 3 is 2.200000
+Remainder of 8.200000 / 5.700000 is 2.500000
+```
+
+```c
+#include <stdio.h>
+#include <math.h>
+ 
+int main ()
+{
+ 
+   printf("Square root of %lf is %lf\n", 225.0, sqrt(225.0) );
+   printf("Square root of %lf is %lf\n", 300.0, sqrt(300.0) );
+    
+   return(0);
+}
+```
+```output
+Square root of 225.000000 is 15.000000
+Square root of 300.000000 is 17.320508
+```
+
+```c
+#include <stdio.h>
+#include <math.h>
+ 
+int main ()
+{
+   printf("Value 8.0 ^ 3 = %lf\n", pow(8.0, 3));
+ 
+   printf("Value 3.05 ^ 1.98 = %lf", pow(3.05, 1.98));
+    
+   return(0);
+}
+```
+```output
+Value 8.0 ^ 3 = 512.000000
+Value 3.05 ^ 1.98 = 9.097324
+```
+
+```c
+#include<stdio.h>
+#include<math.h>
+ 
+int main ()
+{
+   double x, fractpart, intpart;
+ 
+   x = 8.123456;
+   fractpart = modf(x, &intpart);
+ 
+   printf("Integral part = %lf\n", intpart);
+   printf("Fraction Part = %lf \n", fractpart);
+    
+   return(0);
+}
+```
+```output
+Integral part = 8.000000
+Fraction Part = 0.123456 
+```
+
+```c
+#include <stdio.h>
+#include <math.h>
+ 
+int main ()
+{
+   double x = 0;
+   
+   printf("The exponential value of %lf is %lf\n", x, exp(x));
+   printf("The exponential value of %lf is %lf\n", x+1, exp(x+1));
+   printf("The exponential value of %lf is %lf\n", x+2, exp(x+2));
+    
+   return(0);
+}
+```
+```output
+The exponential value of 0.000000 is 1.000000
+The exponential value of 1.000000 is 2.718282
+The exponential value of 2.000000 is 7.389056
+```
+
+```c
+#include <stdio.h>
+#include <math.h>
+ 
+#define PI 3.14159265
+ 
+int main ()
+{
+   double x, ret, val;
+ 
+   x = 60.0;
+   val = PI / 180.0;
+   ret = cos( x*val );
+   printf("The cosine of %lf is %lf degrees\n", x, ret);
+    
+   x = 90.0;
+   val = PI / 180.0;
+   ret = cos( x*val );
+   printf("The cosine of %lf is %lf degrees\n", x, ret);
+    
+   return(0);
+}
+```
+```output
+The cosine of 60.000000 is 0.500000 degrees
+The cosine of 90.000000 is 0.000000 degrees
+```
+
+```c
+#include <stdio.h>
+#include <math.h>
+ 
+#define PI 3.14159265
+ 
+int main ()
+{
+   double x, ret, val;
+ 
+   x = 0.9;
+   val = 180.0 / PI;
+ 
+   ret = acos(x) * val;
+   printf("The arc cosine of %lf is %lf degrees", x, ret);
+    
+   return(0);
+}
+```
+```output
+The arc cosine of 0.900000 is 25.855040 degrees
+```
+
+```c
+#include <stdio.h>
+#include <math.h>
+ 
+int main ()
+{
+   double x, ret;
+   x = 0.5;
+ 
+   ret = tanh(x);
+   printf("The hyperbolic tangent of %lf is %lf degrees", x, ret);
+    
+   return(0);
+}
+```
+```output
+The hyperbolic tangent of 0.500000 is 0.462117 degrees
+```
+
+
 #062 - Binary Search Tree
+
+
+
+## 62.1 Search and Insertion
 
 ```c
 #include <stdio.h>
@@ -5843,4 +6163,2144 @@ data = 82
 data = 85
 data = 90
 data = 99
+```
+
+## 62.1 Delete
+
+***1) Node to be deleted is the leaf:** Simply remove from the tree.* 
+
+              50                            50
+           /     \         delete(20)      /   \
+          30      70       --------->    30     70 
+         /  \    /  \                     \    /  \ 
+       20   40  60   80                   40  60   80
+
+***2) Node to be deleted has only one child:** Copy the child to the node and delete the child*
+
+              50                            50
+           /     \         delete(30)      /   \
+          30      70       --------->    40     70 
+            \    /  \                          /  \ 
+            40  60   80                       60   80
+
+***3) Node to be deleted has two children:** Find inorder successor of the node. Copy contents of the inorder successor to the node and delete the inorder successor. Note that inorder predecessor can also be used.*
+
+              50                            60
+           /     \         delete(50)      /   \
+          40      70       --------->    40    70 
+                 /  \                            \ 
+                60   80                           80
+
+*The important thing to note is, inorder successor is needed only when the right child is not empty. In this particular case, inorder successor can be obtained by finding the minimum value in the right child of the node.*
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct mynode_tag {
+    int data;
+    struct mynode_tag *left; 
+    struct mynode_tag *right;
+} mynode;
+
+void insert(mynode **rt, int num)
+{
+    mynode *tmp;
+
+    if(*rt == NULL) {
+        tmp = (mynode *) malloc(sizeof(mynode));
+        if (tmp == NULL) {
+            fprintf(stderr, "Unable to allocate mynode\n");
+            exit(1);
+        }
+
+        tmp->data = num;
+        *rt = tmp;
+    } else {
+        if(num > (*rt)->data)
+            insert(&(*rt)->right, num);
+        else
+            insert(&(*rt)->left, num);
+    }
+}
+
+void print_nodes(mynode *root)
+{
+
+    if(root == NULL)
+        return;
+
+    /* Go to the left/less first */
+    if(root->left != NULL)
+        print_nodes(root->left);
+    printf("data = %d\n", root->data);
+
+    /* Go to the right/greater then */
+    if(root->right != NULL)
+        print_nodes(root->right);
+}
+
+mynode* min(mynode *root)
+{   
+    if (root == NULL)
+        return NULL;
+
+    if (root->left == NULL)
+        return root;
+    else {
+        min(root->left);
+    }
+    
+}
+
+void delete_node(mynode **root, int num)
+{
+    if((*root) == NULL)
+        return;
+
+    if((*root)->data == num) {
+
+        if((*root)->left == NULL && (*root)->right == NULL) {
+            *root = NULL;
+            return;
+        }
+            
+        else if ((*root)->left == NULL) {
+            mynode* tmp;
+            tmp = (*root)->right;
+            (*root)->left = NULL;
+            free((*root)->left);
+            (*root) = tmp;
+            return;
+        }
+        else if ((*root)->right == NULL) {
+            mynode* tmp;
+            tmp = (*root)->left;
+            (*root)->right = NULL;
+            free((*root)->right);
+            (*root) = tmp;
+            return;
+        }
+
+        printf("DEBUG: GOT IT!\n");
+        printf("data: %d\n", (*root)->data);
+        printf("num: %d\n", num);
+        mynode* tmp = min((*root)->right);
+        printf("tmp->data: %d\n", tmp->data);
+        (*root)->data = tmp->data;
+        delete_node(&((*root)->right), tmp->data);
+        return;
+    }
+
+    if(num < (*root)->data)
+        delete_node(&((*root)->left), num);
+    else {
+        delete_node(&((*root)->right), num);
+    }
+    
+}
+
+int main(int argc, char *argv[])
+{
+    int numbers[8] = { 50, 30, 40, 20, 70, 60, 80 };
+    int i;
+    mynode *root = NULL;
+
+    for (i = 0; i < 7; i++) {
+        insert(&root, numbers[i]);
+    }
+
+    delete_node(&root, 50);
+    print_nodes(root);
+
+    return 0;
+}
+```
+```c
+int main(int argc, char *argv[])
+{
+    int size = 10000;
+    int i;
+    mynode *root = NULL;
+    insert(&root, (size/2));
+
+    clock_t begin_r = clock();
+
+    for (i = 0; i < size; i++) 
+        insert(&root, i);
+    delete_node(&root, 1);
+    clock_t end_r =clock();
+    double time_spent_r = (double)(end_r - begin_r) / CLOCKS_PER_SEC;
+    printf("%f\n", time_spent_r);
+
+    return 0;
+}
+```
+```output
+0.208544
+```
+
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+ 
+struct node {
+    int key;
+    struct node *left, *right;
+};
+ 
+// A utility function to create a new BST node
+struct node* newNode(int item)
+{
+    struct node* temp
+        = (struct node*)malloc(sizeof(struct node));
+    temp->key = item;
+    temp->left = temp->right = NULL;
+    return temp;
+}
+ 
+// A utility function to do inorder traversal of BST
+void inorder(struct node* root)
+{
+    if (root != NULL) {
+        inorder(root->left);
+        printf("%d ", root->key);
+        inorder(root->right);
+    }
+}
+ 
+/* A utility function to
+   insert a new node with given key in
+ * BST */
+struct node* insert(struct node* node, int key)
+{
+    /* If the tree is empty, return a new node */
+    if (node == NULL)
+        return newNode(key);
+ 
+    /* Otherwise, recur down the tree */
+    if (key < node->key)
+        node->left = insert(node->left, key);
+    else
+        node->right = insert(node->right, key);
+ 
+    /* return the (unchanged) node pointer */
+    return node;
+}
+ 
+/* Given a non-empty binary search
+   tree, return the node
+   with minimum key value found in
+   that tree. Note that the
+   entire tree does not need to be searched. */
+struct node* minValueNode(struct node* node)
+{
+    struct node* current = node;
+ 
+    /* loop down to find the leftmost leaf */
+    while (current && current->left != NULL)
+        current = current->left;
+ 
+    return current;
+}
+ 
+/* Given a binary search tree
+   and a key, this function
+   deletes the key and
+   returns the new root */
+struct node* deleteNode(struct node* root, int key)
+{
+    // base case
+    if (root == NULL)
+        return root;
+ 
+    // If the key to be deleted
+    // is smaller than the root's
+    // key, then it lies in left subtree
+    if (key < root->key)
+        root->left = deleteNode(root->left, key);
+ 
+    // If the key to be deleted
+    // is greater than the root's
+    // key, then it lies in right subtree
+    else if (key > root->key)
+        root->right = deleteNode(root->right, key);
+ 
+    // if key is same as root's key,
+    // then This is the node
+    // to be deleted
+    else {
+        // node with only one child or no child
+        if (root->left == NULL) {
+            struct node* temp = root->right;
+            free(root);
+            return temp;
+        }
+        else if (root->right == NULL) {
+            struct node* temp = root->left;
+            free(root);
+            return temp;
+        }
+ 
+        // node with two children:
+        // Get the inorder successor
+        // (smallest in the right subtree)
+        struct node* temp = minValueNode(root->right);
+ 
+        // Copy the inorder
+        // successor's content to this node
+        root->key = temp->key;
+ 
+        // Delete the inorder successor
+        root->right = deleteNode(root->right, temp->key);
+    }
+    return root;
+}
+ 
+// Driver Code
+int main()
+{
+    /* Let us create following BST
+              50
+           /     \
+          30      70
+         /  \    /  \
+       20   40  60   80 */
+    struct node* root = NULL;
+    root = insert(root, 50);
+    root = insert(root, 30);
+    root = insert(root, 20);
+    root = insert(root, 40);
+    root = insert(root, 70);
+    root = insert(root, 60);
+    root = insert(root, 80);
+ 
+    printf("Inorder traversal of the given tree \n");
+    inorder(root);
+ 
+    printf("\nDelete 20\n");
+    root = deleteNode(root, 20);
+    printf("Inorder traversal of the modified tree \n");
+    inorder(root);
+ 
+    printf("\nDelete 30\n");
+    root = deleteNode(root, 30);
+    printf("Inorder traversal of the modified tree \n");
+    inorder(root);
+ 
+    printf("\nDelete 50\n");
+    root = deleteNode(root, 50);
+    printf("Inorder traversal of the modified tree \n");
+    inorder(root);
+ 
+    return 0;
+}
+```
+```output
+Inorder traversal of the given tree
+20 30 40 50 60 70 80
+Delete 20
+Inorder traversal of the modified tree
+30 40 50 60 70 80
+Delete 30
+Inorder traversal of the modified tree
+40 50 60 70 80
+Delete 50
+Inorder traversal of the modified tree
+40 60 70 80
+```
+```c
+int main()
+{
+    int size = 10000;
+    int i;
+    struct node* root = NULL;
+    root = insert(root, (size/2));
+
+    clock_t begin_r = clock();
+
+    for (i = 0; i < size; i++) 
+        root = insert(root, i);
+    root = deleteNode(root, 1);
+    clock_t end_r =clock();
+    double time_spent_r = (double)(end_r - begin_r) / CLOCKS_PER_SEC;
+    printf("%f\n", time_spent_r);
+
+    return 0;
+}
+```
+```output
+0.186627
+```
+
+#063 - Hash Program
+
+key = 9, name = John            index->9   
+key = 9, name = Steve           index->9(used)->0
+key = 2, name = Ajit            index->2
+key = 1, name = premal          index->1
+key = 0, name = Kho             index->0(used)->1(used)->2(used)->3
+key = 3, name = Xiang           index->3(used)->4
+key = 9, name = Yamamoto        index->9(used)->0(used)->1(used)->2(used)->3(used)->4(used)->5
+
+
+```c
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct mydata_tag {
+    int used;       /* 0 - empty, 1 - used */
+    int key;
+    char name[24];
+} mydata;
+
+int hash_key(char *name)
+{
+    int key;
+    int len;
+    int i;
+
+    key = 0;
+    len = strlen(name);
+
+    for (i = 0; i < len; i++) {
+        key += name[i];
+    }
+    key %= 10;
+    printf("key = %d, name = %s\n", key, name);
+    return key;
+}
+
+void init_table(char *filename, int size)
+{
+    int i;
+    FILE *fp;
+    mydata data;
+    memset(&data, 0, sizeof(mydata));
+
+    fp = fopen(filename, "w+");
+    if (fp == NULL) {
+        perror("fopen: init_table");
+        exit(1);
+    }
+    for (i = 0; i < size; i++) {
+        fwrite(&data, sizeof(mydata), 1, fp);
+    }
+}
+
+void insert_data(int key, char *name, char *filename)
+{
+    FILE *fp;
+    mydata data, slot;
+    int pos;
+
+    pos = key;
+    data.used = 1;
+    data.key = key;
+    strcpy(data.name, name);
+
+    fp =  fopen(filename, "r+");
+    if (fp == NULL) {
+        perror("fopen: insert_data");
+        exit(1);
+    }
+
+    while (1)
+    {
+        fseek(fp, pos*sizeof(mydata), SEEK_SET);
+        fread(&slot, sizeof(mydata), 1, fp);
+        if(slot.used != 1) {
+            // fclosed(fp);
+            break;
+        }
+        printf("Collision!\n");
+        pos++;
+        pos %= 10;
+    }
+    
+    printf("pos = %d\n", pos);
+    fseek(fp, pos*sizeof(mydata), SEEK_SET);
+    fwrite(&data, sizeof(mydata), 1, fp);
+
+    fclose(fp);
+}
+
+void print_buckets(char *filename)
+{
+    FILE *fp;
+    mydata data;
+    int i;
+
+    fp = fopen(filename, "r+");
+    if (fp == NULL)
+    {
+        perror("fopen: insert_data");
+        exit(1);
+    }
+    for (i = 0; i < 10; i++)
+    {
+        fread(&data, sizeof(mydata), 1, fp);
+        printf("used = %d, key = %d. data = %s\n", data.used, data.key, data.name);
+    }
+    fclose(fp);
+}
+
+int main(int argc, char *argv[])
+{
+    char *names[7] = {
+        "John",
+        "Steve",
+        "Ajit",
+        "premal",
+        "Kho",
+        "Xiang",
+        "Yamamoto"
+    };
+
+    int key;
+    int i;
+
+    // for (i = 0; i < 7; i++) {
+    //     key = hash_key(names[i]);
+    //     printf("key = %d, name = %s\n", key, names[i]);
+    // }
+
+    init_table("myhashtable", 10);
+    for (i = 0; i < 7; i++) {
+        key = hash_key(names[i]);
+        insert_data(key, names[i], "myhashtable");
+    }
+    print_buckets("myhashtable");
+
+    return 0;
+}
+```
+```output
+key = 9, name = John
+pos = 9
+key = 9, name = Steve
+Collision!
+pos = 0
+key = 2, name = Ajit
+pos = 2
+key = 1, name = premal
+pos = 1
+key = 0, name = Kho
+Collision!
+Collision!
+Collision!
+pos = 3
+key = 3, name = Xiang
+Collision!
+pos = 4
+key = 9, name = Yamamoto
+Collision!
+Collision!
+Collision!
+Collision!
+Collision!
+Collision!
+pos = 5
+used = 1, key = 9. data = Steve
+used = 1, key = 1. data = premal
+used = 1, key = 2. data = Ajit
+used = 1, key = 0. data = Kho
+used = 1, key = 3. data = Xiang
+used = 1, key = 9. data = Yamamoto
+used = 0, key = 0. data = 
+used = 0, key = 0. data = 
+used = 0, key = 0. data = 
+used = 1, key = 9. data = John
+```
+
+#064 - mkdir() rmdir() symlink() unlink() Functions
+
+```sh
+man 2 mkdir
+`=>
+SYNOPSIS
+       #include <sys/stat.h>
+       #include <sys/types.h>
+
+       int mkdir(const char *pathname, mode_t mode);
+
+       #include <fcntl.h>           /* Definition of AT_* constants */
+       #include <sys/stat.h>
+
+       int mkdirat(int dirfd, const char *pathname, mode_t mode);
+
+   Feature Test Macro Requirements for glibc (see feature_test_macros(7)):
+
+       mkdirat():
+           Since glibc 2.10:
+               _POSIX_C_SOURCE >= 200809L
+           Before glibc 2.10:
+               _ATFILE_SOURCE
+
+```
+
+*To chekc the file mode*
+```sh
+man 2 stat
+```
+
+```c
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
+int main(int argc, char *argv[]) 
+{
+
+    int ret;
+
+    ret = mkdir("mynewdir", S_IRUSR | \
+                            S_IRGRP | \
+                            S_IROTH | \
+                            S_IXUSR | \
+                            S_IXGRP | \
+                            S_IXOTH);
+
+
+    return 0;
+}
+```
+```sh
+ls -l | grep mynewdir
+`=>
+dr-xr-xr-x 2 lawjune lawjune  4096 1月  19 07:34 mynewdir
+```
+
+```sh
+man 2 rmdir
+```
+
+**Remove the `mynewdir`**
+```c
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{
+
+    int ret;
+
+    ret = rmdir("mynewdir");
+
+    return 0;
+}
+```
+
+```sh
+man 2 link
+man 2 symlink
+```
+
+```c
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{
+
+    int ret;
+
+    ret = mkdir("mynewdir", S_IRUSR | \
+                            S_IRGRP | \
+                            S_IROTH | \
+                            S_IXUSR | \
+                            S_IXGRP | \
+                            S_IXOTH);
+
+    ret = symlink("mynewdir", "hellodir");
+
+    return 0;
+}
+```
+```sh
+ls -ls | grep -i dir
+`=>
+ 0 lrwxrwxrwx 1 lawjune lawjune     8 1月  19 07:41 hellodir -> mynewdir
+ 4 dr-xr-xr-x 2 lawjune lawjune  4096 1月  19 07:39 mynewdir
+```
+
+**Unlink the dir**
+```c
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{
+
+    int ret;
+
+    ret = unlink("hellodir");
+
+    return 0;
+}
+```
+```sh
+ls -ls | grep -i dir
+ 4 dr-xr-xr-x 2 lawjune lawjune  4096 1月  19 07:39 mynewdir
+ ```
+
+
+#065 - exec() Functions
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{
+    int ret;
+
+    printf("Calling execl...\n");
+    ret = execl("ls", "ls", "-l", NULL);
+
+    printf("Failed execl... ret = %d\n", ret);
+
+    return 0;
+}
+```
+```output
+Calling execl...
+Failed execl... ret = -1
+```
+```sh
+which ls
+`=>
+/usr/bin/ls
+```
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{
+    int ret;
+
+    printf("Calling execl...\n");
+    ret = execl("/usr/bin/ls", "ls", "-l", NULL);
+
+    printf("Failed execl... ret = %d\n", ret);
+
+    return 0;
+}
+```
+```output
+Calling execl...
+total 176
+-rw-rw-r-- 1 lawjune lawjune    98 12月 23 07:28 add.c
+-rw-rw-r-- 1 lawjune lawjune  1392 12月 23 07:41 add.o
+......
+(Without "Failed execl... ret = -1")
+```
+
+*hello.c*
+```c
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{
+    int i;
+
+    for(i = 0; i < argc; i++) {
+        printf("argv[%d] = %s\n", i, argv[i]);
+    }
+
+    return 0;
+}
+```
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{
+    int ret;
+
+    printf("Calling execl...\n");
+    ret = execl("hello", "hello", "one", "two", "three", "four", NULL);
+
+    printf("Failed execl... ret = %d\n", ret);
+
+    return 0;
+}
+```
+```output
+Calling execl...
+argv[0] = hello
+argv[1] = one
+argv[2] = two
+argv[3] = three
+argv[4] = four
+```
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) 
+{
+    int ret;
+
+    printf("Calling execl...\n");
+    ret = execl("hello", "progr", "one", "two", "three", "four", NULL);
+
+    printf("Failed execl... ret = %d\n", ret);
+
+    return 0;
+}
+```
+```output
+Calling execl...
+argv[0] = progr
+argv[1] = one
+argv[2] = two
+argv[3] = three
+argv[4] = four
+```
+
+#066 - abort() assert() Functions
+
+```c
+#include <stdio.h>
+#include  <stdlib.h>
+
+int main(int argc, char *argv[]) 
+{
+    printf("Begin...\n");
+
+    abort();
+
+    printf("End...\n");
+
+    return 0;
+}
+```
+```sh
+gcc -g -o main main.c
+./main
+`=> 
+Begin...
+Aborted (core dumped)
+```
+
+```sh
+gdb main
+(gdb) run
+Starting program: /home/lawjune/Projects/justc/main 
+Begin...
+
+Program received signal SIGABRT, Aborted.
+__GI_raise (sig=sig@entry=6)
+    at ../sysdeps/unix/sysv/linux/raise.c:50
+50      ../sysdeps/unix/sysv/linux/raise.c: No such file or directory.
+(gdb) list
+45      in ../sysdeps/unix/sysv/linux/raise.c
+(gdb) where
+#0  __GI_raise (sig=sig@entry=6)
+    at ../sysdeps/unix/sysv/linux/raise.c:50
+#1  0x00007ffff7de4859 in __GI_abort () at abort.c:79
+#2  0x000055555555518d in main (argc=1, argv=0x7fffffffdc08)
+    at main.c:8
+```
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+
+int main(int argc, char *argv[]) 
+{
+    int i; 
+
+    printf("Begin...\n");
+
+    for(i = 0; i < 10; i++) {
+        printf("i = %d\n", i);
+        assert(i <= 5);
+    }
+
+    printf("End...\n");
+    return 0;
+}
+```
+```sh
+gcc -g -o main main.c
+./main 
+Begin...
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+main: main.c:13: main: Assertion `i <= 5' failed.
+```
+```sh
+gdb main
+(gdb) run
+Starting program: /home/lawjune/Projects/justc/main 
+Begin...
+i = 0
+i = 1
+i = 2
+i = 3
+i = 4
+i = 5
+i = 6
+main: main.c:13: main: Assertion `i <= 5' failed.
+
+Program received signal SIGABRT, Aborted.
+__GI_raise (sig=sig@entry=6)
+    at ../sysdeps/unix/sysv/linux/raise.c:50
+50      ../sysdeps/unix/sysv/linux/raise.c: No such file or directory.
+(gdb) where
+#0  __GI_raise (sig=sig@entry=6)
+    at ../sysdeps/unix/sysv/linux/raise.c:50
+#1  0x00007ffff7de4859 in __GI_abort () at abort.c:79
+#2  0x00007ffff7de4729 in __assert_fail_base (
+    fmt=0x7ffff7f7a588 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", assertion=0x55555555601c "i <= 5", 
+    file=0x555555556015 "main.c", line=13, 
+    function=<optimized out>) at assert.c:92
+#3  0x00007ffff7df5f36 in __GI___assert_fail (
+    assertion=0x55555555601c "i <= 5", 
+    file=0x555555556015 "main.c", line=13, 
+    function=0x55555555602a <__PRETTY_FUNCTION__.2849> "main")
+    at assert.c:101
+#4  0x00005555555551ec in main (argc=1, argv=0x7fffffffdc08)
+    at main.c:13
+(gdb) list
+45      in ../sysdeps/unix/sysv/linux/raise.c
+```
+
+#067 - Memory Map using mmap() Function
+
+*stat (C System Call) stat is a system call that is used to determine information about a file based on its file path.*
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+
+int main(int argc, char *argv[])
+{
+
+    int fd; 
+    struct stat mystat;
+    void *pmap;
+
+    fd = open("mytext.txt", O_RDWR);
+    if(fd == -1) {
+        perror("open");
+        exit(1);
+    }
+
+    if(fstat(fd, &mystat) < 0) {
+        perror("fstat");
+        close(fd);
+        exit(1);
+    }
+
+    pmap = mmap(0, mystat.st_size, PROT_READ | PROT_WRITE, 
+                MAP_SHARED, fd, 0);
+
+    if(pmap == MAP_FAILED) {
+        perror("mmap");
+        close(fd);
+    }
+
+    strncpy(pmap, "That", 4);
+    close(fd);
+
+    return 0;
+}
+```
+```sh
+cat mytext.txt 
+`=>
+This is a file to test mmap.
+```
+```sh
+./main
+cat mytext.txt 
+`=>
+That is a file to test mmap.
+```
+
+#068 - strftime() Function
+
+```sh
+man 2 time
+```
+
+```c
+#include <stdio.h>
+#include <time.h>
+
+int main(int argc, char *argv[])
+{
+    char buf[32];
+    struct tm *mytm;
+    time_t mytime;
+
+    mytime = time(NULL);
+    mytm = localtime(&mytime);
+    
+    /* 2021-01-18 14:36:36 */
+    strftime(buf, 31, "%Y-%m-%d %H:%M:%S", mytm);
+
+    printf("Date and Time: %s\n", buf);
+
+    return 0;
+}
+```
+```output
+#include <stdio.h>
+#include <time.h>
+
+int main(int argc, char *argv[])
+{
+    char buf[32];
+    struct tm *mytm;
+    time_t mytime;
+
+    mytime = time(NULL);
+    mytm = localtime(&mytime);
+    
+    /* 2021-01-18 14:36:36 */
+    strftime(buf, 31, "%Y-%m-%d %H:%M:%S", mytm);
+
+    printf("Date and Time: %s\n", buf);
+
+    return 0;
+}
+```
+
+#069 - Generating Random Numbers
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[])
+{
+    printf("r1 = %d\n", rand());
+
+    return 0;
+}
+```
+*Everytime we get*
+```output
+1804289383
+```
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[])
+{
+    printf("r1 = %d\n", rand());
+    printf("r2 = %d\n", rand());
+    printf("r3 = %d\n", rand());
+
+    return 0;
+}
+```
+*Everytime we get the same*
+```output
+r1 = 1804289383
+r2 = 846930886
+r3 = 1681692777
+```
+
+```sh
+man 3 srand
+```
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int main(int argc, char *argv[])
+{
+    srand((unsigned int) time(NULL));
+
+    printf("r1 = %d\n", rand());
+    printf("r2 = %d\n", rand());
+    printf("r3 = %d\n", rand());
+
+    return 0;
+}
+```
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int main(int argc, char *argv[])
+{
+    srand((unsigned int) time(NULL));
+    printf("Dice numbers: \n");
+    printf("n1 = %d\n", rand() % 6 + 1);
+    printf("n2 = %d\n", rand() % 6 + 1);
+    printf("n3 = %d\n", rand() % 6 + 1);
+    printf("n4 = %d\n", rand() % 6 + 1);
+    printf("n5 = %d\n", rand() % 6 + 1);
+    printf("n6 = %d\n", rand() % 6 + 1);
+
+    return 0;
+}
+```
+
+# 070 - Wide Characters
+
+```c
+#include <stdio.h>
+#include <wchar.h>
+
+int main(int argc, char *argv[])
+{
+    wchar_t buf[128] = L"Hello World!";
+    wchar_t buf2[128];
+
+    wprintf(L"%ls\n", buf);
+
+    wcscpy(buf2, buf);
+    wprintf(L"%ls\n", buf2);
+
+    return 0;
+}
+```
+```output
+Hello World!
+Hello World!
+```
+
+# 071 - fsync() Function
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[])
+{
+    char *str = "This is a strin to go to the file.\n";
+
+    int fd;
+    int ret;
+
+    fd = creat("mytext.txt", S_IRUSR | S_IRUSR);
+
+    if(fd < -1) {
+        perror("creat()");
+        exit(1);
+    }
+
+    ret = write(fd, str, strlen(str));
+
+    if(ret < -1) {
+        perror("write()");
+        exit(1);
+    }
+
+    fsync(fd);
+
+    /*
+        Very long lines of code ...
+    */
+
+    close(fd);
+
+    return 0;
+}
+```
+```sh
+gcc -o main main.c
+./main
+cat mytext.txt
+`=> 
+This is a strin to go to the file.
+```
+
+# 072 - sendfile() Function
+
+***Using while()***
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[])
+{
+    int fd1;
+    int fd2;
+    int ret;
+    char buf[20];
+
+    if((fd1 = open("file1.txt", O_RDONLY)) < 0) {
+        perror("open() read");
+        exit(1);
+    }
+
+    if((fd2 = open("file2.txt", O_CREAT | O_WRONLY, 0600)) < 0) {
+        perror("open() write");
+        close(fd1);
+        exit(1);
+    }
+
+    while ((ret = read(fd1, buf, 20)) > 0) 
+    {
+        if(write(fd2, buf, ret) < 0) {
+            perror("write");
+            exit(1);
+        }
+    }
+    
+    close(fd1);
+    close(fd2);
+
+    return 0;
+}
+```
+```sh
+gcc -o main main.c
+./main
+cat file2.txt 
+`=>
+This is the first line.
+This is the second line.
+```
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/sendfile.h>
+
+int main(int argc, char *argv[])
+{
+    int fd1;
+    int fd2;
+    int ret;
+    struct stat stbuf;
+
+    if((fd1 = open("file1.txt", O_RDONLY)) < 0) {
+        perror("open() read");
+        exit(1);
+    }
+
+    fstat(fd1, &stbuf);
+
+    if((fd2 = open("file2.txt", O_CREAT | O_WRONLY, 0600)) < 0) {
+        perror("open() write");
+        close(fd1);
+        exit(1);
+    }
+
+    sendfile(fd2, fd1, 0, stbuf.st_size);
+    
+    close(fd1);
+    close(fd2);
+
+    return 0;
+}
+```
+
+# 073 - GDBM Embedded Database
+
+```sh
+sudo apt install libgdbm-dev
+```
+
+```c
+#include <stdio.h>
+#include <string.h>
+#include <gdbm.h>
+
+typedef struct myd_tag {
+    char first[24];
+    char last[24];
+} myd;
+
+int main(int argc, char *argv[])
+{
+    GDBM_FILE file;
+
+    datum key1, data1, ndata1;
+    datum key2, data2, ndata2;
+
+    char *k1 = "msg1";
+    char *d1 = "I love C programming.";
+
+    char *k2 = "msg2";
+    myd d2 = { "John", "Doe" };
+
+    key1.dptr = k1;
+    key1.dsize = strlen(k1) + 1;
+    data1.dptr = d1;
+    data1.dsize = strlen(d1) + 1;
+
+    key2.dptr = k2;
+    key2.dsize = strlen(k2) + 1;
+    data2.dptr = (char *) &d2;
+    data2.dsize = sizeof(d2);
+
+    file = gdbm_open("mydatabase", 0, GDBM_WRCREAT | GDBM_READER, 0660, 0);
+
+    gdbm_store(file, key1, data1, GDBM_INSERT);
+    gdbm_store(file, key2, data2, GDBM_INSERT);
+
+    ndata1 = gdbm_fetch(file, key1);
+    ndata2 = gdbm_fetch(file, key2);
+
+    printf("ndata1: %s\n", ndata1.dptr);
+    printf("ndata2: %s\n", ((myd *)ndata2.dptr)->first);
+    printf("ndata2: %s\n", ((myd *)ndata2.dptr)->last);
+
+    gdbm_close(file);
+
+    return 0;
+}
+```
+```sh
+gcc -o main main.c -lgdbm
+./main
+`=> 
+ndata1: I love C programming.
+ndata2: John
+ndata2: Doe
+```
+
+# 074 - libusb
+
+```sh
+sudo apt-get install libusb-1.0-0-dev
+```
+
+```sh
+dpkg -l libusb-1.0*
+`=>
+Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                   Version          Architecture Description
++++-======================-================-============-=====================>
+ii  libusb-1.0-0:amd64     2:1.0.23-2build1 amd64        userspace USB program>
+ii  libusb-1.0-0-dev:amd64 2:1.0.23-2build1 amd64        userspace USB program>
+ii  libusb-1.0-doc         2:1.0.23-2build1 all          documentation for use>
+```
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <libusb-1.0/libusb.h>
+
+void print_devices(libusb_device *dev)
+{
+    struct libusb_device_descriptor desc;
+    struct libusb_config_descriptor *config;
+    const struct libusb_interface *interface;
+    const struct libusb_interface_descriptor *intfdesc; 
+    const struct libusb_endpoint_descriptor *endpointdesc;
+
+    int ret;
+    int i, j, k;
+
+    ret = libusb_get_device_descriptor(dev, &desc);
+    if(ret < 0) {
+        fprintf(stderr, "Error in getting device descriptor!\n");
+        return;
+    }
+
+    printf("Number of possible configs is %d\n", desc.bNumConfigurations);
+    printf("Device class: %d\n", desc.idVendor);
+    printf("Product ID: %d\n", desc.idProduct);
+
+    libusb_get_config_descriptor(dev, 0, &config);
+    printf("Interface: %d\n", config->bNumInterfaces);
+
+    for(i = 0; i < config->bNumInterfaces; i++) {
+        interface = &config->interface[i];
+        printf("Number of alt settings: %d\n", interface->num_altsetting);
+        for(j = 0; j < interface->num_altsetting; j++) {
+            intfdesc = &interface->altsetting[j];
+            printf("    Interface number: %d,   ", intfdesc->bInterfaceNumber);
+            printf("    Num of endpoints: %d\n  ", intfdesc->bNumEndpoints);
+            for(k = 0; k < intfdesc->bNumEndpoints; k++) {
+                endpointdesc = &intfdesc->endpoint[k];
+                printf("    Desc Type: %d,   ", endpointdesc->bDescriptorType);
+                printf("    EP Addr: %d\n", endpointdesc->bEndpointAddress);
+            }
+        }
+    }
+
+    printf("\n\n");
+    libusb_free_config_descriptor(config);
+
+}
+
+int main(int argc, char *argv[])
+{
+    libusb_device **devs;
+    libusb_context *context= NULL;
+
+    size_t list;
+    size_t i;
+    int ret;
+
+    ret = libusb_init(&context);
+    if(ret < 0) {
+        perror("libusb_init");
+        exit(1);
+    }
+
+    list = libusb_get_device_list(context, &devs);
+    if(list < 0) {
+        fprintf(stderr, "Error in getting device list\n");
+        libusb_free_device_list(devs, 1);
+        libusb_exit(context);
+        exit(1);
+    }
+
+    printf("There are %ld devices found\n", list);
+
+    for(i = 0; i < list; i++) {
+        /* print devices specs */
+        print_devices(devs[i]);
+    }
+
+    libusb_free_device_list(devs, 1);
+    libusb_exit(context);
+
+    return 0;
+}
+```
+
+```sh
+gcc -o main main.c -lusb-1.0
+./main
+`=>
+There are 10 devices found
+Number of possible configs is 1
+Device class: 9390
+Product ID: 4352
+Interface: 2
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 129
+Number of alt settings: 1
+    Interface number: 1,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 130
+
+
+Number of possible configs is 1
+Device class: 32903
+Product ID: 36
+Interface: 1
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 129
+
+
+Number of possible configs is 1
+Device class: 7531
+Product ID: 2
+Interface: 1
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 129
+
+
+Number of possible configs is 1
+Device class: 1266
+Product ID: 45802
+Interface: 2
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 129
+Number of alt settings: 6
+    Interface number: 1,       Num of endpoints: 0
+      Interface number: 1,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 130
+    Interface number: 1,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 130
+    Interface number: 1,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 130
+    Interface number: 1,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 130
+    Interface number: 1,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 130
+
+
+Number of possible configs is 1
+Device class: 32903
+Product ID: 36
+Interface: 1
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 129
+
+
+Number of possible configs is 1
+Device class: 7531
+Product ID: 2
+Interface: 1
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 129
+
+
+Number of possible configs is 1
+Device class: 7531
+Product ID: 3
+Interface: 1
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 129
+
+
+Number of possible configs is 4
+Device class: 1452
+Product ID: 4776
+Interface: 1
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 3
+      Desc Type: 5,       EP Addr: 2
+    Desc Type: 5,       EP Addr: 129
+    Desc Type: 5,       EP Addr: 131
+
+
+Number of possible configs is 1
+Device class: 2578
+Product ID: 1
+Interface: 2
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 3
+      Desc Type: 5,       EP Addr: 129
+    Desc Type: 5,       EP Addr: 2
+    Desc Type: 5,       EP Addr: 130
+Number of alt settings: 6
+    Interface number: 1,       Num of endpoints: 2
+      Desc Type: 5,       EP Addr: 3
+    Desc Type: 5,       EP Addr: 131
+    Interface number: 1,       Num of endpoints: 2
+      Desc Type: 5,       EP Addr: 3
+    Desc Type: 5,       EP Addr: 131
+    Interface number: 1,       Num of endpoints: 2
+      Desc Type: 5,       EP Addr: 3
+    Desc Type: 5,       EP Addr: 131
+    Interface number: 1,       Num of endpoints: 2
+      Desc Type: 5,       EP Addr: 3
+    Desc Type: 5,       EP Addr: 131
+    Interface number: 1,       Num of endpoints: 2
+      Desc Type: 5,       EP Addr: 3
+    Desc Type: 5,       EP Addr: 131
+    Interface number: 1,       Num of endpoints: 2
+      Desc Type: 5,       EP Addr: 3
+    Desc Type: 5,       EP Addr: 131
+
+
+Number of possible configs is 1
+Device class: 7531
+Product ID: 2
+Interface: 1
+Number of alt settings: 1
+    Interface number: 0,       Num of endpoints: 1
+      Desc Type: 5,       EP Addr: 129
+```
+
+```sh
+lsusb -t
+`=>
+/:  Bus 04.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/4p, 5000M
+/:  Bus 03.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/4p, 480M
+    |__ Port 1: Dev 2, If 0, Class=Wireless, Driver=btusb, 12M
+    |__ Port 1: Dev 2, If 1, Class=Wireless, Driver=btusb, 12M
+    |__ Port 2: Dev 7, If 0, Class=Imaging, Driver=usbfs, 480M
+    |__ Port 2: Dev 7, If 1, Class=Vendor Specific Class, Driver=usbfs, 480M
+    |__ Port 2: Dev 7, If 2, Class=Vendor Specific Class, Driver=ipheth, 480M
+/:  Bus 02.Port 1: Dev 1, Class=root_hub, Driver=ehci-pci/3p, 480M
+    |__ Port 1: Dev 2, If 0, Class=Hub, Driver=hub/8p, 480M
+        |__ Port 5: Dev 3, If 0, Class=Human Interface Device, Driver=usbhid, 12M
+        |__ Port 5: Dev 3, If 1, Class=Human Interface Device, Driver=usbhid, 12M
+/:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=ehci-pci/3p, 480M
+    |__ Port 1: Dev 2, If 0, Class=Hub, Driver=hub/6p, 480M
+        |__ Port 6: Dev 4, If 0, Class=Video, Driver=uvcvideo, 480M
+        |__ Port 6: Dev 4, If 1, Class=Video, Driver=uvcvideo, 480M
+
+```
+
+# 075 - Redirect
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[])
+{
+    int fd;
+    int ret;
+    
+    fd = open("out.txt", O_CREAT | O_APPEND | O_WRONLY);
+    if(fd < 0) {
+        perror("open");
+        exit(1);
+    }
+
+    ret = dup2(fd, 1);
+    if(ret < 0) {
+        perror("dup2");
+        exit(1);
+    }
+
+    system("ls");
+    close(fd);
+
+    return 0;
+}
+```
+```sh
+gcc -o main main.c 
+./main
+cat out.txt
+`=>
+add.c
+add.o
+client
+client.c
+file1.txt
+file2.txt
+hello
+hello.c
+...
+...
+```
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[])
+{
+    int fd, fd2;
+    int ret;
+    
+    fd = open("out.txt", O_CREAT | O_APPEND | O_WRONLY);
+    if(fd < 0) {
+        perror("open");
+        exit(1);
+    }
+
+    fd2 = open("outerr.txt", O_CREAT | O_APPEND | O_WRONLY);
+    if(fd2 < 0) {
+        perror("open err");
+        exit(1);
+    }
+
+    ret = dup2(fd, 1);
+    if(ret < 0) {
+        perror("dup2");
+        exit(1);
+    }
+
+    ret = dup2(fd2, 2);
+    if(ret < 0) {
+        perror("dup2 err");
+        exit(1);
+    }
+
+    system("ls");
+    close(fd);
+
+    return 0;
+}
+```
+```sh
+gcc -o main main.c 
+./main
+cat outerr.txt
+`=>
+cat: outerr.txt: Permission denied
+```
+
+# 076 - lseek() Function
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+
+int main(int argc, char *argv[])
+{
+    int fd;
+    int ret;
+    int a[10] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+    int buf;
+
+    fd = open("outfile", O_CREAT | O_APPEND | O_RDWR, 0600);
+    if(fd < 0) {
+        perror("open");
+        exit(1);
+    }
+
+    /* write something */
+    ret = write(fd, (void *) a, sizeof(a));
+    if(ret < 0) {
+        perror("write");
+        close(fd);
+        exit(1);
+    }    
+
+    /* seek using lseek */
+    ret = lseek(fd, 0, SEEK_SET);
+    if(fd < 0) {
+        perror("lseek");
+        close(fd);
+        exit(1);
+    }
+
+    /* read from that position set by lseek */
+    ret = read(fd, &buf, sizeof(int));
+    if(fd < 0) {
+        perror("read");
+        close(fd);
+        exit(1);
+    }
+
+    printf("buf = %d\n", buf);
+
+    /* seek using lseek */
+    ret = lseek(fd, 3*sizeof(int), SEEK_SET);
+    if(fd < 0) {
+        perror("lseek");
+        close(fd);
+        exit(1);
+    }
+
+    /* read from that position set by lseek */
+    ret = read(fd, &buf, sizeof(int));
+    if(fd < 0) {
+        perror("read");
+        close(fd);
+        exit(1);
+    }
+
+    printf("buf = %d\n", buf);
+
+    close(fd);
+
+    return 0;
+}
+```
+```output
+buf = 1
+buf = 4
+```
+
+# 077 - stat() Function
+
+```sh
+man 2 stat
+```
+
+```c
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <string.h>
+#include <time.h>
+
+int main(int argc, char *argv[])
+{   
+    struct stat buf;
+    char mtime[100];
+
+    stat("mytext.txt", &buf);
+
+    printf("st_mode = %o\n", buf.st_mode);
+
+    strcpy(mtime, ctime(&buf.st_mtime));
+    printf("st_time = %s\n", mtime);
+
+    return 0;
+}
+```
+```output
+st_mode = 100664
+st_time = Thu Jan 27 16:21:55 2022
+```
+
+```c
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/sysmacros.h>
+
+int
+main(int argc, char *argv[])
+{
+    struct stat sb;
+
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <pathname>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    if (lstat(argv[1], &sb) == -1) {
+        perror("lstat");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("ID of containing device:  [%lx,%lx]\n",
+            (long) major(sb.st_dev), (long) minor(sb.st_dev));
+
+    printf("File type:                ");
+
+    switch (sb.st_mode & q) {
+    case S_IFBLK:  printf("block device\n");            break;
+    case S_IFCHR:  printf("character device\n");        break;
+    case S_IFDIR:  printf("directory\n");               break;
+    case S_IFIFO:  printf("FIFO/pipe\n");               break;
+    case S_IFLNK:  printf("symlink\n");                 break;
+    case S_IFREG:  printf("regular file\n");            break;
+    case S_IFSOCK: printf("socket\n");                  break;
+    default:       printf("unknown?\n");                break;
+    }
+    printf("I-node number:            %ld\n", (long) sb.st_ino);
+
+    printf("Mode:                     %lo (octal)\n",
+            (unsigned long) sb.st_mode);
+
+    printf("Link count:               %ld\n", (long) sb.st_nlink);
+    printf("Ownership:                UID=%ld   GID=%ld\n",
+            (long) sb.st_uid, (long) sb.st_gid);
+
+    printf("Preferred I/O block size: %ld bytes\n",
+            (long) sb.st_blksize);
+    printf("File size:                %lld bytes\n",
+            (long long) sb.st_size);
+    printf("Blocks allocated:         %lld\n",
+            (long long) sb.st_blocks);
+
+    printf("Last status change:       %s", ctime(&sb.st_ctime));
+    printf("Last file access:         %s", ctime(&sb.st_atime));
+    printf("Last file modification:   %s", ctime(&sb.st_mtime));
+
+    exit(EXIT_SUCCESS);
+}
+
+
+```
+```sh
+./main .
+`=>
+ID of containing device:  [8,2]
+File type:                directory
+I-node number:            24644357
+Mode:                     40775 (octal)
+Link count:               4
+Ownership:                UID=1000   GID=1000
+Preferred I/O block size: 4096 bytes
+File size:                4096 bytes
+Blocks allocated:         8
+Last status change:       Thu Jan 27 16:29:20 2022
+Last file access:         Thu Jan 27 16:27:19 2022
+Last file modification:   Thu Jan 27 16:29:20 2022
+```
+
+# 078 - va_start(), va_end(), va_arg() Functions
+
+```c
+#include <stdio.h>
+#include <stdarg.h>
+
+int sumnum(int num, ...)
+{
+    int sum = 0;
+    int count = 0;
+
+    va_list argptr;
+    va_start(argptr, num);
+
+    while (count < num)
+    {       
+        sum += va_arg(argptr, int);
+        count++;
+    }
+
+    va_end(argptr);
+
+    return sum;
+}
+
+void printstr(int num, ...)
+{
+    int count = 0;
+    char *ptr;
+    va_list argptr;
+
+    va_start(argptr, num);
+
+    while (count < num)
+    {
+        ptr = va_arg(argptr, char *);
+        printf("ptr = %s\n", ptr);
+        count++;
+    }
+
+    va_end(argptr);
+    
+}
+
+int main(int argc, char *argv[])
+{   
+
+    int total;
+
+    total = sumnum(5, 3, 5, 7, 6, 4);
+
+    printf("total = %d\n", total);
+    printstr(3, "one", "two", "three");
+
+    return 0;
+}
+```
+```output
+total = 25
+ptr = one
+ptr = two
+ptr = three
+```
+
+# 079 - union
+
+In structure each member get separate space in memory. ... In union, the **total memory space allocated is equal to the member with largest size by overlapping.** All other members share the same memory space. This is the biggest difference between structure and union.
+
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char *argv[])
+{   
+    union {
+        int a;
+        int b;
+        char s[8];
+    } myunion;
+
+    myunion.a = 3;
+
+    printf("a =  %d\n", myunion.a);
+    printf("b =  %d\n", myunion.b);
+    printf("s = %s\n", myunion.s);
+
+    myunion.a = 7;
+
+    printf("a =  %d\n", myunion.a);
+    printf("b =  %d\n", myunion.b);
+    printf("s = %s\n", myunion.s);
+
+    myunion.b = 9;
+
+    printf("a =  %d\n", myunion.a);
+    printf("b =  %d\n", myunion.b);
+    printf("s = %s\n", myunion.s);
+
+    strcpy(myunion.s, "happy");
+    printf("s = %s\n", myunion.s);
+    printf("a =  %d\n", myunion.a);
+    printf("a =  %x\n", myunion.a);
+    printf("b =  %a\n", myunion.b);
+    printf("b =  %x\n", myunion.b);
+
+    return 0;
+}
+```
+```output
+a =  3
+b =  3
+s = 
+a =  7
+b =  7
+s = 
+a =  9
+b =  9
+s = 
+s = happy
+a =  1886413160
+a =  70706168
+b =  1886413160
+b =  70706168
+```
+a [h] [a] [p] [p]
+b [h] [a] [p] [p]
+s [h] [a] [p] [p] [y] [] [] []
+h->68
+a->61
+p->70
+p->70
+
+
+# 080 - Trimming out end spaces in a string
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+void trimstring(char *s)
+{
+    char *p = s;
+    int len;
+
+    while (*p == ' ' && *p != '\0')
+        p++;
+
+    len = strlen(p);
+
+    memmove(s, p, len+1);
+
+    p = s + len - 1;
+    while (*p == ' ' && p > s)
+        p--;
+
+    *(++p) = '\0';
+
+}
+
+int main(int argc, char *argv[])
+{   
+    char str[64] = "          Hello World!       ";
+
+    printf("Before trimming str = >%s<\n", str);
+
+    trimstring(str);
+
+    printf("Post trimming str = >%s<\n", str);
+
+    return 0;
+}
+```
+```output
+Before trimming str = >          Hello World!       <
+Post trimming str = >Hello World!<
+```
+
+# 081 - Field extraction from one-line record of flat file database
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int breakfields(char *s, char **data, int n)
+{
+    int fields = 0;
+    int i;
+    char *start = s;
+    char *end = s;
+
+    for (i = 0; i < n; i++) {
+        while (*end != ',' && *end != '\0') 
+            end++;
+
+        if (*end == '\0') {
+            data[i] = (char *) malloc(strlen(start) + 1);
+            strcpy(data[i], start);
+            fields++;
+            break;
+        } else if (*end == ',') {
+            *end = '\0';
+            data[i] = (char *) malloc(strlen(start) + 1);
+            strcpy(data[i], start);
+            start = end + 1;
+            end = start;
+            fields++;
+        }
+    }
+
+    return fields;
+}
+
+int main(int argc, char *argv[])
+{   
+    char str[128] = "Steve,28 Palm St, Honolulu, HI, 98765";
+
+    char *data[5];
+    int ret;
+    int i;
+
+    printf("str = %s\n", str);
+
+    ret = breakfields(str, data, 5);
+
+    for (i = 0; i < 5; i++) {
+        printf("data[%d] = %s\n", i, data[i]);
+        free(data[i]);
+    }
+
+    printf("Number of fields processed = %d\n", ret);
+
+    return 0;
+}
+```
+```output
+str = Steve,28 Palm St, Honolulu, HI, 98765
+data[0] = Steve
+data[1] = 28 Palm St
+data[2] =  Honolulu
+data[3] =  HI
+data[4] =  98765
+Number of fields processed = 5
 ```
