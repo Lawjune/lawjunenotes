@@ -2277,10 +2277,12 @@ int main(int argc, char *argv[])
 
 #035 (Rev. 2) - Linked List
 
+```
 { ["Paul"] ["Gonzales"] [18] [next->{"{Peter"}] }
 { ["Peter"] ["Mars"] [24] [next->{"John"}] }
 { ["John"] ["Doe"] [34] [next->*{"Andy"}] }
 { ["Andy"] ["Mars"] [22] [NULL] }
+```
 
 ```c
 #include <stdio.h>
@@ -8304,3 +8306,160 @@ data[3] =  HI
 data[4] =  98765
 Number of fields processed = 5
 ```
+
+# 082 - Passing struct by value and by reference
+
+```c
+#include <stdio.h>
+
+typedef struct add_num_struct_t {
+    int a;
+    int b;
+    int sum;
+} add_num_struct;
+
+void get_numbers(int x, int y, add_num_struct mydata)
+{
+    mydata.a = x;
+    mydata.b = y;
+}
+
+void compute_sum(add_num_struct mydata) 
+{
+    mydata.sum = mydata.a + mydata.b;
+}
+
+int main(int argc, char *argv[])
+{
+    add_num_struct newdata;
+
+    get_numbers(4, 7, newdata);
+    compute_sum(newdata);
+
+    printf("newdata.a = %d\n", newdata.a);
+    printf("newdata.b = %d\n", newdata.b);
+    printf("newdata.sum = %d\n", newdata.sum);
+}
+```
+***It does not work!***
+```output
+newdata.a = 32766
+newdata.b = 0
+newdata.sum = 0
+```
+
+```c
+#include <stdio.h>
+
+typedef struct add_num_struct_t {
+    int a;
+    int b;
+    int sum;
+} add_num_struct;
+
+void get_numbers(int x, int y, add_num_struct *mydata)
+{
+    mydata->a = x;
+    mydata->b = y;
+}
+
+void compute_sum(add_num_struct *mydata) 
+{
+    mydata->sum = mydata->a + mydata->b;
+}
+
+int main(int argc, char *argv[])
+{
+    add_num_struct newdata;
+
+    get_numbers(4, 7, &newdata);
+    compute_sum(&newdata);
+
+    printf("newdata.a = %d\n", newdata.a);
+    printf("newdata.b = %d\n", newdata.b);
+    printf("newdata.sum = %d\n", newdata.sum);
+}
+```
+```output
+newdata.a = 4
+newdata.b = 7
+newdata.sum = 11
+```
+
+# 083 - select() function
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char *argv[])
+{
+    int fd;
+    char buf[11];
+    int ret;
+
+    fd = 0;
+    while (1)
+    {
+        memset((void *)buf, 0, 11);
+        ret = read(fd, (void *)buf, 10);
+        printf("ret = %d\n", ret);
+
+        if (ret != 1) {
+            buf[10] = '\0';
+            printf("    buf = %s\n", buf);
+        }
+    }
+}
+```
+
+**To add timeout =>**
+```c
+#include <stdio.h>
+#include <string.h>
+#include <sys/select.h>
+
+int main(int argc, char *argv[])
+{
+    int fd;
+    char buf[11];
+    int ret, sret;
+
+    fd = 0;
+
+    fd_set readfds;
+    struct timeval timeout;
+
+
+    while (1)
+    {
+        FD_ZERO(&readfds);
+        FD_SET(fd, &readfds);
+
+        timeout.tv_sec = 5;
+        timeout.tv_usec = 0;
+
+        sret = select(8, &readfds, NULL, NULL, &timeout);
+
+        if (sret == 0) {
+            printf("\n");
+            printf("sret = %d\n", sret);
+            printf("    timeout\n");
+        } else {
+
+            memset((void *)buf, 0, 11);
+            ret = read(fd, (void *)buf, 10);
+            printf("ret = %d\n", ret);
+
+            if (ret != 1) {
+                buf[10] = '\0';
+                printf("    buf = %s\n", buf);
+            }
+        }
+    }
+
+    return 0;
+}
+```
+
+
