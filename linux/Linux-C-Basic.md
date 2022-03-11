@@ -8061,7 +8061,127 @@ Last file access:         Thu Jan 27 16:27:19 2022
 Last file modification:   Thu Jan 27 16:29:20 2022
 ```
 
+```c
+int stat(const char *path, struct stat *buf);
+```
+*stat() function is used to list properties of a file identified by path. It reads all file properties and dumps to buf structure. The function is defined in sys/stat.h header file.*
+
+*Here *path is a pointer to constant character pointing to file path. *buf is a stat type structure defined in sys/stat.h*
+
+*On success the function returns 0 and fills the buf structure with file properties. On error the function return -1 and sets error code. You can use this function to get various properties of a file.*
+
+```c
+/**
+ * C program to find file permission, size, creation and last modification date of 
+ * a given file.
+ */
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <time.h>
+
+
+void printFileProperties(struct stat stats);
+
+
+int main()
+{
+    char path[100];
+    struct stat stats;
+
+    printf("Enter source file path: ");
+    scanf("%s", path);
+
+
+    // stat() returns 0 on successful operation,
+    // otherwise returns -1 if unable to get file properties.
+    if (stat(path, &stats) == 0)
+    {
+        printFileProperties(stats);
+    }
+    else
+    {
+        printf("Unable to get file properties.\n");
+        printf("Please check whether '%s' file exists.\n", path);
+    }
+
+    return 0;
+}
+
+
+
+/**
+ * Function to print file properties.
+ */
+void printFileProperties(struct stat stats)
+{
+    struct tm dt;
+
+    // File permissions
+    printf("\nFile access: ");
+    if (stats.st_mode & R_OK)
+        printf("read ");
+    if (stats.st_mode & W_OK)
+        printf("write ");
+    if (stats.st_mode & X_OK)
+        printf("execute");
+
+    // File size
+    printf("\nFile size: %d", stats.st_size);
+
+    // Get file creation time in seconds and 
+    // convert seconds to date and time format
+    dt = *(gmtime(&stats.st_ctime));
+    printf("\nCreated on: %d-%d-%d %d:%d:%d", dt.tm_mday, dt.tm_mon, dt.tm_year + 1900, 
+                                              dt.tm_hour, dt.tm_min, dt.tm_sec);
+
+    // File modification time
+    dt = *(gmtime(&stats.st_mtime));
+    printf("\nModified on: %d-%d-%d %d:%d:%d", dt.tm_mday, dt.tm_mon, dt.tm_year + 1900, 
+                                              dt.tm_hour, dt.tm_min, dt.tm_sec);
+
+}
+```
+```output
+Enter source file path: ./main
+
+File access: read execute
+File size: 17032
+Created on: 11-2-2022 3:14:26
+```
+
+```sh
+stat ./main
+`=>
+  File: ./main
+  Size: 17032       Blocks: 40         IO Block: 4096   regular file
+Device: 802h/2050d  Inode: 8652040     Links: 1
+Access: (0775/-rwxrwxr-x)  Uid: ( 1000/ lawjune)   Gid: ( 1000/ lawjune)
+Access: 2022-03-11 11:14:31.314182834 +0800
+Modify: 2022-03-11 11:14:26.598135103 +0800
+Change: 2022-03-11 11:14:26.598135103 +0800
+ Birth: -
+````
+
+**File**: The name of the provided file. If the provided file is a symlink, then the name will be different.
+**Size**: The size of a given file in Bytes.
+**Blocks**: Total number of allocated blocks to the file to store on the hard disk.
+**IO Block**: The size of every allocated block in bytes.
+**File type**: The file may be of the following types: Regular files, special files, directories, or symbolic links.
+**Device**: Device number in hexadecimal format.
+**Inode**: Inode number of the file.
+**Links**: Number of hard links of the file.
+**Access**: Access permissions in the numeric and symbolic methods.
+**Context**: The field stores SELinux security context.
+**Access**: The last time at which the file was accessed.
+**Modify**: The last time at which file was modified.
+**Change**: The last time the at which file’s attribute or content was changed.
+**Birth**: The time at which the file was created.
+
 # 078 - va_start(), va_end(), va_arg() Functions
+
+***Fetch Argument from Variable Argument List***
 
 ```c
 #include <stdio.h>
@@ -8124,6 +8244,7 @@ ptr = one
 ptr = two
 ptr = three
 ```
+
 
 # 079 - union
 
@@ -8462,4 +8583,87 @@ int main(int argc, char *argv[])
 }
 ```
 
+# 084 - poll() function
 
+```c
+#include <stdio.h>
+#include <string.h>
+#include <poll.h>
+
+int main(int argc, char *argv[])
+{
+    int fd;
+    char buf[14];
+    int ret, pret;
+
+    struct pollfd fds[1];
+    int timeout;
+
+    fd = 0;
+    while (1)
+    {
+
+        fds[0].fd = fd;
+        fds[0].events = 0;
+        fds[0].events |= POLLIN;
+
+        timeout = 5000;
+
+        pret = poll(fds, 1, timeout);
+
+        if (pret == 0) {
+            printf("\n");
+            printf("pret = %d\n", pret);
+            printf("    timeout\n");
+        }
+        else
+        {
+
+            memset((void *)buf, 0, 11);
+            ret = read(fd, (void *)buf, 10);
+            printf("ret = %d\n", ret);
+
+            if (ret != 1) {
+                buf[10] = '\0';
+                printf("    buf = %s\n", buf);
+            }
+        }
+    }
+}
+```
+
+# 085 - "Segmentation fault" handling
+
+```c
+#include <stdio.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+
+void segfunc(int signal, siginfo_t *si, void *arg)
+{
+    printf("Caught segfault address *p\n", si->si_addr);
+    exit(0);
+}
+
+int main(int argc, char *argv[])
+{
+
+    int *pvar = NULL;
+    struct sigaction sa;
+
+    memset(&sa, 0, sizeof(struct  sigaction));
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_SIGINFO;
+    sa.sa_sigaction = segfunc;
+
+    sigaction(SIGSEGV, &sa, NULL);
+
+    *pvar = 24;
+
+    return 0;
+}
+```
+```output
+Caught segfault address *p
+```
