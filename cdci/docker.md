@@ -15,7 +15,7 @@
 **Consistently**
 *build, run and ship applications*
 
-### Virtual Machines vs COntainers
+### Virtual Machines vs Containers
 
 **VIRTUAL MACHINE**
 *An abstraction of a machine (physical hardware)*

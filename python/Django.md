@@ -1792,6 +1792,883 @@ INSTALLED_APPS = [
 ]
 ```
 
+# Part II
+
+## 2.0 Set Up the Project
+
+```sql
+CREATE DATABASE storefront2
+```
+
+- *Drap the `start` code file to vscoe*
+- *`cmd` + `T`* 
+- *Type `DATABASE` then jump the `settings.py`*
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'storefront2',
+        'HOST': 'localhost',
+        'USER': 'root',
+        'PASSWORD': 'MyPassword'
+    }
+}
+```
+```sh
+pipenv install
+```
+```sh
+pipenv shell
+```
+```sh
+python manage.py migrate
+```
+- *Run the `seed.sql`*s
+```sh
+python manage.py runserver
+```
+```sh
+python manage.py createsuperuser
+```
+
+## 2.1 Building RESTful APIs with Django REST Framework
+
+### 2.1.1 Introduction
+
+**IN THIS SECTION**
+- Introduction to RESTful APIs
+- Insalling Django REST Framework 
+- Creating API views
+- Creating serializers
+- Serializing and deserializing models
+
+### 2.1.2 What are RESTful APIs
+
+**RESTFUL?**
+***Re**presentational **S**tate **T**ransfer*
+
+**BENEFITS**
+- *Fast*
+- *Scalable*
+- *Reliable*
+- *Easy to understand*
+- *Easy to change*
+
+***RULES***
+- **RESOURCES**
+- **REPRESENTATIONS**
+- **HTTP METHODS**
+
+### 2.1.3 Resoures
+
+**RESOURCES**
+- Product
+- Collection
+- Cart
+
+*Internet can access these resources via URL over HTTP.*
+**URL - Uniform Resource Locator**
+
+http://lawjunerecite.com/recites
+http://lawjunerecite.com/recites/1
+http://lawjunerecite.com/recites/1/reviews
+http://lawjunerecite.com/recites/1/reviews/1
+
+### 2.1.4 Resources Representations
+
+**REPRESENTATIONS**
+- HTML
+- XML
+- JSON
+
+### 2.1.5 HTTP Methods
+
+**HTTP METHODS**
+- **GET**
+- **POST**
+- **PUT**
+- **PATCH**
+- **DELETE**
+
+**Creating a Product**
+*POST /products*
+```json
+    {
+        "title": "...",
+        "price": 74
+    }
+```
+
+**Updating a Product**
+*PATCH /products/1*
+```json
+    {
+        "title": "...",
+        "price": 47
+    }
+```
+
+**Deleting a Product**
+*DELETE /products/1*
+
+
+### 2.1.6 Installing Django REST Framework
+
+```sh
+pipenv install djangorestframework
+```
+
+- *`cmd` + `T`* 
+- *Type `INSTALLED` then jump the `INSTALLEDAPPS` in `settings.py`*
+```python
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.sessions',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',   # Insert here
+    'playground',
+    'debug_toolbar',
+    'store',
+    'store_custom',
+    'tags',
+    'likes'
+]
+```
+
+### 2.1.7 Creating API Views
+
+*store/views.py*
+```python
+from django.shortcuts import render
+from django.http import HttpResponse
+
+# Create your views here.
+def product_list(request):
+    return HttpResponse('ok')
+```
+
+*To add `urls.py` in `store` folder.*
+
+*store/url.py*
+```python
+from django.urls import path
+from . import views
+
+# URLConf
+urlpatterns = [
+    path('products/', views.product_list)
+]
+```
+
+*storefront/urls.py*
+```python
+from django.contrib import admin
+from django.urls import path, include
+import debug_toolbar
+
+admin.site.site_header = 'Storefront Admin'
+admin.site.index_title = 'Admin'
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('playground/', include('playground.urls')),
+    path('store/', include('store.urls')),  # Insert here
+    path('__debug__/', include(debug_toolbar.urls)),
+]
+```
+
+**...**
+
+*Updated store/views.py*
+```python
+from django.shortcuts import render
+from django.http import HttpResponse
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+@api_view()
+def product_list(request):
+    return Response('ok')
+
+@api_view()
+def product_detail(request, id):
+    return Response(id)
+```
+
+*Updated store/urls.py*
+```python
+from django.urls import path
+from . import views
+
+# URLConf
+urlpatterns = [
+    path('products/', views.product_list), 
+    path('products/<int:id>/', views.product_detail)
+]
+```
+
+### 2.1.8 Creating Serializers
+
+**REST Framework**
+[   JSONRenderer    ]
+[   render(dict)    ]
+
+**Serializer**
+*Converts a model instance to a dictionary.*
+
+https://www.django-rest-framework.org/api-guide/fields/
+
+*store/serializers.py*
+```python
+from rest_framework import serializers
+
+class ProductSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    title = serializers.CharField(max_length=255)
+    unit_price = serializers.DecimalField(max_digits=6, decimal_places=2)
+```
+
+### 2.1.9 Serializing Objects
+
+*Updated store/views.py*
+```python
+from django.shortcuts import get_object_or_404
+# from django.http import HttpResponse
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Product
+from .serializers import ProductSerializer
+
+@api_view()
+def product_list(request):
+    queryset = Product.objects.all()
+    serializer = ProductSerializer(queryset, many=True)
+    return Response(serializer.data)
+
+@api_view()
+def product_detail(request, id):
+    product = get_object_or_404(Product, pk=id)
+    serializer = ProductSerializer(product)
+    return Response(serializer.data)
+```
+
+
+*Insert `REST_FRAMEWORK` storefront/settings.py*
+```python
+REST_FRAMEWORK = {
+    'COERCE_DECIMAL_TO_STRING': False
+}
+```
+
+### 2.1.10 Creating Custom Serializer Fields
+
+**API Model != Data Model**
+Interfaces     Implementation
+
+```python
+from rest_framework import serializers
+from store.models import Product
+from decimal import Decimal
+
+class ProductSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    title = serializers.CharField(max_length=255)
+    price = serializers.DecimalField(max_digits=6, decimal_places=2, source='unit_price')
+    price_with_tax = serializers.SerializerMethodField(method_name='calculate_tax')
+
+    def calculate_tax(self, product: Product):
+        return product.unit_price * Decimal(1.1)
+```
+
+### 2.1.11 Serializing Relationships
+
+```python
+# Add select_related('collection') in store/views.py
+@api_view()
+def product_list(request):
+    queryset = Product.objects.select_related('collection').all()
+    serializer = ProductSerializer(queryset, many=True)
+    return Response(serializer.data)
+```
+
+**SERIALIZING RELATIONSHIPS**
+- Primary key
+- String
+- Nested Object
+- Hyperlink
+
+
+### 2.1.12 Model Serializers
+
+```python
+from rest_framework import serializers
+from store.models import Product, Collection
+from decimal import Decimal
+
+class CollectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Collection
+        fields = ['id', 'title']
+    # id = serializers.IntegerField()
+    # title = serializers.CharField(max_length=255)
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'price', 'price_with_tax', 'collection']
+    # id = serializers.IntegerField()
+    # title = serializers.CharField(max_length=255)
+    price = serializers.DecimalField(max_digits=6, decimal_places=2, source='unit_price')
+    price_with_tax = serializers.SerializerMethodField(method_name='calculate_tax')
+    # # collection = serializers.PrimaryKeyRelatedField(
+    # #     queryset=Collection.objects.all()
+    # # )
+    # # collection_str = serializers.StringRelatedField(source='collection')
+    # # collection = CollectionSerializer()
+    collection = serializers.HyperlinkedRelatedField( 
+        queryset=Collection.objects.all(), 
+        view_name='collection-detail'
+    )
+
+    def calculate_tax(self, product: Product):
+        return product.unit_price * Decimal(1.1)
+```
+
+### 2.1.13 Deserializing Objects
+
+**Creating a Product**
+*POST /products*
+```json
+    {
+        "title": "...",
+        "price": 74
+    }
+```
+
+*store/views.py*
+```python
+from django.shortcuts import get_object_or_404
+# from django.http import HttpResponse
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Product
+from .serializers import ProductSerializer
+
+@api_view(['GET',  'POST'])
+def product_list(request):
+    if request.method == 'GET':
+        queryset = Product.objects.select_related('collection').all()
+        serializer = ProductSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        serializer = ProductSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response('ok')
+
+@api_view()
+def product_detail(request, id):
+    product = get_object_or_404(Product, pk=id)
+    serializer = ProductSerializer(product, context={'request': request})
+    return Response(serializer.data)
+
+@api_view()
+def collection_detail(request, pk):
+    return Response('ok')
+
+```
+
+### 2.1.14 Data Validation
+
+
+### 2.1.15 Saving Data
+```json
+{
+    "title": "a",
+    "slug": "a",
+    "inventory": 74,
+    "unit_price": 7,
+    "collection": "/store/collections/5/"
+}
+```
+
+*store/views.py*
+```python
+from django.shortcuts import get_object_or_404
+# from django.http import HttpResponse
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Product
+from .serializers import ProductSerializer
+
+@api_view(['GET',  'POST'])
+def product_list(request):
+    if request.method == 'GET':
+        queryset = Product.objects.select_related('collection').all()
+        serializer = ProductSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        serializer = ProductSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+@api_view(["GET", "PUT"])
+def product_detail(request, id):
+    product = get_object_or_404(Product, pk=id)
+    if request.method == 'GET':
+        serializer = ProductSerializer(product, context={'request': request})
+        return Response(serializer.data)
+    elif request.method == 'PUT':
+        serializer = ProductSerializer(product, data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+@api_view()
+def collection_detail(request, pk):
+    return Response('ok')
+```
+
+### 2.1.16 Deleting Objects
+
+*store/models.py*
+```python
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.PROTECT)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='orderitems')
+    quantity = models.PositiveSmallIntegerField()
+    unit_price = models.DecimalField(max_digits=6, decimal_places=2)
+```
+
+*store/views.py*
+```python
+...
+...
+@api_view(["GET", "PUT", "DELETE"])
+def product_detail(request, id):
+    product = get_object_or_404(Product, pk=id)
+    if request.method == 'GET':
+        serializer = ProductSerializer(product, context={'request': request})
+        return Response(serializer.data)
+    elif request.method == 'PUT':
+        serializer = ProductSerializer(product, data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    elif request.method == 'DELETE':
+        if product.orderitems.count() > 0:
+            return Response({'error': 'It cannot be deleted because it is associated with an order item.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+...
+```
+
+### 2.1.17 Exercise - Building the Collections API
+
+*store/serializers.py*
+```python
+class CollectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Collection
+        fields = ['id', 'title', 'product_count']
+    product_count = serializers.IntegerField(required=False)
+```
+
+*store/views.py*
+```python
+...
+...
+@api_view(['GET', 'POST'])
+def collection_list(request):
+    if request.method == 'GET':
+        queryset = Collection.objects.annotate(product_count=Count('product')).all()
+        serializer = CollectionSerializer(queryset, many=True)
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        serializer = CollectionSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+@api_view(["GET", "PUT", "DELETE"])
+def collection_detail(request, pk):
+    collection = get_object_or_404(Collection.objects.annotate(
+        product_count=Count('product')), pk=pk)
+    if request.method == 'GET':
+        serializer = CollectionSerializer(collection)
+        return Response(serializer.data)
+    elif request.method == 'PUT':
+        serializer = CollectionSerializer(collection, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    elif request.method == 'DELETE':
+        if collection.product_count > 0:
+            return Response({'error': 'It cannot be deleted because it has products'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        collection.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+```
+
+## 2.2 Advanced API Concepts
+
+### 2.2.1 Introduction
+**IN THIS SECTION**
+- Class-based views
+- Generic views
+- Viewsets
+- Routes
+- Searching, filting, and pagaination
+
+### 2.2.2 Class-based Views
+
+```python
+from rest_framework.views import APIView
+```
+
+```python
+class ProductList(APIView):
+    def get(self, request):
+        queryset = Product.objects.select_related('collection').all()
+        serializer = ProductSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = ProductSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class ProductDetail(APIView):
+    def get(self, request, id):
+        product = get_object_or_404(Product, pk=id)
+        serializer = ProductSerializer(product, context={'request': request})
+        return Response(serializer.data)
+
+    def put(self, request, id):
+        product = get_object_or_404(Product, pk=id)
+        serializer = ProductSerializer(product, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, id):
+        product = get_object_or_404(Product, pk=id)
+        if product.orderitems.count() > 0:
+            return Response({'error': 'It cannot be deleted because it is associated with an order item.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+```
+
+### 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -2289,14 +2289,108 @@ print(dimensions_cm)
 ## Machine Learning with Python
 
 
+### Machine Learning with Python - 1 - What is Machine Learning
+
+### Machine Learning with Python - 2 - Machine Learning in Action
+
+**Steps**
+1. Import the Data
+2. Clean the Data
+3. Split the Data into Training/Test Sets
+4. Create a Model
+5. Train the Model
+6. Make Predictions
+7. Evaluate and Improve
+
+### Machine Learning with Python - 3 - Libraries and Tools
+- **Numpy**
+- **Pandas**
+- **MatPlotLib**
+- **Scikit-Learn**
 
 
+### Machine Learning with Python - 4 - mporting a Data Set
+
+https://www.kaggle.com/
+https://www.kaggle.com/gregorut/video-game-sales-study
+        
+### Machine Learning with Python - 5 - Jupyter Shortcuts
+
+### Machine Learning with Python - 6 - A Real Machine Learning Problem
+
+### Machine Learning with Python - 7 - Preparing the Data
+
+### Machine Learning with Python - 8 - Learning and Predicting
+
+```python
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+music_data = pd.read_csv('music.csv')
+x = music_data.drop(columns=['genre'])
+y = music_data['genre']
+
+model = DecisionTreeClassifier()
+model.fit(x, y)
+predictions = model.predict([ [21, 1], [22, 0] ])
+predictions
+```
+```output
+array(['HipHop', 'Dance'], dtype=object)
+```
+
+### Machine Learning with Python - 9 - Calculating Accuracy
+
+```python
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+music_data = pd.read_csv('music.csv')
+x = music_data.drop(columns=['genre'])
+y = music_data['genre']
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
+
+model = DecisionTreeClassifier()
+model.fit(x_train, y_train)
+predictions = model.predict(x_test)
+
+score = accuracy_score(y_test, predictions)
+score
+```
+
+`ctrl` + `enter` in jupyter notebook
 
 
+### Machine Learning with Python - 10 - Persisting Models
 
+*Dump*
+```python
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+import joblib
 
+music_data = pd.read_csv('music.csv')
+x = music_data.drop(columns=['genre'])
+y = music_data['genre']
 
+model = DecisionTreeClassifier()
+model.fit(x, y)
 
+joblib.dump(model, 'music-recommender.joblib')
+
+# predictions = model.predict([ [21, 1], [22, 0] ])
+# predictions
+```
+
+*Load*
+```python
+model = joblib.load('music-recommender.joblib')
+predictions = model.predict([ [21, 1], [22, 0] ])
+predictions
+```
+
+### Machine Learning with Python - 11 - Visualizing a Decision Tree
 
 
 
