@@ -1480,7 +1480,7 @@ Chart got updated.
 
 [ConcreteSubject]
     + get_value()
-```
+```     
 
 # Mediator Pattern
 
@@ -1491,6 +1491,8 @@ Chart got updated.
 [DialogBox] <--inheritance-- [ArticlesDialogBox]
 
 [DialogBox]
+    + change(control) 
+[ArticlesDialogBox]
     + change(control)                         
 ```
 
@@ -1499,6 +1501,681 @@ Chart got updated.
 [Colleague] --dependency--> [Mediator] 
 
 [Mediator] <--inheritance-- [ConcreteMediator] --dependency--> [ConcreteColleague]                        
+```
+
+```cpp
+#include <iostream>
+#include <string>
+
+class UIControl;
+
+class DialogBox {
+public:
+    virtual void changed(UIControl * control) = 0;
+};
+
+class UIControl {
+protected:
+    DialogBox * _owner;
+    
+public:
+    UIControl(DialogBox * owner) : _owner(owner) {}
+};
+
+class ListBox : public UIControl {
+private:
+    std::string _selection;
+    
+public:
+    ListBox(DialogBox * owner) : UIControl(owner) {}
+    
+    std::string get_selection() {
+        return  _selection;
+    }
+    
+    void set_selection(std::string selection) {
+        _selection = selection;
+        _owner->changed(this);
+    }
+};
+
+class TextBox : public UIControl {
+private:
+    std::string _content;
+    
+public:
+    TextBox(DialogBox * owner) : UIControl(owner) {}
+    
+    std::string get_content() {
+        return _content;
+    }
+    
+    void set_content(std::string content) {
+        _content = content;
+        _owner->changed(this);
+    }
+};
+
+class Button : public UIControl {
+private:
+    bool _is_enabled;
+    
+public:
+    Button(DialogBox * owner) : UIControl(owner) {}
+    
+    bool is_enabled() {
+        return _is_enabled;
+    }
+    
+    void set_enabled() {
+        _is_enabled = true;
+        _owner->changed(this);
+    }
+    
+    void set_enabled(bool enabled) {
+        _is_enabled = enabled;
+        _owner->changed(this);
+    }
+    
+    void reset_enabled() {
+        _is_enabled = false;
+        _owner->changed(this);
+    }
+};
+
+class ArticlesDialogBox : public DialogBox {
+private:
+    ListBox * _articles_list_box = new ListBox(this);
+    TextBox * _title_text_box = new TextBox(this);
+    Button * _save_button = new Button(this);
+    
+    void _article_selected() {
+        _title_text_box->set_content(_articles_list_box->get_selection());
+        _save_button->set_enabled();
+    }
+    
+    void _title_changed() {
+        
+        auto content = _title_text_box->get_content();
+        auto is_empty = (content.empty() || content.size() == 0);
+        _save_button->set_enabled(!is_empty);
+    }
+    
+public:
+    ~ArticlesDialogBox() {
+        delete _articles_list_box;
+        delete _title_text_box;
+        delete _save_button;
+    }
+    
+    void simulate_user_interface() {
+        _articles_list_box->set_selection("Article 1");
+        std::cout << "TextBox: " + _title_text_box->get_content() << std::endl;
+        std::cout << "Button " << _save_button->is_enabled() << std::endl;
+        _title_text_box->set_content("");
+        std::cout << "TextBox: " + _title_text_box->get_content() << std::endl;
+        std::cout << "Button " << _save_button->is_enabled() << std::endl;
+        _title_text_box->set_content("Article 2");
+        std::cout << "TextBox: " + _title_text_box->get_content() << std::endl;
+        std::cout << "Button " << _save_button->is_enabled() << std::endl;
+    }
+    
+    void changed(UIControl * control) override {
+        if (control == _articles_list_box) _article_selected();
+        else if (control == _title_text_box) _title_changed();
+    }
+    
+};
+
+int main(int argc, const char * argv[])
+{
+    auto * diaglog = new ArticlesDialogBox();
+    diaglog->simulate_user_interface();
+
+    return 0;
+}
+```
+```output
+TextBox: Article 1
+Button 1
+TextBox:
+Button 0
+TextBox: Article 2
+Button 1
+```
+
+***Impelementation Using the Observer Pattern***
+
+**PUSH STYLE**
+```patter 
+[Subject] *--composite--> [Observer] <--Inheritance-- [ConcreteObserver]
+                                
+
+[Subject] <--dependency-- [ConcreteSubject] 
+
+[Subject]                  ----ArticlesDialogBox
+    + attach(obs)
+    + deattach(obs)
+    + notify()
+
+[Observer]
+    - update(value)      
+
+[ConcreteObserver]          ----ListBox   
+[ConcreteObserver]          ----TextBox 
+[ConcreteObserver]          ----ButtonBox 
+```
+
+*We can also name the Observer as EventHandler, update() as handle(), attach() as add_event_handler(), etc.*
+```cpp
+#include <iostream>
+#include <utility>
+#include <string>
+#include <list>
+
+class Observer {
+public:
+    virtual void update() = 0;
+};
+
+template<class T>
+class LambdaObserver : public Observer {
+private:
+    T t;
+public:
+    LambdaObserver(T t) : t(std::move(t)) {}
+    virtual void update() {
+        t();
+    }
+};
+
+template<class T>
+auto make_obverser(T &&t) {
+    return new LambdaObserver<std::decay_t<T>>{std::forward<T>(t)};
+}
+
+class UIControl {
+    
+private:
+    std::list<Observer *> _observers;
+    
+public:
+    
+    void attach(Observer * observer) {
+        _observers.push_back(observer);
+    }
+    
+protected:
+    void notify() {
+        for (auto * observer : _observers)
+            observer->update();
+    }
+};
+
+class ListBox : public UIControl {
+private:
+    std::string _selection;
+    
+public:
+    
+    
+    std::string get_selection() {
+        return  _selection;
+    }
+    
+    void set_selection(std::string selection) {
+        _selection = selection;
+        notify();
+    }
+};
+
+class TextBox : public UIControl {
+private:
+    std::string _content;
+    
+public:
+    std::string get_content() {
+        return _content;
+    }
+    
+    void set_content(std::string content) {
+        _content = content;
+        notify();
+    }
+};
+
+class Button : public UIControl {
+private:
+    bool _is_enabled;
+    
+public:
+    
+    bool is_enabled() {
+        return _is_enabled;
+    }
+    
+    void set_enabled() {
+        _is_enabled = true;
+        notify();
+    }
+    
+    void set_enabled(bool enabled) {
+        _is_enabled = enabled;
+        notify();
+    }
+    
+    void reset_enabled() {
+        _is_enabled = false;
+        notify();
+    }
+};
+
+
+class ArticlesDialogBox {
+private:
+    ListBox * _articles_list_box = new ListBox();
+    TextBox * _title_text_box = new TextBox();
+    Button * _save_button = new Button();
+    
+    void _article_selected() {
+        _title_text_box->set_content(_articles_list_box->get_selection());
+        _save_button->set_enabled();
+    }
+    
+    void _title_changed() {
+        
+        auto content = _title_text_box->get_content();
+        auto is_empty = (content.empty() || content.size() == 0);
+        _save_button->set_enabled(!is_empty);
+    }
+    
+    
+public:
+    ~ArticlesDialogBox() {
+        delete _articles_list_box;
+        delete _title_text_box;
+        delete _save_button;
+    }
+    
+    ArticlesDialogBox() {
+//        auto article_list_box_observer = make_obverser([this]() { _article_selected();});
+        this->_articles_list_box->attach(make_obverser([this]() { _article_selected();}));
+//        auto title_text_box_observer = make_obverser([this]() { _title_changed();});
+        this->_articles_list_box->attach(make_obverser([this]() { _title_changed();}));
+    }
+    
+    void simulate_user_interface() {
+        _articles_list_box->set_selection("Article 1");
+        std::cout << "TextBox: " + _title_text_box->get_content() << std::endl;
+        std::cout << "Button " << _save_button->is_enabled() << std::endl;
+        _title_text_box->set_content("");
+        std::cout << "TextBox: " + _title_text_box->get_content() << std::endl;
+        std::cout << "Button " << _save_button->is_enabled() << std::endl;
+        _title_text_box->set_content("Article 2");
+        std::cout << "TextBox: " + _title_text_box->get_content() << std::endl;
+        std::cout << "Button " << _save_button->is_enabled() << std::endl;
+    }
+    
+    
+};
+
+int main(int argc, const char * argv[])
+{
+    auto * diaglog = new ArticlesDialogBox();
+    diaglog->simulate_user_interface();
+
+    return 0;
+}
+```
+
+# Chain Of Responsibility
+
+
+```pattern
+[WebServer] --composite--> [Handler] --(next)-->self
+                           [Handler] --inheritance--> [Authorizator]
+                           [Handler] --inheritance--> [Logger]
+
+[WebServer]
+    + handler(request) { handler.handle(request); }
+```
+
+https://refactoring.guru/design-patterns/chain-of-responsibility/cpp/example
+
+```cpp
+#include <iostream>
+#include <string>
+
+template <typename T>
+class Handler {
+private:
+    Handler * _next_handler;
+    
+public:
+//    Handler() : _next_handler(nullptr) {}
+    explicit Handler(Handler * next) : _next_handler(next) {}
+    
+    virtual bool do_handle(T *t) = 0;
+    
+    void handle(T * t) {
+        if (do_handle(t))
+            return;
+        
+        if (_next_handler != nullptr)
+            _next_handler->handle(t);
+    }
+};
+
+class HttpRequest {
+private:
+    std::string _username;
+    std::string _password;
+    
+public:
+    HttpRequest(std::string username, std::string password) : _username(username), _password(password) {}
+    
+    std::string get_username() {
+        return _username;
+    }
+    
+    std::string get_password() {
+        return _password;
+    }
+};
+
+class Authenticator : public Handler<HttpRequest> {
+public:
+    Authenticator(Handler * next) : Handler(next) {}
+    
+    bool do_handle(HttpRequest *request) override {
+        bool is_valid = ( request->get_username() == "admin" &&
+                          request->get_password() == "1234");
+            
+        std::cout << "Authentication" << std::endl;
+        return !is_valid;
+    }
+};
+
+class Compressor : public Handler<HttpRequest> {
+public:
+    Compressor(Handler * next) : Handler(next) {}
+    
+    bool do_handle(HttpRequest *t) override {
+        std::cout << "Compress" << std::endl;
+        return false;
+    }
+};
+
+class Logger : public Handler<HttpRequest> {
+public:
+    Logger(Handler * next) : Handler(next) {}
+    
+    bool do_handle(HttpRequest *t) override {
+        std::cout << "Log" << std::endl;
+        return false;
+    }
+};
+
+class WebServer {
+private:
+    Handler<HttpRequest> * _http_handler;
+    
+public:
+    WebServer(Handler<HttpRequest> * handler) : _http_handler(handler) {}
+    
+    void handle(HttpRequest * request) {
+        _http_handler->handle(request);
+    }
+};
+
+int main(int argc, const char * argv[])
+{
+    // authenticator -> logger -> compressor
+    auto *compressor = new Compressor(nullptr);
+    auto *logger = new Logger(compressor);
+    auto *authenticator = new Authenticator(logger);
+    auto *server = new WebServer(authenticator);
+    auto *request = new HttpRequest("admin", "1234");
+    server->handle(request);
+    
+    auto *invalid_request = new HttpRequest("user", "0000");
+    server->handle(invalid_request);
+    
+    delete invalid_request;
+    delete request;
+    delete server;
+    delete authenticator;
+    delete logger;
+    delete compressor;
+    return 0;
+}
+```
+```output
+Authentication
+Log
+Compress
+Authentication
+```
+
+# Vistor Pattern
+
+*What if we need to add a new function rather than just `highlight()`.*
+```cpp
+#include <iostream>
+#include <string>
+#include <vector>
+
+class HtmlNode {
+public:
+    virtual ~HtmlNode() = default;
+    virtual void highlight() = 0;
+};
+
+class HeaderNode : public HtmlNode {
+public:
+    void highlight() override {
+        std::cout << "Highlight Heading" << std::endl;
+    }
+};
+
+class AnchorNode : public HtmlNode {
+public:
+    void highlight() override {
+        std::cout << "Highlight Anchor" << std::endl;
+    }
+};
+
+class HtmlDocument {
+private:
+    std::vector<HtmlNode *> _nodes;
+    
+public:
+    ~HtmlDocument() {
+        for (auto node : _nodes)
+            delete node;
+    }
+    
+    void add(HtmlNode *node) {
+        _nodes.push_back(node);
+    }
+    
+    void highlight() {
+        for (auto node : _nodes)
+            node->highlight();
+    }
+    
+};
+
+int main(int argc, const char * argv[])
+{
+    auto *document = new HtmlDocument();
+    auto *header_0 = new HeaderNode();
+    auto *anchor_0 = new AnchorNode();
+    
+    document->add(header_0);
+    document->add(anchor_0);
+    document->highlight();
+    
+    delete document;
+    
+    return 0;
+}
+```
+
+```old_structure
+[HtmlDocument] --composite--> [HtmlNode] <--inheritance-- [HeadingNode]
+                                         <--inheritance-- [AnchorNode]
+
+
+[HtmlDocument]
+    + highlight()
+    + plaintext()
+
+[HtmlNode]
+    + highlight()
+    + plaintext()
+```
+
+```the_first_vistor_pattern
+[Operation]           
+    + apply(heading)   <--inheritance-- [HighlightOperation]
+    + apply(anchor)    <--inheritance-- [AnchorOperation]
+```
+
+```the_second_vistor_pattern
+[HtmlNode] --dependency--> [Operation]
+           <--inheritance-- [HeadingNode]
+           <--inheritance-- [AnchorNode]
+
+[HtmlNode]
+    + execute(operation)
+
+[HeadingNode] : [HtmlNode]
+    +execute(operation) { operation.apply(this); }
+
+[AnchorNode] : [HtmlNode]
+    +execute(operation) { operation.apply(this); }
+
+[Operation]           
+    + apply(heading)   
+    + apply(anchor)    
+```
+
+```gof_vistor_pattern
+[Element] --dependency--> [Vistor]
+          <--inheritance-- [ConcreteElementA]
+          <--inheritance-- [ConcreteElementB]
+
+[Element]
+    + accept(vistor)
+
+[ConcreteElementA] : [Element]
+    +accept(vistor) { vistor.visit(this); }
+    
+[ConcreteElementB] : [Element]
+    +accept(vistor) { vistor.visit(this); }
+
+[Operation]           
+    + visit(concrete_element_a)   
+    + visit(concrete_element_b)    
+```
+
+```cpp
+#include <iostream>
+#include <string>
+#include <vector>
+
+class HeadingNode;
+class AnchorNode;
+
+class Operation {
+public:
+    virtual void apply(HeadingNode *heading) = 0;
+    virtual void apply(AnchorNode *anchor) = 0;
+};
+
+class HighlightOperation : public Operation {
+public:
+    void apply(HeadingNode *heading) override {
+        std::cout << "highligh-heading" << std::endl;
+    }
+    
+    void apply(AnchorNode *anchor) override {
+        std::cout << "highligh-anchor" << std::endl;
+    }
+};
+
+class HtmlNode {
+public:
+    virtual ~HtmlNode() = default;
+//    virtual void highlight() = 0;
+    virtual void execute(Operation *operation) = 0;
+};
+
+class HeadingNode : public HtmlNode {
+public:
+    void execute(Operation *operation) override {
+        operation->apply(this);
+    }
+};
+
+class AnchorNode : public HtmlNode {
+public:
+    void execute(Operation *operation) override {
+        operation->apply(this);
+    }
+};
+
+class HtmlDocument {
+private:
+    std::vector<HtmlNode *> _nodes;
+    
+public:
+    ~HtmlDocument() {
+        for (auto node : _nodes)
+            delete node;
+    }
+    
+    void add(HtmlNode *node) {
+        _nodes.push_back(node);
+    }
+    
+    void execute(Operation *operation) {
+        for (auto node : _nodes)
+            node->execute(operation);
+    }
+};
+
+class PlainTextOperation : public Operation {
+public:
+    void apply(HeadingNode *heading) override {
+        std::cout << "text-heading" << std::endl;
+    }
+    
+    void apply(AnchorNode *anchor) override {
+        std::cou   t << "text-anchor" << std::endl;
+    }
+};
+
+int main(int argc, const char * argv[])
+{
+    auto *document = new HtmlDocument();
+    auto *header_0 = new HeadingNode();
+    auto *anchor_0 = new AnchorNode();
+    auto *highlight_operation = new HighlightOperation();
+    auto *plaintext_operation = new PlainTextOperation();
+    
+    document->add(header_0);
+    document->add(anchor_0);
+    document->execute(highlight_operation);
+    document->execute(plaintext_operation);
+    
+    delete plaintext_operation;
+    delete highlight_operation;
+    delete document;
+    
+    return 0;
+}
 ```
 
 
