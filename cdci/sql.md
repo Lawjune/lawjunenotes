@@ -857,7 +857,7 @@ GROUP BY date, payment_method
 ORDER BY date
 ```
 
-## The HAVING Clause
+## 5.3 The HAVING Clause
 
 ```sql
 SELECT
@@ -870,6 +870,11 @@ HAVING
     total_sales > 500 AND 
     number_of_invoices > 5
 ```
+
+**Exercise:**
+*-- Get the customers*
+*--     located in Virginia*
+*--     who have spent more than $100*
 
 ```sql
 USE sql_store;
@@ -890,7 +895,7 @@ GROUP BY
 HAVING total_sales > 100
 ```
 
-## The ROLLUP Operator
+## 5.4 The ROLLUP Operator
 
 ```sql
 use sql_invoicing;
@@ -904,6 +909,7 @@ JOIN clients c USING (client_id)
 GROUP BY state, city WITH ROLLUP
 ```
 
+**Exercise:**
 ```sql
 use sql_invoicing;
 
@@ -918,7 +924,7 @@ GROUP BY pm.name WITH ROLLUP
 ```
 
 
-# Writing Complex Query 
+# 6 Writing Complex Query 
 
 
 ## Subqueries
@@ -1184,7 +1190,7 @@ WHERE total_sales IS NOT NULL
 ```
 
 
-# Essential MySQL Functions
+# 7 Essential MySQL Functions
 
 ## Numeric Functions
 
@@ -1347,6 +1353,34 @@ SELECT
 FROM orders
 ```
 
+# 8 Views
+
+# 9 Store Precedures
+
+## 9.1 What are Stored Procedures
+
+**Store Precedue**
+**- Store and organize SQL**
+**-Faster execution**
+**Data security**
+
+## 9.2 Creating a Store Procedure
+
+```sql
+
+DELIMITER $$
+CREATE PROCEDURE get_clients()
+
+BEGIN
+    SELECT * FROM clients;
+END$$
+
+DELIMITER ;
+```
+**Exercise**
+*-- Create a store procedure called*
+*--     get_invoices_with_balance*
+*--     to return all the invoices with a balance > 0*
 
 
 
