@@ -1172,6 +1172,729 @@ After
 
 ## 6.6 Accessor Decorators - Title
 
+```JavaScript
+function Capitalize(
+  target: any,
+  methodName: string,
+  descriptor: PropertyDescriptor
+) {
+  const original = descriptor.get;
+  descriptor.get = function () {
+    const result = original?.call(this);
+    return typeof result === "string" ? result.toUpperCase() : result;
+  };
+
+  console.log("target: " + target);
+  console.log("methodName: " + methodName);
+}
+
+class Person {
+  constructor(public firstName: string, public lastName: string) {}
+
+  @Capitalize
+  get fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  }
+}
+
+let person = new Person("Jun", "Luo");
+console.log(person.fullName);
+```
+```output
+target: [object Object]
+methodName: fullName
+JUN LUO
+```
+
+## 6.8 Property Decorators
+
+```JavaScript
+function MinLength(length: number) {
+  return (target: any, propertyName: string) => {
+    let value: string;
+
+    const descriptor: PropertyDescriptor = {
+      get() {
+        return value;
+      },
+      set(newValue: string) {
+        if (newValue.length < length)
+          throw new Error(
+            `${propertyName} should be at least ${length} characters long.``
+          );
+        value = newValue;
+      },
+    };
+
+    Object.defineProperty(target, propertyName, descriptor);
+  };
+}
+
+class User {
+  @MinLength(4)
+  password: string;
+
+  constructor(password: string) {
+    this.password = password;
+  }
+}
+
+let user = new User("1234");
+user.password = "1";
+console.log(user.password);
+```
+
+## 6.9 Parameter Decorators
+
+```JavaScript
+type WatchedParameter = {
+  methodName: string;
+  parameterIndex: number;
+};
+
+const watchedParameters: WatchedParameter[] = [];
+
+function Watch(target: any, methodName: string, parameterIndex: number) {
+  watchedParameters.push({
+    methodName,
+    parameterIndex,
+  });
+
+  console.log("target: " + target);
+}
+
+class Vehicle {
+  move(@Watch speed: number) {
+    console.log("speed: " + speed);
+  }
+}
+
+console.log(watchedParameters);
+```
+```output
+target: [object Object]
+[ { methodName: 'move', parameterIndex: 0 } ]
+```
+
+# 7 Modules
+## 7.1 Introduction
+
+- **Creating and using modules**
+- **Module formats**
+- **Default exprts**
+- **Wildcart imports**
+- **Re-exporting**
+
+##  7.2 Exporting and Importing
+
+./shapes.ts
+```JavaScript
+export class Circle {
+  constructor(public radius: number) {}
+}
+
+export class Square {
+  constructor(public radius: number) {}
+}
+````
+
+```JavaScript
+import { Circle, Square } from "./shapes";
+
+let circle = new Circle(1);
+console.log(circle.radius);
+
+let square = new Square(1);
+console.log(square.radius);
+```
+
+## 7.3 Module Formats
+
+## 7.4 Default Exports
+
+
+```JavaScript
+export default class Store {}
+
+export enum Format {
+  Raw,
+  Compressed,
+}
+
+class Compressor {}
+class Encryptor {}
+```
+
+```JavaScript
+import Store, {Format} from './storage';
+```
+
+## 7.5 Wildcard Imports
+
+```JavaScript
+import * as Shapes from './shapes'
+```
+
+## 7.6 Re-exporting
+
+
+# 8 Integration with JavaScript
+## 8.1 Introduction
+
+- **Including JS code in TS projects**
+- **Type checking JS code**
+- **JSDocs**
+- **Declaration (Type Definitions)**
+- **Using declarations files from @types/**
+
+## 8.2 Including JS Code in TS Projects
+
+
+```json
+    /* JavaScript Support */
+    "allowJs": true,      
+```
+
+## 8.3 Type Checking JS Code
+
+```json
+    /* JavaScript Support */
+    "allowJs": true /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */,
+    "checkJs": true /* Enable error reporting in type-checked JavaScript files. */,
+```
+
+```JavaScript
+// @ts-nocheck
+export function calculate_tax(income) {
+  return income * 0.3;
+}
+```
+
+## 8.4 Describing Types Using JSDoc
+
+```JavaScript
+/**
+ * Calculate income tax.
+ * @param {number} income - Net salary after expenses.
+ * @returns {number}
+ */
+
+export function calculate_tax(income) {
+  return income * 0.3;
+}
+```
+
+## 8.5 Creating Declaration Files
+
+
+./src/tax.d.ts
+```JavaScript
+export declare function calculate_tax(incomde: number): number;
+```
+
+***Shall describe all of the functions in the js module.***
+
+## 8.6 Using Definitely Typed Declaration Files
+
+```sh
+npm i lodash
+```
+
+```sh
+npm i  --save-dev @types/lodash
+```
+or 
+```sh
+npm i  --D @types/lodash
+```
+
+# 9 React with TypeScript
+## 9.1 Introduction
+
+## 9.2 Creating a React App with TypeScript
+
+```sh
+npx create-react-app reminders-app --template typescript
+```
+
+## 9.3 Adding Bootstrap
+
+```sh
+npm i bootstrap
+```
+
+index.ts
+```JavaScript
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import 'bootstrap/dist/css/bootstrap.css'; // Add this code 
+import './index.css';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
+```
+
+App.css
+```JavaScript
+body {
+  padding: 20px;
+}
+```
+
+App.tsx
+```JavaScript
+import React from "react";
+import "./App.css";
+
+function App() {
+  return (
+    <div className="App">
+      <button className="btn btn-primary">Click Me</button>
+    </div>
+  );
+}
+
+export default App;
+```
+
+
+## 9.4 Creating a Component - Title
+
+*Create a `components` folder under `./src.`*
+*Create `ReminderList.tsx` in `components` folder.*
+*Create a `models` folder under `./src.`*
+*Create a `Reminder.ts` in `models` folder.*
+
+*Install <ReactJS Code Snippets> in vscode.*
+
+./src/models/Reminder.ts
+```JavaScript
+export default interface Reminder {
+  id: number;
+  title: string;
+}
+```
+
+./src/components/ReminderList.tsx
+```JavaScript
+import React from "react";
+import Reminder from "../models/Reminder";
+
+interface ReminderListProps {
+  items: Reminder[];
+}
+
+function ReminderList({ items }: ReminderListProps) {
+  return (
+    <ul>
+      {items.map((item) => (
+        <li key={item.id}>{item.title}</li>
+      ))}
+    </ul>
+  );
+}
+
+export default ReminderList;
+```
+
+App.tsx
+```JavaScript
+import React from "react";
+import "./App.css";
+import ReminderList from "./components/ReminderList";
+import Reminder from "./models/Reminder";
+
+const reminders: Reminder[] = [{ id: 1, title: "Reminder 1" }];
+
+function App() {
+  return (
+    <div className="App">
+      <ReminderList items={reminders} />
+    </div>
+  );
+}
+
+export default App;
+```
+
+## 9.5 Using the State Hook
+
+```JavaScript
+import React, { useState } from "react";
+import "./App.css";
+import ReminderList from "./components/ReminderList";
+import Reminder from "./models/Reminder";
+
+const reminders: Reminder[] = [{ id: 1, title: "Reminder 1" }];
+
+function App() {
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  return (
+    <div className="App">
+      <ReminderList items={reminders} />
+    </div>
+  );
+}
+
+export default App;
+```
+
+## 9.6 Calling the Backend
+
+https://jsonplaceholder.typicode.com/
+
+*Create a `service` folder folder under `./src.`*
+*Craete a `reminders.ts` file in `service` folder.*
+
+```sh
+npm i axios
+```
+
+./src/service/reminders.ts
+```JavaScript
+import axios from "axios";
+import Reminder from "../models/Reminder";
+
+class ReminderService {
+  http = axios.create({
+    baseURL: "https://jsonplaceholder.typicode.com/",
+  });
+
+  async getReminder() {
+    const response = await this.http.get<Reminder[]>("/tools");
+    return response.data;
+  }
+
+  async addReminder(title: string) {
+    const response = await this.http.post<Reminder>("/todos", { title });
+    return response.data;
+  }
+
+  async removeReminder(id: number) {
+    const response = await this.http.delete("/todos/" + id);
+    return response.data;
+  }
+}
+
+export default new ReminderService();
+``` 
+
+## 9.7 Using the Effect Hook
+
+
+./src/components/ReminderList.tsx
+```JavaScript
+import React from "react";
+import Reminder from "../models/Reminder";
+
+interface ReminderListProps {
+  items: Reminder[];
+}
+
+function ReminderList({ items }: ReminderListProps) {
+  return (
+    <ul className="list-group">
+      {items.map((item) => (
+        <li className="list-group-item" key={item.id}>
+          {item.title}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export default ReminderList;
+```
+
+App.tsx
+```JavaScript
+import React, { useEffect, useState } from "react";
+import "./App.css";
+import ReminderList from "./components/ReminderList";
+import Reminder from "./models/Reminder";
+import reminderService from "./services/reminders";
+
+function App() {
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  useEffect(() => {
+    loadReminders();
+  }, []);
+
+  const loadReminders = async () => {
+    const reminders = await reminderService.getReminder();
+    setReminders(reminders);
+  };
+
+  return (
+    <div className="App">
+      <ReminderList items={reminders} />
+    </div>
+  );
+}
+
+export default App;
+```
+
+## 9.8 Handling Events
+
+./src/components/ReminderList.tsx
+```JavaScript
+import React from "react";
+import Reminder from "../models/Reminder";
+
+interface ReminderListProps {
+  items: Reminder[];
+  onRemoveReminder: (id: number) => void;
+}
+
+function ReminderList({ items, onRemoveReminder }: ReminderListProps) {
+  return (
+    <ul className="list-group">
+      {items.map((item) => (
+        <li className="list-group-item" key={item.id}>
+          {item.title}
+          <button
+            onClick={() => onRemoveReminder(item.id)}
+            className="btn btn-outline-danger mx-2 rounded-pill"
+          >
+            Delete
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export default ReminderList;
+```
+
+```JavaScript
+import React, { useEffect, useState } from "react";
+import "./App.css";
+import ReminderList from "./components/ReminderList";
+import Reminder from "./models/Reminder";
+import reminderService from "./services/reminders";
+
+function App() {
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  useEffect(() => {
+    loadReminders();
+  }, []);
+
+  const loadReminders = async () => {
+    const reminders = await reminderService.getReminder();
+    setReminders(reminders);
+  };
+
+  const removeReminder = (id: number) => {
+    console.log("[DEBUG] Removing reminder id: " + id);
+    setReminders(reminders.filter((reminder) => reminder.id !== id));
+  };
+
+  return (
+    <div className="App">
+      <ReminderList items={reminders} onRemoveReminder={removeReminder} />
+    </div>
+  );
+}
+
+export default App;
+```
+
+## 9.9 Building a Form
+
+*Create `NewReminder.tsx` in components folder.*
+```JavaScript
+import React, { useState } from "react";
+
+function NewReminder(): JSX.Element {
+  const [title, seteTitle] = useState("");
+
+  return (
+    <form>
+      <label htmlFor="title"></label>
+      <input
+        value={title}
+        onChange={(e) => seteTitle(e.target.value)}
+        type="text"
+        className="form-control"
+      />
+      <button type="submit" className="btn btn-primary my-3 rounded-pill">
+        Add Reminder
+      </button>
+    </form>
+  );
+}
+
+export default NewReminder;
+```
+
+**Then add this component to App.tsx**
+
+## 9.10 Handling Form Submission
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

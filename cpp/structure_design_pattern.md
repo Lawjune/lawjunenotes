@@ -279,8 +279,97 @@ Applying Caramel Filter
 # Decorator Pattern
 
 
+**The Problem**
+*How to flexibly add new features?*
+```cpp
+#include <iostream>
+#include <string>
+#include <list>
+
+class CloudStream {
+public:
+    virtual void write(std::string data) {
+        std::cout << "Storing " << data << std::endl;
+    }
+};
+
+class EncryptedCloudStream : public CloudStream {
+private:
+    std::string _encrypt(std::string data) {
+        return "!@R%OI$U#$WE@&";
+    }
+    
+public:
+    void write(std::string data) override {
+        auto encrypted = _encrypt(data);
+        CloudStream::write(encrypted);
+    }
+};
+
+class CompressedCloudStream : public CloudStream {
+private:
+    std::string _compress(std::string data) {
+        return data.substr(0, 5);
+    }
+    
+public:
+    void write(std::string data) override {
+        auto compressed = _compress(data);
+        CloudStream::write(compressed);
+    }
+}
+
+int main(int argc, const char * argv[])
+{
+    auto cloud_stream = new EncryptedCloudStream();
+    
+    cloud_stream->write("Here's some data!");
+    
+    delete cloud_stream;
+    
+    return 0;
+}
+```
+
+*The problem structure:*
+[CloudStream] <--inheritance-- [Encrypted]
+              <--inheritance-- [Compressed]
+              <--inheritance-- [EncryptedAndCompressed]
+
+*Favor Composition Over INheritance*  
+
+**Solution:**
+
+[Stream](Interface) <--implement-- [CloudStream]
+                    <--implement-- [Encrypted]  
+                    <--composite--
+
+[Stream]
+    +write(data)
+
+[Encrypted] implements [Stream]
+    -Stream stream
+    +write(data) {
+        encrypted = encrypt(data);
+        stream.write(encrypted);
+    }
 
 
+=>**Gof Presentation:**
+
+[Component](Interface) <--implement-- [ConcreteComponent]
+                       <--implement-- [Decorator]  
+                       <--composite--
+
+[Component]
+    +operation() 
+
+[Decorator] implements [Component]
+
+    +write(data) {
+        // additional behavior
+        component.operation();
+    }
 
 
 

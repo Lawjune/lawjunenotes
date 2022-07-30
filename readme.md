@@ -1,9 +1,9 @@
 remote.origin.url
 
 
-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
+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
 
-git remote add origin https://Lawjune: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@github.com/Lawjune/mqtt_python_client.git
+git remote add origin https://Lawjune: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@github.com/Lawjune/aliyun-iot-device.git
 
 git init
 git add README.md
