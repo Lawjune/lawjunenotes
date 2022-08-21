@@ -20,3 +20,6 @@ git remote add origin https://github.com/Lawjune/mqtt_python_client.git
 git push -u origin main
 
 luojun6: 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
+
+
+git push https://Lawjune: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@github.com/Lawjune/lawjunenotes.git
